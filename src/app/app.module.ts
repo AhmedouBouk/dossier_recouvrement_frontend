@@ -9,6 +9,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApiInterceptorService } from './shared/services/api-interceptor.service';
 import { AddUserComponent } from './admin/add-user/add-user.component';
+import { RoleGuard } from './shared/guards/role.guard';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { AddUserComponent } from './admin/add-user/add-user.component';
     FormsModule
   ],
   providers: [
+    RoleGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptorService,

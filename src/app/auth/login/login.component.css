@@ -2,136 +2,123 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #e0f2e9;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
     transition: background-color 0.3s ease;
-}
-
-header {
+  }
+  
+  header {
     background-color: #ffffff;
-    padding: 15px;
+    padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Enhanced shadow for 3D effect */
-    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 30px;
     transition: box-shadow 0.3s ease;
-}
-
-header:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover for added lift */
-}
-
-.logo-container {
+  }
+  
+  header:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  }
+  
+  .logo-container {
     display: flex;
     align-items: center;
+    gap: 20px;
     transition: transform 0.3s ease;
-}
-
-.logo-container img {
+  }
+  
+  .logo-container img {
     height: 60px;
-    margin-right: 15px;
     transition: transform 0.3s ease;
-}
-
-.logo-container:hover {
-    transform: scale(1.1);
-}
-
-.logo-container h1 {
-    font-size: 24px;
-    font-weight: normal;
+  }
+  
+  .logo-container:hover {
+    transform: translateY(-3px);
+  }
+  
+  .logo-container h1 {
+    font-size: 28px;
     color: #333;
+    font-weight: 600;
     transition: color 0.3s ease;
-}
-
-.logo-container:hover h1 {
-    color: #6d5436;
-}
-
-.language-switcher a {
-    color: #333;
-    text-decoration: none;
-    margin: 0 5px;
-    font-size: 16px;
-    transition: color 0.3s ease;
-}
-
-.language-switcher a:hover {
-    text-decoration: underline;
-    color: #6d5436;
-}
-
-.login-container {
-    background-color: #fff;
-    width: 350px;
-    padding: 20px;
+  }
+  
+  .logo-container:hover h1 {
+    color: #c68642;
+  }
+  
+  .login-container {
+    background-color: #ffffff;
+    padding: 40px;
     margin: 100px auto;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Stronger shadow for 3D effect */
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.login-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* Darker shadow on hover */
-}
-
-.login-container h2 {
-    font-size: 22px;
+  }
+  
+  .login-container:hover {
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  #login-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #333;
+  }
+  
+  .input-group {
     margin-bottom: 20px;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-input {
+  }
+  
+  input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow around inputs */
-}
-
-input:focus {
-    border-color: #6d5436;
-    box-shadow: 0 0 8px rgba(109, 84, 54, 0.5); /* Focus shadow for more prominence */
-}
-
-.login-btn {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #c68642;
+  }
+  
+  .login-btn {
     width: 100%;
-    padding: 10px;
-    background-color: #6d5436;
+    padding: 12px;
+    background-color: #c68642;
     color: #fff;
     border: none;
-    border-radius: 12px;
+    border-radius: 30px;
+    font-size: 18px;
     cursor: pointer;
-    margin-top: 10px;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow on button for depth */
-}
-
-.login-btn:hover {
-    background-color: #5a452b;
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Darker shadow on hover */
-}
-
-a#forgot-link {
-    color: black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .login-btn:hover {
+    background-color: #b67532;
+    transform: translateY(-2px);
+  }
+  
+  #forgot-link {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: 20px;
+    color: #333;
     text-decoration: none;
     transition: color 0.3s ease;
-}
-
-a#forgot-link:hover {
+  }
+  
+  #forgot-link:hover {
+    color: #c68642;
     text-decoration: underline;
-    color: #6d5436;
-}
+  }
