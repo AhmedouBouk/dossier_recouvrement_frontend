@@ -10,6 +10,7 @@ import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'auth/login', component: LoginComponent },
   { path: 'admin/user-list', component: UserListComponent, canActivate: [AuthGuard] },
   { path: 'admin/user-edit', component: UserEditComponent, canActivate: [AuthGuard] },

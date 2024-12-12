@@ -1,30 +1,42 @@
+<header>
+  <div class="header-left">
+      <div class="logo-container">
+          <img src="assets/logo.png" alt="Logo">
+          <h1>User Management</h1>
+      </div>
+  </div>
+  <div class="header-right">
+      <span class="user-email">{{ userName }}</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
+  </div>
+</header>
+
 <div class="page-container">
   <div class="user-list-container">
-    <h2>User List</h2>
-    <button class="add-user-btn" (click)="onAddUser()">Add User</button>
-    <table *ngIf="users.length > 0; else noUsers">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users">
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.role }}</td>
-          <td class="action-buttons">
-            <button class="edit-btn" (click)="onEditUser(user)">Edit</button>
-            <button class="delete-btn" (click)="onDeleteUser(user.id)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <ng-template #noUsers>
-      <p class="no-users-message">No users found. Please add a new user.</p>
-    </ng-template>
+      <button class="add-user-btn" (click)="onAddUser()">Ajouter un Utilisateur</button>
+      <table *ngIf="users.length > 0; else noUsers">
+          <thead>
+              <tr>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Rôle</th>
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngFor="let user of users">
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.role }}</td>
+                  <td class="action-buttons">
+                      <button class="edit-btn" (click)="onEditUser(user)">Modifier</button>
+                      <button class="delete-btn" (click)="onDeleteUser(user.id)">Supprimer</button>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+      <ng-template #noUsers>
+          <p class="no-users-message">Aucun utilisateur trouvé. Veuillez en ajouter un nouveau.</p>
+      </ng-template>
   </div>
 </div>

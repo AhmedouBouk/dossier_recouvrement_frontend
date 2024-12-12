@@ -35,4 +35,18 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
   }
+
+  getLoggedInUserName(): string {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1])); // Decodes the token's payload
+        return payload.username || payload.sub || 'Utilisateur inconnu';
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return 'Utilisateur inconnu';
+      }
+    }
+    return 'Utilisateur non connecté';
+  }
 }
