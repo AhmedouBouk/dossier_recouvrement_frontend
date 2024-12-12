@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthRequest } from '../shared/models/auth-request.model';
 import { AuthResponse } from '../shared/models/auth-response.model';
 import { environment } from './../../environments/environment';
@@ -15,6 +15,24 @@ export class AuthService {
 
   login(email: string, password: string): Observable<AuthResponse> {
     const authRequest: AuthRequest = { email, password };
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, authRequest);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, authRequest)
+      .pipe(
+        tap(response => {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('userRole', response.role);
+        })
+      );
+  }
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+  }
+
+  getRole(): string | null {
+    return localStorage.getItem('userRole');
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
   }
 }
