@@ -1,0 +1,32 @@
+<header>
+    <div class="logo-container">
+      <img src="assets/logo.png" alt="Banque Nationale de Mauritanie Logo">
+      <h1>Banque Nationale de Mauritanie</h1>
+    </div>
+  </header>
+  
+  <div class="login-container">
+    <h2 id="login-title">Connectez Vous</h2>
+    <form (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <input
+          type="text"
+          id="username"
+          placeholder="Identifiant"
+          [(ngModel)]="email"
+          name="username"
+          required>
+      </div>
+      <div class="input-group">
+        <input
+          type="password"
+          id="password"
+          placeholder="Mot de passe"
+          [(ngModel)]="password"
+          name="password"
+          required>
+      </div>
+      <button type="submit" class="login-btn" id="login-btn">Connexion</button>
+    </form>
+  </div>
+  

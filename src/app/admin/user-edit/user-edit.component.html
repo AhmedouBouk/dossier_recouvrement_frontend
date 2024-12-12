@@ -1,0 +1,57 @@
+<div class="page-container">
+  <div class="user-edit-container">
+    <h2>Edit User</h2>
+    <form (ngSubmit)="onSubmit()" #editUserForm="ngForm">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="user.name"
+          required
+          minlength="2"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="user.email"
+          required
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="user.password"
+          minlength="6"
+          placeholder="Enter new password or leave blank"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role" name="role" [(ngModel)]="user.role" required class="form-control">
+          <option value="DGCR">DGCR</option>
+          <option value="RECOUVREMENT">RECOUVREMENT</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="CONSULTANT">CONSULTANT</option>
+          <option value="AUDITEUR">AUDITEUR</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Update User</button>
+    </form>
+  </div>
+</div>
