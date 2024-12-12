@@ -1,0 +1,93 @@
+<div class="container">
+  <h2>Gestion des Comptes</h2>
+
+  <!-- Import Section -->
+  <div class="import-section">
+    <div class="import-section-header">
+      <h3>Importer des comptes</h3>
+      <div class="import-section-actions">
+        <label for="file-input" class="file-input-label">Choisir un fichier</label>
+        <input 
+          type="file" 
+          id="file-input"
+          (change)="onFileSelected($event)" 
+          accept=".csv"
+          class="file-input">
+        <button 
+          [disabled]="!selectedFile" 
+          (click)="uploadFile()" 
+          class="import-button">
+          {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Message d'import -->
+    <div *ngIf="importMessage" [class]="'alert ' + importMessage.type">
+      {{ importMessage.text }}
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <input [(ngModel)]="searchNomCompte" placeholder="Numéro de compte" class="search-input">
+    <input [(ngModel)]="searchNom" placeholder="Nom client" class="search-input">
+    <input [(ngModel)]="searchPrenom" placeholder="Prénom client" class="search-input">
+    <input [(ngModel)]="searchNNI" type="number" placeholder="NNI client" class="search-input">
+    <button (click)="searchComptes()" class="search-button">Rechercher</button>
+  </div>
+
+  <!-- Comptes Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>N° Compte</th>
+          <th>Client</th>
+          <th>Catégorie</th>
+          <th>Solde</th>
+          <th>État</th>
+          <th>Date d'ouverture</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let compte of comptes">
+          <!-- Mode Vue -->
+          <ng-container *ngIf="editingCompte?.nomCompte !== compte.nomCompte">
+            <td>{{compte.nomCompte}}</td>
+            <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
+            <td>{{compte.categorie}}</td>
+            <td>{{compte.solde | number:'1.2-2'}} MRU</td>
+            <td>{{compte.etat}}</td>
+            <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
+            <td class="actions">
+              <button class="edit-button" (click)="startEdit(compte)">Modifier</button>
+              <button class="delete-button" (click)="deleteCompte(compte.nomCompte)">Supprimer</button>
+            </td>
+          </ng-container>
+
+          <!-- Mode Édition -->
+          <ng-container *ngIf="editingCompte?.nomCompte === compte.nomCompte">
+            <td>{{compte.nomCompte}}</td>
+            <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
+            <td>{{compte.categorie}}</td>
+            <td><input type="number" [(ngModel)]="editingCompte.solde" class="form-control"></td>
+            <td>
+              <select [(ngModel)]="editingCompte.etat" class="form-control">
+                <option value="ACTIF">ACTIF</option>
+                <option value="BLOQUÉ">BLOQUÉ</option>
+                <option value="FERMÉ">FERMÉ</option>
+              </select>
+            </td>
+            <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
+            <td class="actions">
+              <button class="save-button" (click)="updateCompte(editingCompte)">Sauvegarder</button>
+              <button class="cancel-button" (click)="cancelEdit()">Annuler</button>
+            </td>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

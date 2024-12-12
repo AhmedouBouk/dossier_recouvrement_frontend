@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../admin.service';
 import { User } from '../../shared/models/user.model';
-import { UserDataService } from '../../shared/services/user-data.service';  // Import UserDataService
+import { UserDataService } from '../../shared/services/user-data.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -27,13 +27,11 @@ export class UserEditComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const user = this.userDataService.getUser();  // Get user data from the service
+    const user = this.userDataService.getUser();
 
     if (user) {
-      // If user data is available, use it directly
       this.user = user;
     } else {
-      // If no user data is found in the service, fetch it using the ID from the route
       const userId = this.route.snapshot.paramMap.get('id');
       if (userId) {
         this.adminService.getUserById(+userId).subscribe(
@@ -55,12 +53,19 @@ export class UserEditComponent implements OnInit {
 
   onSubmit() {
     if (this.user.id !== undefined) {
-      // Update the user with the new details from the form
-      this.adminService.updateUser(this.user).subscribe(
+      const updateRequest = {
+        id: this.user.id,
+        name: this.user.name,
+        email: this.user.email,
+        role: this.user.role,
+        password: this.user.password // Include the password field
+      };
+
+      this.adminService.updateUser(updateRequest).subscribe(
         (response: User) => {
           console.log('User updated successfully:', response);
-          this.userDataService.clearUser();  // Clear the user data from the service
-          this.router.navigate(['/admin/user-list']);  // Navigate back to the user list after update
+          this.userDataService.clearUser();
+          this.router.navigate(['/admin/user-list']);
         },
         (error: HttpErrorResponse) => {
           console.error('Error updating user:', error);
