@@ -25,7 +25,13 @@ export class LoginComponent {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-        this.navigateBasedOnRole(response.role);
+        const role = this.authService.getRole();
+        if (role) {
+          this.navigateBasedOnRole(role);
+        } else {
+          this.errorMessage = 'Token invalide';
+          this.authService.logout();
+        }
       },
       error: (error) => {
         this.loading = false;
