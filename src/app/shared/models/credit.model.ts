@@ -1,5 +1,6 @@
 export interface Credit {
-    id: number;
+[x: string]: any;
+    idCredit: number;
     montant: number;
     tauxInteret: number;
     duree: number;

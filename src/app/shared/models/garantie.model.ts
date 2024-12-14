@@ -1,5 +1,5 @@
 export interface Garantie {
-    id: number;
+    idGarantie: number;
     typeGarantie: string;
     valeur: number;
     description: string; // Peut contenir un fichier encodé en base64

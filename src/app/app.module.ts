@@ -20,14 +20,15 @@ import { GarantiesComponent } from './pages/garanties/garanties.component';
     UserListComponent,
     UserEditComponent,
     AddUserComponent,
-    CreditsComponent,
-    GarantiesComponent
+    
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    CreditsComponent,
+    GarantiesComponent
   ],
   providers: [
     RoleGuard,
