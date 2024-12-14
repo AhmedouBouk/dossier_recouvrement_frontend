@@ -6,6 +6,7 @@ import { UserEditComponent } from './admin/user-edit/user-edit.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AddUserComponent } from './admin/add-user/add-user.component';
 import { RoleGuard } from './shared/guards/role.guard';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
@@ -18,7 +19,9 @@ const routes: Routes = [
   { path: 'admin/user-edit/:id', component: UserEditComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
   { path: 'admin/users/add', component: AddUserComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
   { path: 'clients', component: ClientsComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'DO' } },
-  { path: 'comptes', component: ComptesComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'DC' } }
+  { path: 'comptes', component: ComptesComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'DC' } },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
 ];
 
 @NgModule({

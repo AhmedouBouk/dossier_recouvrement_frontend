@@ -1,0 +1,43 @@
+.stat-container {
+  display: flex;
+  justify-content: space-around; /* Écart régulier entre les cartes */
+  align-items: center;
+  max-width: calc(100% - 250px); /* 250px est la largeur de la sidebar */
+  margin-left: 280px; /* Décale le conteneur pour laisser de l'espace pour la sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.stat-card {
+  width: 22%; /* Ajustez pour que 4 cartes tiennent côte à côte */
+  background-color: #A7D7C5;
+  text-align: center;
+  padding: 15px;
+  margin: 0 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  font-size: 1rem; /* Réduction de la taille des titres */
+  color: #2E8B57; /* Vert Émeraude */
+  margin-bottom: 8px; /* Réduit l'espacement sous le titre */
+}
+
+.stat-card p {
+  font-size: 1.8rem; /* Taille réduite pour les valeurs */
+  font-weight: bold;
+  margin: 5px 0;
+  color: #000; /* Texte noir */
+}
+
+.stat-card small {
+  font-size: 0.8rem; /* Taille réduite pour le sous-titre */
+  color: #555; /* Gris doux */
+}
+body, .dashboard-container {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%; /* Utilisez toute la largeur disponible */
+}

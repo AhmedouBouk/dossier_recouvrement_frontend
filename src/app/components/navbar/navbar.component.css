@@ -1,0 +1,71 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color:    #b2b282; /* Couleur de fond */
+  ; /* Couleur du sidebar */
+  padding: 10px 20px;
+  border-radius: 8px; /* Pour une meilleure finition */
+}
+
+.navbar-logo img {
+  height: 40px;
+}
+
+.search-bar {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.search-bar input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-search {
+  background-color: #A7D7C5; /* Beige Crème */
+  border: none;
+  padding: 8px 12px;
+  margin-left: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.2rem;
+}
+
+.user-profile .material-icons,
+.user-profile .fas {
+  font-size: 2rem; /* Ajuste la taille de l'icône */
+  color: #2E8B57; /* Vert émeraude */
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #A52A2A; /* Rouge foncé */
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background-color: #8B0000; /* Rouge plus foncé */
+}
