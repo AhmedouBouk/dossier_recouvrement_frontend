@@ -1,0 +1,54 @@
+/* Global styles */
+.container {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  /* Table styles */
+  .table {
+    margin-top: 20px;
+  }
+  
+  .table thead {
+    background-color: #343a40;
+    color: white;
+  }
+  
+  /* Form styles */
+  .credit-form {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .credit-form h3 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .credit-form .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .credit-form .btn {
+    width: 100%;
+  }
+  
+  /* Search bar styles */
+  .search-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .search-bar input {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .search-bar button {
+    width: 50%;
+  }
+  

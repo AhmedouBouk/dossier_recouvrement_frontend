@@ -10,6 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { ApiInterceptorService } from './shared/services/api-interceptor.service';
 import { AddUserComponent } from './admin/add-user/add-user.component';
 import { RoleGuard } from './shared/guards/role.guard';
+import { CreditsComponent } from './pages/credits/credits.component';
+import { GarantiesComponent } from './pages/garanties/garanties.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +19,9 @@ import { RoleGuard } from './shared/guards/role.guard';
     LoginComponent,
     UserListComponent,
     UserEditComponent,
-    AddUserComponent
+    AddUserComponent,
+    CreditsComponent,
+    GarantiesComponent
   ],
   imports: [
     BrowserModule,
