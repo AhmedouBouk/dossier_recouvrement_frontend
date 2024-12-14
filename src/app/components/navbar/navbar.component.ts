@@ -1,21 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  userName: string = 'user@example.com'; // Remplacez par les données dynamiques de l'utilisateur
+  userName: string = 'Utilisateur non connecté';
 
-  constructor(private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  logout() {
-    // Ajoutez ici la logique de déconnexion
-    console.log('Utilisateur déconnecté');
-    // Par exemple, supprimer le token et rediriger
-    localStorage.removeItem('authToken');
-    this.router.navigate(['/login']);
+  ngOnInit(): void {
+    this.userName = this.authService.getLoggedInUserName();
   }
 
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']); // Redirection après déconnexion
+  }
 }
