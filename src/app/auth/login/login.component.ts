@@ -11,20 +11,30 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   errorMessage: string = '';
-  loading: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    // Redirect if already logged in
+    if (this.authService.isAuthenticated()) {
+      this.navigateBasedOnRole(this.authService.getRole());
+    }
+  }
 
   onSubmit() {
-    this.loading = true;
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs';
+      return;
+    }
+
+    this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
-        this.loading = false;
+        console.log('Login successful');
         const role = this.authService.getRole();
         if (role) {
           this.navigateBasedOnRole(role);
@@ -34,13 +44,27 @@ export class LoginComponent {
         }
       },
       error: (error) => {
-        this.loading = false;
-        this.errorMessage = 'Identifiants invalides';
+        console.error('Login error:', error);
+        if (error.status === 401) {
+          this.errorMessage = 'Email ou mot de passe incorrect';
+        } else if (error.status === 403) {
+          this.errorMessage = 'Accès non autorisé';
+        } else {
+          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+        }
+      },
+      complete: () => {
+        this.isLoading = false;
       }
     });
   }
 
-  private navigateBasedOnRole(role: string) {
+  private navigateBasedOnRole(role: string | null) {
+    if (!role) {
+      this.errorMessage = 'Rôle non défini';
+      return;
+    }
+
     switch(role) {
       case 'DO':
         this.router.navigate(['/clients']);
@@ -60,7 +84,6 @@ export class LoginComponent {
       default:
         this.errorMessage = 'Rôle non reconnu';
         this.authService.logout();
-        this.router.navigate(['/auth/login']);
         break;
     }
   }

@@ -1,200 +1,316 @@
+/* Base styles and CSS Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    transition: background-color 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
 }
 
 /* Header Styling */
 header {
-    background-color: #ffffff;
-    padding: 20px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 30px;
-    transition: box-shadow 0.3s ease;
+  background-color: #ffffff;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  margin: 20px 30px;
+  transition: box-shadow 0.3s ease;
 }
 
 header:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Left Header - Logo and Title */
 .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.3s ease;
 }
 
 .logo-container img {
-    height: 60px;
-    transition: transform 0.3s ease;
+  height: 60px;
+  transition: transform 0.3s ease;
 }
 
 .logo-container:hover {
-    transform: translateY(-3px);
+  transform: translateY(-3px);
 }
 
 .logo-container h1 {
-    font-size: 28px;
-    color: #333;
-    font-weight: 600;
-    transition: color 0.3s ease;
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+  transition: color 0.3s ease;
 }
 
-.logo-container:hover h1 {
-    color: #c68642;
-}
-
-/* Right Header - User Email and Logout Button */
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+/* User Controls */
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .user-email {
-    font-size: 18px;
-    color: #333;
+  font-size: 16px;
+  color: #333;
+  padding: 8px 15px;
+  background-color: #f8f9fa;
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
 
 .logout-btn {
-    padding: 12px 20px;
-    background-color: #e53935;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
+  background-color: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .logout-btn:hover {
-    background-color: #c62828;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Main Content Styling */
-.page-container {
-    background-color: #ffffff;
-    padding: 30px;
-    margin: 30px auto;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 1200px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.3s ease;
+/* Main Content */
+.main-content {
+  padding: 20px 30px;
+  margin-top: 20px;
 }
 
-.page-container:hover {
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.user-list-container {
-    text-align: left;
-}
-
-/* "Ajouter un utilisateur" Button Styling */
+/* Add User Button */
 .add-user-btn {
-    margin-bottom: 20px;
-    padding: 12px 24px;
-    background-color: #4caf50;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .add-user-btn:hover {
-    background-color: #43a047;
-    transform: translateY(-2px);
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* User List Styling */
-#user-list-title {
-    font-size: 24px;
-    margin-bottom: 25px;
-    color: #333;
+/* Table Container */
+.table-container {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
 }
 
+.table-container:hover {
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Table Styling */
 table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 15px;
-    margin-top: 15px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-thead th {
-    background-color: #c68642;
-    color: white;
-    padding: 12px;
-    font-size: 18px;
-    text-align: left;
+thead tr {
+  background-color: #f8f9fa;
 }
 
-tbody td {
-    padding: 15px;
-    text-align: left;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
+th {
+  padding: 15px 20px;
+  text-align: left;
+  color: #333;
+  font-weight: 600;
+  font-size: 16px;
 }
 
-tbody tr:hover td {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+td {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
 }
 
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+/* Action Buttons */
 .action-buttons {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  gap: 10px;
 }
 
 .edit-btn, .delete-btn {
-    padding: 10px 16px;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .edit-btn {
-    background-color: #2196f3;
-    color: white;
-}
-
-.edit-btn:hover {
-    background-color: #1976d2;
-    transform: translateY(-2px);
+  background-color: #3b82f6;
+  color: white;
 }
 
 .delete-btn {
-    background-color: #f44336;
-    color: white;
+  background-color: #ef4444;
+  color: white;
 }
 
-.delete-btn:hover {
-    background-color: #d32f2f;
-    transform: translateY(-2px);
+.edit-btn:hover, .delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Role Chips */
+.role-chip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.role-chip.admin {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.role-chip.editor {
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+}
+
+.role-chip.user {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* Empty State */
 .no-users-message {
-    font-size: 18px;
-    color: #777;
-    margin-top: 30px;
-    font-style: italic;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-users-message i {
+  font-size: 48px;
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.no-users-message p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px;
+    padding: 15px;
+  }
+
+  .logo-container {
+    justify-content: center;
+  }
+
+  .user-controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .user-email, .logout-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .edit-btn, .delete-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.user-email {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  background-color: #f8f9fa;
+  border-radius: 20px;
+  color: #333;
+}
+
+.user-email i {
+  color: #333;
+  font-size: 20px;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #dc2626;
+}
+
+.logout-btn i {
+  transform: rotate(180deg); /* This will make the logout icon point left */
 }
