@@ -36,6 +36,7 @@ export class UserEditComponent implements OnInit {
       // If no user data is found in the service, fetch it using the ID from the route
       const userId = this.route.snapshot.paramMap.get('id');
       if (userId) {
+        
         this.adminService.getUserById(+userId).subscribe(
           response => {
             this.user = response;

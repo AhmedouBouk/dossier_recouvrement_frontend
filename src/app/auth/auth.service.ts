@@ -5,6 +5,7 @@ import { AuthRequest } from '../shared/models/auth-request.model';
 import { AuthResponse } from '../shared/models/auth-response.model';
 import { environment } from './../../environments/environment';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,4 +18,5 @@ export class AuthService {
     const authRequest: AuthRequest = { email, password };
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, authRequest);
   }
+  
 }

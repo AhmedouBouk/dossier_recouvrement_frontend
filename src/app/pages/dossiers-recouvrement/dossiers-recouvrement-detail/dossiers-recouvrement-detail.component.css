@@ -1,0 +1,44 @@
+/* Conteneur pour les détails */
+.detail-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  .detail-container h2 {
+    color: #2a3d66;
+    margin-bottom: 15px;
+  }
+  
+  .detail-container .detail-item {
+    margin-bottom: 10px;
+  }
+  
+  .detail-container .label {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .detail-container .value {
+    color: #555;
+  }
+  
+  .detail-container .btn-container {
+    margin-top: 20px;
+  }
+  
+  .detail-container .btn-info {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .detail-container .btn-info:hover {
+    background-color: #2980b9;
+  }
+  
