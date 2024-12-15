@@ -11,50 +11,76 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   errorMessage: string = '';
-  loading: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    if (this.authService.isAuthenticated()) {
+      this.navigateBasedOnRole(this.authService.getRole());
+    }
+  }
 
   onSubmit() {
-    this.loading = true;
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs';
+      return;
+    }
+
+    this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: (response) => {
-        this.loading = false;
-        this.navigateBasedOnRole(response.role);
+      next: () => {
+        const role = this.authService.getRole();
+        if (role) {
+          this.navigateBasedOnRole(role);
+        } else {
+          this.errorMessage = 'Token invalide';
+          this.authService.logout();
+        }
       },
       error: (error) => {
-        this.loading = false;
-        this.errorMessage = 'Identifiants invalides';
+        if (error.status === 401) {
+          this.errorMessage = 'Email ou mot de passe incorrect';
+        } else if (error.status === 403) {
+          this.errorMessage = 'Accès non autorisé';
+        } else {
+          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+        }
+      },
+      complete: () => {
+        this.isLoading = false;
       }
     });
   }
 
-  private navigateBasedOnRole(role: string) {
+  private navigateBasedOnRole(role: string | null) {
+    if (!role) {
+      this.errorMessage = 'Rôle non défini';
+      return;
+    }
+
     switch(role) {
+      case 'ADMIN':
+        this.router.navigate(['/admin/user-list']);
+        break;
       case 'DO':
         this.router.navigate(['/clients']);
         break;
       case 'DC':
         this.router.navigate(['/comptes']);
         break;
-      case 'ADMIN':
-        this.router.navigate(['/admin/user-list']);
-        break;
       case 'RECOUVREMENT':
-        this.router.navigate(['/dossiers']);
+        this.router.navigate(['/dossiers-recouvrement']);
         break;
-      case 'DGCR':
-        this.router.navigate(['/credits']);
-        break;
+        case 'DGCR':
+          this.router.navigate(['/dossiers-recouvrement']);
+          break;
       default:
         this.errorMessage = 'Rôle non reconnu';
         this.authService.logout();
-        this.router.navigate(['/auth/login']);
         break;
     }
   }

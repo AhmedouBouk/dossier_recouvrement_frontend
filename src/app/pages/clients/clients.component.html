@@ -1,77 +1,86 @@
-
-
-  <!-- Import Section -->
-  <div class="file-selection">
-    <div class="file-selection-header">
-      <h3>Gestion des Clients</h3>
-      <div class="file-selection-actions">
-        <label for="file-input" class="file-input-label">Choisir un fichier</label>
-        <input type="file" id="file-input" (change)="onFileSelected($event)" accept=".csv" class="file-input">
-        <button class="select-file-button" [disabled]="!selectedFile" (click)="importClients()">
-          {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
-        </button>
-      </div>
-    </div>
-    
-    <div class="search-section">
-      <input [(ngModel)]="searchNom" placeholder="Nom" class="search-input">
-      <input [(ngModel)]="searchPrenom" placeholder="Prénom" class="search-input">
-      <input [(ngModel)]="searchNNI" type="number" placeholder="NNI" class="search-input">
-      <button (click)="searchClients()" class="search-button">Rechercher</button>
+<div class="file-selection">
+  <div class="file-selection-header">
+    <h3>Gestion des Clients</h3>
+    <div *ngIf="roleService.hasEditPermission()" class="file-selection-actions">
+      <label for="file-input" class="file-input-label">Choisir un fichier</label>
+      <input 
+        type="file" 
+        id="file-input" 
+        (change)="onFileSelected($event)" 
+        accept=".csv" 
+        class="file-input">
+      <button 
+        class="select-file-button" 
+        [disabled]="!selectedFile" 
+        (click)="importClients()">
+        {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
+      </button>
     </div>
   </div>
-
-  <!-- Clients Table -->
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>NNI</th>
-          <th>NIF</th>
-          <th>Nom</th>
-          <th>Prénom</th>
-          <th>Date de Naissance</th>
-          <th>Adresse</th>
-          <th>Secteur d'Activité</th>
-          <th>Genre</th>
-          <th>Salaire</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let client of clients">
-          <ng-container *ngIf="editingClient?.nni !== client.nni">
-            <td>{{client.nni}}</td>
-            <td>{{client.nif}}</td>
-            <td>{{client.nom}}</td>
-            <td>{{client.prenom}}</td>
-            <td>{{client.dateNaissance | date:'dd/MM/yyyy'}}</td>
-            <td>{{client.adresse}}</td>
-            <td>{{client.secteurActivite}}</td>
-            <td>{{client.genre}}</td>
-            <td>{{client.salaire}}</td>
-            <td class="actions">
-              <button class="edit-button" (click)="startEdit(client)">Modifier</button>
-              <button class="delete-button" (click)="deleteClient(client.nni)">Supprimer</button>
-            </td>
-          </ng-container>
-
-          <ng-container *ngIf="editingClient?.nni === client.nni">
-            <td>{{client.nni}}</td>
-            <td>{{client.nif}}</td>
-            <td><input [(ngModel)]="editingClient.nom" class="form-control"></td>
-            <td><input [(ngModel)]="editingClient.prenom" class="form-control"></td>
-            <td>{{client.dateNaissance | date:'dd/MM/yyyy'}}</td>
-            <td><input [(ngModel)]="editingClient.adresse" class="form-control"></td>
-            <td><input [(ngModel)]="editingClient.secteurActivite" class="form-control"></td>
-            <td>{{client.genre}}</td>
-            <td><input [(ngModel)]="editingClient.salaire" type="number" class="form-control"></td>
-            <td class="actions">
-              <button class="save-button" (click)="updateClient()">Sauvegarder</button>
-              <button class="cancel-button" (click)="cancelEdit()">Annuler</button>
-            </td>
-          </ng-container>
-        </tr>
-      </tbody>
-    </table>
+  
+  <div class="search-section">
+    <input [(ngModel)]="searchNom" placeholder="Nom" class="search-input">
+    <input [(ngModel)]="searchPrenom" placeholder="Prénom" class="search-input">
+    <input [(ngModel)]="searchNNI" type="number" placeholder="NNI" class="search-input">
+    <button (click)="searchClients()" class="search-button">Rechercher</button>
   </div>
+</div>
+
+<!-- Import Message -->
+<div *ngIf="importMessage" [class]="'alert alert-' + importMessage.type">
+  {{ importMessage.text }}
+</div>
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>NNI</th>
+        <th>NIF</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Date de Naissance</th>
+        <th>Adresse</th>
+        <th>Secteur d'Activité</th>
+        <th>Genre</th>
+        <th>Salaire</th>
+        <th *ngIf="roleService.hasEditPermission()">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let client of clients">
+        <ng-container *ngIf="editingClient?.nni !== client.nni">
+          <td>{{client.nni}}</td>
+          <td>{{client.nif}}</td>
+          <td>{{client.nom}}</td>
+          <td>{{client.prenom}}</td>
+          <td>{{client.dateNaissance | date:'dd/MM/yyyy'}}</td>
+          <td>{{client.adresse}}</td>
+          <td>{{client.secteurActivite}}</td>
+          <td>{{client.genre}}</td>
+          <td>{{client.salaire}}</td>
+          <td *ngIf="roleService.hasEditPermission()" class="actions">
+            <button class="edit-button" (click)="startEdit(client)">Modifier</button>
+            <button class="delete-button" (click)="deleteClient(client.nni)">Supprimer</button>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="editingClient?.nni === client.nni">
+          <td>{{client.nni}}</td>
+          <td>{{client.nif}}</td>
+          <td><input [(ngModel)]="editingClient.nom" class="form-control"></td>
+          <td><input [(ngModel)]="editingClient.prenom" class="form-control"></td>
+          <td>{{client.dateNaissance | date:'dd/MM/yyyy'}}</td>
+          <td><input [(ngModel)]="editingClient.adresse" class="form-control"></td>
+          <td><input [(ngModel)]="editingClient.secteurActivite" class="form-control"></td>
+          <td>{{client.genre}}</td>
+          <td><input [(ngModel)]="editingClient.salaire" type="number" class="form-control"></td>
+          <td class="actions">
+            <button class="save-button" (click)="updateClient()">Sauvegarder</button>
+            <button class="cancel-button" (click)="cancelEdit()">Annuler</button>
+          </td>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+</div>

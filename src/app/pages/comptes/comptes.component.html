@@ -1,8 +1,8 @@
 <div class="container">
   <h2>Gestion des Comptes</h2>
 
-  <!-- Import Section -->
-  <div class="import-section">
+  <!-- Import Section - Only visible for DC role -->
+  <div *ngIf="roleService.hasEditPermission()" class="import-section">
     <div class="import-section-header">
       <h3>Importer des comptes</h3>
       <div class="import-section-actions">
@@ -23,12 +23,12 @@
     </div>
 
     <!-- Message d'import -->
-    <div *ngIf="importMessage" [class]="'alert ' + importMessage.type">
+    <div *ngIf="importMessage" [class]="'alert alert-' + importMessage.type">
       {{ importMessage.text }}
     </div>
   </div>
 
-  <!-- Search Section -->
+  <!-- Search Section - Visible for all -->
   <div class="search-section">
     <input [(ngModel)]="searchNomCompte" placeholder="Numéro de compte" class="search-input">
     <input [(ngModel)]="searchNom" placeholder="Nom client" class="search-input">
@@ -48,7 +48,7 @@
           <th>Solde</th>
           <th>État</th>
           <th>Date d'ouverture</th>
-          <th>Actions</th>
+          <th *ngIf="roleService.hasEditPermission()">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -61,7 +61,7 @@
             <td>{{compte.solde | number:'1.2-2'}} MRU</td>
             <td>{{compte.etat}}</td>
             <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
-            <td class="actions">
+            <td *ngIf="roleService.hasEditPermission()" class="actions">
               <button class="edit-button" (click)="startEdit(compte)">Modifier</button>
               <button class="delete-button" (click)="deleteCompte(compte.nomCompte)">Supprimer</button>
             </td>
