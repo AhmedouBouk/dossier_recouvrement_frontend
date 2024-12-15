@@ -67,10 +67,8 @@ export class LoginComponent {
         this.router.navigate(['/admin/user-list']);
         break;
       case 'DO':
-        this.router.navigate(['/clients']);
-        break;
       case 'DC':
-        this.router.navigate(['/comptes']);
+        this.router.navigate(['/credits']);
         break;
       case 'RECOUVREMENT':
         this.router.navigate(['/dossiers-recouvrement']);

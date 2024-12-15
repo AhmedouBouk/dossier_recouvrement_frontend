@@ -8,7 +8,7 @@ import { Garantie } from '../models/garantie.model';
   providedIn: 'root'
 })
 export class GarantieService {
-  private apiUrl = 'http://localhost:8080/Garantie';
+  private apiUrl = 'http://localhost:8080/api/Garantie';
 
   constructor(private http: HttpClient) {}
 

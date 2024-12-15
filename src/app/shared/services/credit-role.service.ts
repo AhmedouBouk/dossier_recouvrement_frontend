@@ -1,35 +1,27 @@
 import { Injectable } from '@angular/core';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CreditRoleService {
-
   constructor() { }
 
-  // Fonction pour obtenir le rôle à partir du token JWT
-  getUserRole(): string {
-    const token = localStorage.getItem('token');  // Utilisez localStorage ou sessionStorage en fonction de vos besoins
+  // Function to get the role from the JWT token
+  private getUserRole(): string {
+    const token = localStorage.getItem('token');  // Use localStorage or sessionStorage based on your needs
     if (token) {
-      const decodedToken: any = jwtDecode(token);  // Décoder le token JWT
-      console.log(decodedToken);  // Affichez le contenu du token pour vérifier son contenu
-      return decodedToken.role;  // Assurez-vous que le rôle est sous la clé 'role' dans le token
+      const decodedToken: any = jwtDecode(token);  // Decode the JWT token
+        // Log the token content for verification
+      return decodedToken.role;  // Ensure the role is stored under the 'role' key in the token
     }
     return '';
   }
-  
 
-  // Fonction pour vérifier si l'utilisateur a le rôle 'DO'
-  hasDORole(): boolean {
-    const role = this.getUserRole();
-    console.log('Role actuel:', role);  // Vérifiez le rôle dans la console
-    return role === 'DO';  // Vérifier si le rôle est 'DO'
+  // Function to check if the user has either the 'DO' or 'DC' role
+  hasRole(allowedRoles: string[]): boolean {
+    const userRole = this.getUserRole();
+     // Log the current role in the console
+    return allowedRoles.includes(userRole);  // Check if the user's role is included in the allowed roles
   }
-  hasDCRole(): boolean {
-    const role = this.getUserRole();
-    console.log('Role actuel:', role);  // Vérifiez le rôle dans la console
-    return role === 'DC';  // Vérifier si le rôle est 'DC'
-  }
-  
 }
