@@ -17,7 +17,6 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
-    // Redirect if already logged in
     if (this.authService.isAuthenticated()) {
       this.navigateBasedOnRole(this.authService.getRole());
     }
@@ -33,8 +32,7 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: (response) => {
-        console.log('Login successful');
+      next: () => {
         const role = this.authService.getRole();
         if (role) {
           this.navigateBasedOnRole(role);
@@ -44,7 +42,6 @@ export class LoginComponent {
         }
       },
       error: (error) => {
-        console.error('Login error:', error);
         if (error.status === 401) {
           this.errorMessage = 'Email ou mot de passe incorrect';
         } else if (error.status === 403) {
@@ -66,21 +63,21 @@ export class LoginComponent {
     }
 
     switch(role) {
+      case 'ADMIN':
+        this.router.navigate(['/admin/user-list']);
+        break;
       case 'DO':
         this.router.navigate(['/clients']);
         break;
       case 'DC':
         this.router.navigate(['/comptes']);
         break;
-      case 'ADMIN':
-        this.router.navigate(['/admin/user-list']);
-        break;
       case 'RECOUVREMENT':
-        this.router.navigate(['/dossiers']);
+        this.router.navigate(['/dossiers-recouvrement']);
         break;
-      case 'DGCR':
-        this.router.navigate(['/credits']);
-        break;
+        case 'DGCR':
+          this.router.navigate(['/dossiers-recouvrement']);
+          break;
       default:
         this.errorMessage = 'Rôle non reconnu';
         this.authService.logout();

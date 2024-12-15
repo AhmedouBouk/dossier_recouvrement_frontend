@@ -79,7 +79,6 @@
 
       <div class="form-group">
         <label for="role">Role</label>
-<<<<<<< HEAD
         <div class="input-wrapper">
           <i class="material-icons">badge</i>
           <select id="role" name="role" [(ngModel)]="user.role" required class="form-control">
@@ -94,19 +93,6 @@
         <span class="error-message" *ngIf="!isFieldValid('role')">
           {{ getFieldErrorMessage('role') }}
         </span>
-=======
-        <select id="role" name="role" [(ngModel)]="user.role" required class="form-control">
-          <option value="DGCR">DGCR</option>
-          <option value="RECOUVREMENT">RECOUVREMENT</option>
-          <option value="ADMIN">ADMIN</option>
-
-
-          <option value="DO">DO</option>
-          <option value="DC">DC</option>
-
-        
-        </select>
->>>>>>> 047ab46a86ade59ab55c93384a4edc5a2a025baf
       </div>
 
       <div class="button-group">

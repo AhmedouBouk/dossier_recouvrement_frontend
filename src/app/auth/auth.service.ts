@@ -71,5 +71,14 @@ export class AuthService {
     }
     return 'Utilisateur non connecté';
   }
-  
+
+
+  private decodeToken(token: string): DecodedToken | null {
+    try {
+      return jwtDecode<DecodedToken>(token);
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  }
 }

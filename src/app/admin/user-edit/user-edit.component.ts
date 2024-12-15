@@ -45,16 +45,9 @@ export class UserEditComponent implements OnInit {
     } else {
       const userId = this.route.snapshot.paramMap.get('id');
       if (userId) {
-<<<<<<< HEAD
         this.adminService.getUserById(+userId).subscribe({
           next: (response) => {
             this.user = { ...response, password: '' };
-=======
-        
-        this.adminService.getUserById(+userId).subscribe(
-          response => {
-            this.user = response;
->>>>>>> 047ab46a86ade59ab55c93384a4edc5a2a025baf
           },
           error: (error: HttpErrorResponse) => {
             console.error('Error fetching user details:', error);
