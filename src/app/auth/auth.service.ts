@@ -5,6 +5,7 @@ import { AuthRequest } from '../shared/models/auth-request.model';
 import { AuthResponse } from '../shared/models/auth-response.model';
 import { environment } from './../../environments/environment';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -50,4 +51,5 @@ export class AuthService {
     }
     return 'Utilisateur non connecté';
   }
+  
 }

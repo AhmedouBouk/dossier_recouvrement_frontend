@@ -9,6 +9,9 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApiInterceptorService } from './shared/services/api-interceptor.service';
 import { AddUserComponent } from './admin/add-user/add-user.component';
+import { DossiersRecouvrementListComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-list/dossiers-recouvrement-list.component';
+import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-detail/dossiers-recouvrement-detail.component';
+import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
 import { RoleGuard } from './shared/guards/role.guard';
 
 @NgModule({
@@ -17,7 +20,10 @@ import { RoleGuard } from './shared/guards/role.guard';
     LoginComponent,
     UserListComponent,
     UserEditComponent,
-    AddUserComponent
+    AddUserComponent,
+    DossiersRecouvrementListComponent,
+    DossiersRecouvrementDetailComponent,
+    DossiersRecouvrementEditComponent,
   ],
   imports: [
     BrowserModule,
