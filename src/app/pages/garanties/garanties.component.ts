@@ -3,7 +3,7 @@ import { GarantieService } from '../../shared/services/garantie.service';
 import { Garantie } from '../../shared/models/garantie.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { GarantieRoleService } from '../../shared/services/garantie-role.service';
 @Component({
   selector: 'app-garanties',
   templateUrl: './garanties.component.html',
@@ -18,7 +18,10 @@ export class GarantiesComponent implements OnInit {
   file: File | null = null;
   editMode: boolean = false;
 
-  constructor(private garantieService: GarantieService) {}
+  constructor(
+    private garantieService: GarantieService,
+    public garantieRoleService: GarantieRoleService
+  ) {}
 
   ngOnInit() {
     this.loadGaranties();

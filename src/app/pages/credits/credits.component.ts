@@ -7,23 +7,22 @@ import { CreditRoleService } from '../../shared/services/credit-role.service';
 @Component({
   selector: 'app-credits',
   templateUrl: './credits.component.html',
-  styleUrls: ['./credits.component.css'] ,
+  styleUrls: ['./credits.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
 export class CreditsComponent implements OnInit {
-  creditRoleService: any;
-
   credits: any[] = [];
   selectedCredit: any = null;
   searchTerm: string = '';
   showAddForm: boolean = false;
   creditForm: any = {};
   editingCredit: any | null = null;
-credit: any;
 
-
-  constructor(private creditService: CreditService) {}
+  constructor(
+    private creditService: CreditService,
+    public creditRoleService: CreditRoleService
+  ) {}
 
   ngOnInit(): void {
     this.loadCredits();
@@ -32,7 +31,10 @@ credit: any;
   loadCredits() {
     this.creditService.getAllCredits().subscribe({
       next: (data) => (this.credits = data),
-      error: (err) => console.error('Erreur de chargement', err)
+      error: (err) => {
+        console.error('Error loading credits:', err);
+        // Display an error message to the user
+      }
     });
   }
 
@@ -73,20 +75,41 @@ credit: any;
     this.creditForm = {};
   }
 
-  addCredit() {
+  addCredit(): void {
     const formData = new FormData();
+  
+    // Add the serialized CreditDTO object as 'creditdto'
+    formData.append(
+      'creditdto',
+      JSON.stringify({
+        idCompte: this.creditForm.idCompte, // Replace with actual field
+        idGarantie: this.creditForm.idGarantie, // Replace with actual field
+        montant: this.creditForm.montant,
+        tauxInteret: this.creditForm.tauxInteret,
+        duree: this.creditForm.duree,
+        dateDebut: this.creditForm.dateDebut,
+        statut: this.creditForm.statut,
+        refTransaction: this.creditForm.refTransaction
+      })
+    );
+  
+    // Add optional file inputs dynamically
     Object.keys(this.creditForm).forEach((key) => {
-      if (this.creditForm[key]) formData.append(key, this.creditForm[key]);
+      if (this.creditForm[key] instanceof File) {
+        formData.append(key, this.creditForm[key]);
+      }
     });
-
+  
+    // Call the service to add the credit
     this.creditService.addCredit(formData).subscribe({
       next: () => {
-        this.loadCredits();
-        this.showAddForm = false;
+        this.loadCredits(); // Reload the list of credits
+        this.showAddForm = false; // Hide the add form
       },
       error: (err) => console.error('Erreur d\'ajout', err)
     });
   }
+  
 
   deleteCredit(creditId: number) {
     if (confirm('Confirmer la suppression ?')) {
@@ -96,7 +119,7 @@ credit: any;
       });
     }
   }
-  
+
   startEdit(credit: any) {
     this.editingCredit = { ...credit };
   }
@@ -114,7 +137,7 @@ credit: any;
     updatedData.append('refTransaction', credit.refTransaction);
     updatedData.append('idCompte', credit.idCompte);
     updatedData.append('idGarantie', credit.idGarantie);
-  
+
     // Ajoutez les fichiers seulement s'ils existent
     if (credit.demande) updatedData.append('demande', credit.demande);
     if (credit.etude) updatedData.append('etude', credit.etude);
@@ -125,7 +148,7 @@ credit: any;
     if (credit.reconnaissanceDeDette) updatedData.append('reconnaissanceDeDette', credit.reconnaissanceDeDette);
     if (credit.contrat) updatedData.append('contrat', credit.contrat);
     if (credit.tableauAmortissement) updatedData.append('tableauAmortissement', credit.tableauAmortissement);
-  
+
     this.creditService.updateCredit(credit.idCredit, updatedData).subscribe({
       next: (response) => {
         console.log('Crédit mis à jour:', response);
@@ -141,12 +164,4 @@ credit: any;
   onFileSelected(event: any, fileType: string) {
     this.creditForm[fileType] = event.target.files[0];
   }
-
-  hasDORole(): boolean {
-    return this.creditRoleService.hasDORole();
-  }
-  hasDCRole(): boolean {
-    return this.creditRoleService.hasDCRole();
-  }
-
 }
