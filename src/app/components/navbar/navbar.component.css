@@ -2,10 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color:    #b2b282; /* Couleur de fond */
-  ; /* Couleur du sidebar */
+  background-color: #b2b282; /* Couleur de fond */
   padding: 10px 20px;
-  border-radius: 8px; /* Pour une meilleure finition */
+  border-radius: 8px; /* Bordure arrondie */
 }
 
 .navbar-logo img {

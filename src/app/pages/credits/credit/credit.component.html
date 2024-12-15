@@ -7,7 +7,7 @@
         <i class="material-icons">search</i>
         <input [(ngModel)]="searchTerm" placeholder="Rechercher par ID, Compte ou Statut" (keyup.enter)="searchCredits()">
       </div>
-      <button *ngIf="creditRoleService.hasRole(['DO'])" class="add-credit-btn" (click)="navigateToAdd()">
+      <button *ngIf="authService.hasDODCRole" class="add-credit-btn" (click)="navigateToAdd()">
         <i class="material-icons">add_circle</i>
         Ajouter un Crédit
       </button>
@@ -38,15 +38,15 @@
             </td>
             <td>
               <div class="action-buttons">
-                <button class="view-btn" (click)="viewDetails(credit)" *ngIf="creditRoleService.hasRole(['DO'])">
+                <button class="view-btn" (click)="viewDetails(credit)">
                   <i class="material-icons">visibility</i>
                   Détails
                 </button>
-                <button class="edit-btn" (click)="navigateToEdit(credit.idCredit)" *ngIf="creditRoleService.hasRole(['DO', 'DC'])">
+                <button class="edit-btn" (click)="navigateToEdit(credit.idCredit)" *ngIf="authService.hasDODCRole">
                   <i class="material-icons">edit</i>
                   Modifier
                 </button>
-                <button class="delete-btn" (click)="deleteCredit(credit.idCredit)" *ngIf="creditRoleService.hasRole(['DO'])">
+                <button class="delete-btn" (click)="deleteCredit(credit.idCredit)" *ngIf="authService.hasDODCRole">
                   <i class="material-icons">delete</i>
                   Supprimer
                 </button>

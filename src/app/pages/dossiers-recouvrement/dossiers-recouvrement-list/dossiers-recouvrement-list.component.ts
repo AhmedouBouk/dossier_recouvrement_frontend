@@ -3,9 +3,8 @@ import { DossierRecouvrementService } from 'src/app/shared/services/dossier-reco
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { RecouvrementRoleService } from 'src/app/shared/services/recouvrement-role.service';  // Import du service pour vérifier le rôle
 import { Router } from '@angular/router';  // Import de Router pour la navigation
-
+import{AuthService} from 'src/app/auth/auth.service'
 @Component({
   selector: 'app-dossiers-recouvrement-list',
   templateUrl: './dossiers-recouvrement-list.component.html',
@@ -18,7 +17,7 @@ export class DossiersRecouvrementListComponent implements OnInit {
   constructor(
     private dossierService: DossierRecouvrementService,
     private http: HttpClient,
-    private recouvrementRoleService: RecouvrementRoleService,
+    private authService: AuthService,
     private router: Router  // Injection de Router pour la navigation
   ) { }
 
@@ -60,10 +59,10 @@ export class DossiersRecouvrementListComponent implements OnInit {
   }
 
   hasRecouvrementRole(): boolean {
-    return this.recouvrementRoleService.hasRecouvrementRole();
+    return this.authService.hasRecouvrementRole();
   }
   hasDGCRRole(): boolean {
-    return this.recouvrementRoleService.hasDGCRRole();
+    return this.authService.hasDGCRRole();
   }
 
   // Méthode pour rediriger vers la page de modification d'un dossier

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import{AuthService} from'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,8 @@ import { Router } from '@angular/router';
 export class AppComponent {
   title = 'dossiers-recouvrement-frontend';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,    public authService: AuthService,
+  ) {}
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');

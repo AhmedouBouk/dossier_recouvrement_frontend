@@ -21,16 +21,12 @@ import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.c
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'auth/login', component: LoginComponent },
-  { path: 'admin/user-list', component: UserListComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
-  { path: 'admin/user-edit', component: UserEditComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
-  { path: 'admin/user-edit/:id', component: UserEditComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
-  { path: 'admin/users/add', component: AddUserComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'ADMIN' } },
-  { path: 'clients', component: ClientsComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'DO' } },
-  { path: 'comptes', component: ComptesComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'DC' } },
+ 
+  { path: 'clients', component: ClientsComponent},
+  { path: 'comptes', component: ComptesComponent},
   { path: 'dashboard', component: DashboardComponent },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
-  
-  // Admin routes - require ADMIN role
+ 
+
   { 
     path: 'admin', 
     children: [
@@ -44,54 +40,34 @@ const routes: Routes = [
   },
 
   // Non-admin routes - accessible by all authenticated users
+ 
   { 
-    path: 'clients', 
-    component: ClientsComponent, 
-    canActivate: [AuthGuard] 
-  },
-  { 
-    path: 'comptes', 
-    component: ComptesComponent, 
-    canActivate: [AuthGuard] 
-  },
-  { 
-    path: 'dossiers-recouvrement', 
+    path: 'dossier-recouvrement', 
     component: DossiersRecouvrementListComponent,
-    canActivate: [AuthGuard]
   },
   { 
     path: 'dossier-recouvrement/view/:id', 
     component: DossiersRecouvrementDetailComponent,
-    canActivate: [AuthGuard]
   },
   { 
     path: 'dossier-recouvrement/modify/:id', 
     component: DossiersRecouvrementEditComponent,
-    canActivate: [AuthGuard]
   },
   {
     path: 'credits',
     component: CreditComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['DO', 'DC'] }
   },
   {
     path: 'credits/add',
     component: CreditAddComponent,  // Note: Changed from CreditComponent
-    canActivate: [AuthGuard],
-    data: { roles: ['DO', 'DC'] }
   },
   {
     path: 'credits/edit/:id',  // Added :id parameter
     component: CreditEditComponent,  // Note: Changed from CreditComponent
-    canActivate: [AuthGuard],
-    data: { roles: ['DO', 'DC'] }
   },
   {
     path: 'garanties',
     component: GarantiesComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['DO', 'DC'] }
   }
 
 ];

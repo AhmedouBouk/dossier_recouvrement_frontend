@@ -39,7 +39,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AddUserComponent,
     SidebarComponent,
     NavbarComponent,
-    DashboardComponent
+    DashboardComponent,
     DossiersRecouvrementListComponent,
     DossiersRecouvrementDetailComponent,
     DossiersRecouvrementEditComponent,
@@ -66,7 +66,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatTooltipModule,
     BrowserAnimationsModule
 
-  ],
+],
   providers: [
     RoleGuard,
     {

@@ -41,7 +41,35 @@ export class AuthService {
     localStorage.removeItem('userRole');
     window.location.reload();
   }
-
+  private getUserRole(): string {
+    const token = localStorage.getItem('token');  // Use localStorage or sessionStorage based on your needs
+    if (token) {
+      const decodedToken: any = jwtDecode(token);  // Decode the JWT token
+        // Log the token content for verification
+      return decodedToken.role;  // Ensure the role is stored under the 'role' key in the token
+    }
+    return '';
+  }
+  hasRecouvrementRole(): boolean {
+    const role = this.getUserRole();
+    console.log('Role actuel:', role);  // Vérifiez le rôle dans la console
+    return role === 'RECOUVREMENT';  // Vérifier si le rôle est 'recouvrement'
+  }
+  hasDGCRRole(): boolean {
+    const role = this.getUserRole();
+    console.log('Role actuel:', role);  // Vérifiez le rôle dans la console
+    return role === 'DGCR';  // Vérifier si le rôle est 'recouvrement'
+  }
+  hasDODCRole(): boolean {
+    const role = this.getUserRole();
+    console.log('Role actuel:', role);  // Vérifiez le rôle dans la console
+    return role === 'DC'||role==='DO';  // Vérifier si le rôle est 'recouvrement'
+  }
+  hasRoleNotAdmin(): boolean {
+    const role = this.getUserRole();
+    console.log('Role actuel:', role);  // Vérifiez le rôle dans la console
+    return role !=='ADMIN';  // Vérifier si le rôle est 'recouvrement'
+  }
   getRole(): string | null {
     const token = localStorage.getItem('token');
     if (token) {
