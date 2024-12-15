@@ -1,12 +1,21 @@
 export interface Credit {
-[x: string]: any;
     idCredit: number;
+    idCompte: string;
+    idGarantie: string;
     montant: number;
     tauxInteret: number;
     duree: number;
-    statut: string;
     dateDebut: string;
-    idCompte: string; // Référence à l'entité Compte
-    idGarantie: number; // Référence à l'entité Garantie
+    statut: string;
+    refTransaction: string;
+    demande?: File;
+    etude?: File;
+    bulletinSalaire?: File;
+    domiciliation?: File;
+    pvComite?: File;
+    bonPourAval?: File;
+    reconnaissanceDeDette?: File;
+    contrat?: File;
+    tableauAmortissement?: File;
   }
   

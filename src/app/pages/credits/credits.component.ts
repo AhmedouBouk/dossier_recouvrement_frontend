@@ -1,127 +1,152 @@
 import { Component, OnInit } from '@angular/core';
-import { CreditService } from '../../shared/services/credit.service';
-import { Credit } from '../../shared/models/credit.model';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CreditService } from '../../shared/services/credit.service';
+import { CommonModule } from '@angular/common';
+import { CreditRoleService } from '../../shared/services/credit-role.service';
 
 @Component({
   selector: 'app-credits',
   templateUrl: './credits.component.html',
-  styleUrls: ['./credits.component.css'],
+  styleUrls: ['./credits.component.css'] ,
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
 export class CreditsComponent implements OnInit {
-editingCredit: any;
-cancelEdit() {
-throw new Error('Method not implemented.');
-}
-startEdit(_t23: Credit) {
-throw new Error('Method not implemented.');
-}
-  credits: Credit[] = [];
-  selectedCredit: Credit | null = null;
-  newCredit: Partial<Credit> = {};
-  searchNomCompte: string = '';
-  files: { [key: string]: File | null } = {};
-  editMode: boolean = false;
-  importMessage: { type: 'success' | 'error', text: string } | null = null;
+  creditRoleService: any;
+
+  credits: any[] = [];
+  selectedCredit: any = null;
+  searchTerm: string = '';
+  showAddForm: boolean = false;
+  creditForm: any = {};
+  editingCredit: any | null = null;
+credit: any;
+
 
   constructor(private creditService: CreditService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadCredits();
   }
 
-  // Charger tous les crédits
   loadCredits() {
     this.creditService.getAllCredits().subscribe({
-      next: (data) => {
-        this.credits = data;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des crédits:', error);
-      }
+      next: (data) => (this.credits = data),
+      error: (err) => console.error('Erreur de chargement', err)
     });
   }
 
-  // Rechercher des crédits par nom de compte
   searchCredits() {
-    if (this.searchNomCompte) {
-      this.creditService.searchCreditsByNomCompte(this.searchNomCompte).subscribe({
-        next: (data) => {
-          this.credits = data;
-        },
-        error: (error) => {
-          console.error('Erreur lors de la recherche:', error);
-        }
+    if (this.searchTerm) {
+      this.creditService.searchCredits(this.searchTerm).subscribe({
+        next: (data) => (this.credits = data),
+        error: (err) => console.error('Erreur de recherche', err)
       });
     } else {
       this.loadCredits();
     }
   }
 
-  // Ajouter un nouveau crédit
-  addCredit() {
-    this.creditService.createCredit(this.newCredit, this.files).subscribe({
-      next: (data) => {
-        console.log('Crédit créé:', data);
-        this.loadCredits();
-        this.newCredit = {};
-        this.files = {};
-      },
-      error: (error) => {
-        console.error('Erreur lors de la création du crédit:', error);
-      }
+  viewDetails(credit: any) {
+    this.creditService.getCreditsDetails(credit.idCredit).subscribe({
+      next: (details) => (this.selectedCredit = details),
+      error: (err) => console.error('Erreur de récupération des détails', err)
     });
   }
 
-  // Mettre à jour un crédit existant
-  updateCredit() {
+  downloadFile(fileType: string) {
     if (this.selectedCredit) {
-      this.creditService.updateCredit(this.selectedCredit.idCredit!, this.selectedCredit, this.files).subscribe({
-        next: (data) => {
-          console.log('Crédit mis à jour:', data);
-          this.loadCredits();
-          this.selectedCredit = null;
-          this.editMode = false;
-        },
-        error: (error) => {
-          console.error('Erreur lors de la mise à jour:', error);
-        }
-      });
+      this.creditService
+        .downloadFile(this.selectedCredit.idCredit, fileType)
+        .subscribe({
+          next: (blob) => {
+            const url = window.URL.createObjectURL(blob);
+            window.open(url);
+          },
+          error: (err) => console.error('Erreur de téléchargement', err)
+        });
     }
   }
 
-  // Supprimer un crédit
-  deleteCredit(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce crédit ?')) {
-      this.creditService.deleteCredit(id).subscribe({
-        next: (response) => {
-          console.log('Crédit supprimé:', response);
-          this.loadCredits();
-        },
-        error: (error) => {
-          console.error('Erreur lors de la suppression:', error);
-        }
+  showAddCreditForm() {
+    this.showAddForm = true;
+    this.creditForm = {};
+  }
+
+  addCredit() {
+    const formData = new FormData();
+    Object.keys(this.creditForm).forEach((key) => {
+      if (this.creditForm[key]) formData.append(key, this.creditForm[key]);
+    });
+
+    this.creditService.addCredit(formData).subscribe({
+      next: () => {
+        this.loadCredits();
+        this.showAddForm = false;
+      },
+      error: (err) => console.error('Erreur d\'ajout', err)
+    });
+  }
+
+  deleteCredit(creditId: number) {
+    if (confirm('Confirmer la suppression ?')) {
+      this.creditService.deleteCredit(creditId).subscribe({
+        next: () => this.loadCredits(),
+        error: (err) => console.error('Erreur de suppression', err)
       });
     }
   }
+  
+  startEdit(credit: any) {
+    this.editingCredit = { ...credit };
+  }
 
-  // Télécharger tous les documents associés à un crédit
-  downloadDocuments(id: number) {
-    this.creditService.downloadAllDocuments(id).subscribe({
-      next: (path) => {
-        console.log('Documents téléchargés:', path);
+  cancelEdit() {
+    this.editingCredit = null;
+  }
+
+  updateCredit(credit: any) {
+    const updatedData: FormData = new FormData();
+    updatedData.append('montant', credit.montant);
+    updatedData.append('tauxInteret', credit.tauxInteret);
+    updatedData.append('duree', credit.duree);
+    updatedData.append('statut', credit.statut);
+    updatedData.append('refTransaction', credit.refTransaction);
+    updatedData.append('idCompte', credit.idCompte);
+    updatedData.append('idGarantie', credit.idGarantie);
+  
+    // Ajoutez les fichiers seulement s'ils existent
+    if (credit.demande) updatedData.append('demande', credit.demande);
+    if (credit.etude) updatedData.append('etude', credit.etude);
+    if (credit.bulletinSalaire) updatedData.append('bulletinSalaire', credit.bulletinSalaire);
+    if (credit.domiciliation) updatedData.append('domiciliation', credit.domiciliation);
+    if (credit.pvComite) updatedData.append('pvComite', credit.pvComite);
+    if (credit.bonPourAval) updatedData.append('bonPourAval', credit.bonPourAval);
+    if (credit.reconnaissanceDeDette) updatedData.append('reconnaissanceDeDette', credit.reconnaissanceDeDette);
+    if (credit.contrat) updatedData.append('contrat', credit.contrat);
+    if (credit.tableauAmortissement) updatedData.append('tableauAmortissement', credit.tableauAmortissement);
+  
+    this.creditService.updateCredit(credit.idCredit, updatedData).subscribe({
+      next: (response) => {
+        console.log('Crédit mis à jour:', response);
+        this.loadCredits();
+        this.editingCredit = null; // Réinitialiser le mode édition
       },
       error: (error) => {
-        console.error('Erreur lors du téléchargement des documents:', error);
+        console.error('Erreur lors de la mise à jour:', error);
       }
     });
   }
 
-  // Gestion des fichiers
-  onFileSelected(event: any, key: string) {
-    this.files[key] = event.target.files[0];
+  onFileSelected(event: any, fileType: string) {
+    this.creditForm[fileType] = event.target.files[0];
   }
+
+  hasDORole(): boolean {
+    return this.creditRoleService.hasDORole();
+  }
+  hasDCRole(): boolean {
+    return this.creditRoleService.hasDCRole();
+  }
+
 }

@@ -1,54 +1,53 @@
-/* Global styles */
 .container {
-    max-width: 800px;
-    margin: auto;
-  }
-  
-  /* Table styles */
-  .table {
-    margin-top: 20px;
-  }
-  
-  .table thead {
-    background-color: #343a40;
-    color: white;
-  }
-  
-  /* Form styles */
-  .credit-form {
-    border: 1px solid #ddd;
+    margin: 20px auto;
     padding: 20px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
   }
   
-  .credit-form h3 {
-    text-align: center;
+  .search-add-section {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 20px;
   }
   
-  .credit-form .form-group {
-    margin-bottom: 15px;
+  .search-add-section input {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
   }
   
-  .credit-form .btn {
+  table {
     width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
   }
   
-  /* Search bar styles */
-  .search-bar {
+  th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 10px;
   }
   
-  .search-bar input {
-    width: 80%;
+  button {
     padding: 10px;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }
   
-  .search-bar button {
-    width: 50%;
+  button:hover {
+    background-color: #0056b3;
   }
   
