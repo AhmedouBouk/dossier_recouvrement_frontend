@@ -1,0 +1,109 @@
+<div class="container">
+    <h2>Gestion des Crédits</h2>
+  
+    <div class="search-section">
+      <input [(ngModel)]="searchTerm" placeholder="Rechercher par ID, Compte ou Statut">
+      <button (click)="searchCredits()" class="search-btn">Rechercher</button>
+      <button *ngIf="creditRoleService.hasRole(['DO'])" (click)="navigateToAdd()" class="add-btn">
+        Ajouter un Crédit
+      </button>
+    </div>
+  
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID Crédit</th>
+            <th>ID Compte</th>
+            <th>Montant</th>
+            <th>Date Début</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let credit of credits">
+            <td>{{ credit.idCredit }}</td>
+            <td>{{ credit.idCompte }}</td>
+            <td>{{ credit.montant }}</td>
+            <td>{{ credit.dateDebut | date:'dd/MM/yyyy' }}</td>
+            <td>{{ credit.statut }}</td>
+            <td class="actions-column">
+              <button 
+                *ngIf="creditRoleService.hasRole(['DO'])" 
+                (click)="viewDetails(credit)"
+                class="view-btn">
+                Détails
+              </button>
+              <button 
+                *ngIf="creditRoleService.hasRole(['DO', 'DC'])" 
+                (click)="navigateToEdit(credit.idCredit)"
+                class="edit-btn">
+                Modifier
+              </button>
+              <button 
+                *ngIf="creditRoleService.hasRole(['DO'])" 
+                (click)="deleteCredit(credit.idCredit)"
+                class="delete-btn">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Modal des détails du crédit -->
+    <div class="modal" *ngIf="selectedCredit">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Détails du Crédit</h3>
+          <button class="close-btn" (click)="closeDetails()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row">
+            <strong>ID Crédit:</strong> {{ selectedCredit.idCredit }}
+          </div>
+          <div class="detail-row">
+            <strong>ID Compte:</strong> {{ selectedCredit.idCompte }}
+          </div>
+          <div class="detail-row">
+            <strong>ID Garantie:</strong> {{ selectedCredit.idGarantie }}
+          </div>
+          <div class="detail-row">
+            <strong>Montant:</strong> {{ selectedCredit.montant }}
+          </div>
+          <div class="detail-row">
+            <strong>Taux d'intérêt:</strong> {{ selectedCredit.tauxInteret }}
+          </div>
+          <div class="detail-row">
+            <strong>Durée:</strong> {{ selectedCredit.duree }}
+          </div>
+          <div class="detail-row">
+            <strong>Date de début:</strong> {{ selectedCredit.dateDebut | date:'dd/MM/yyyy' }}
+          </div>
+          <div class="detail-row">
+            <strong>Statut:</strong> {{ selectedCredit.statut }}
+          </div>
+          <div class="detail-row">
+            <strong>Référence Transaction:</strong> {{ selectedCredit.refTransaction }}
+          </div>
+  
+          <div class="documents-section">
+            <h4>Documents</h4>
+            <div class="documents-grid">
+              <a (click)="downloadFile('demande')">Demande</a>
+              <a (click)="downloadFile('etude')">Étude</a>
+              <a (click)="downloadFile('bulletinSalaire')">Bulletin de Salaire</a>
+              <a (click)="downloadFile('domiciliation')">Domiciliation</a>
+              <a (click)="downloadFile('pvComite')">PV Comité</a>
+              <a (click)="downloadFile('bonPourAval')">Bon Pour Aval</a>
+              <a (click)="downloadFile('reconnaissanceDeDette')">Reconnaissance de Dette</a>
+              <a (click)="downloadFile('contrat')">Contrat</a>
+              <a (click)="downloadFile('tableauAmortissement')">Tableau d'Amortissement</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

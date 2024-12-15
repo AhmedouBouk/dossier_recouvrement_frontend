@@ -11,8 +11,10 @@ import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvreme
 import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
-import { CreditsComponent } from './pages/credits/credits.component';
+import { CreditComponent } from './pages/credits/credit/credit.component';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
+import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
+import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -59,7 +61,19 @@ const routes: Routes = [
   },
   {
     path: 'credits',
-    component: CreditsComponent,
+    component: CreditComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['DO', 'DC'] }
+  },
+  {
+    path: 'credits/add',
+    component: CreditAddComponent,  // Note: Changed from CreditComponent
+    canActivate: [AuthGuard],
+    data: { roles: ['DO', 'DC'] }
+  },
+  {
+    path: 'credits/edit/:id',  // Added :id parameter
+    component: CreditEditComponent,  // Note: Changed from CreditComponent
     canActivate: [AuthGuard],
     data: { roles: ['DO', 'DC'] }
   },

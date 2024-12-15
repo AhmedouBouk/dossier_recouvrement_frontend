@@ -31,7 +31,7 @@ export class CreditService {
    * @param creditId ID of the credit.
    */
   getCreditsDetails(creditId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/details/${creditId}`);
+    return this.http.get<any>(`${this.apiUrl}/lire/${creditId}`);
   }
 
   /**
@@ -60,12 +60,11 @@ export class CreditService {
   }
 
   /**
-   * Download a specific file related to a credit.
+   * Download all files related to a credit.
    * @param creditId ID of the credit.
-   * @param fileType Type of file to download (e.g., "demande", "contrat").
    */
   downloadFile(creditId: number, fileType: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/telecharger/${creditId}/${fileType}`, {
+    return this.http.get(`${this.apiUrl}/telecharger/${creditId}`, {
       responseType: 'blob'
     });
   }
