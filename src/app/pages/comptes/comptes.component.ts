@@ -3,7 +3,6 @@ import { CompteService } from '../../shared/services/compte.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoleService } from '../../shared/services/role.service';
-
 @Component({
   selector: 'app-comptes',
   templateUrl: './comptes.component.html',
@@ -21,8 +20,7 @@ export class ComptesComponent implements OnInit {
   importMessage: { type: 'success' | 'error', text: string } | null = null;
   editingCompte: any = null;
 
-  constructor(
-    private compteService: CompteService,
+  constructor(private compteService: CompteService,
     public roleService: RoleService
   ) { }
 
@@ -44,6 +42,13 @@ export class ComptesComponent implements OnInit {
         };
       }
     });
+  }
+  getAlertIcon(type: 'success' | 'error'): string {
+    const iconMap: Record<'success' | 'error', string> = {
+      'success': 'check_circle',
+      'error': 'error'
+    };
+    return iconMap[type];
   }
 
   searchComptes() {
@@ -67,9 +72,7 @@ export class ComptesComponent implements OnInit {
   }
 
   startEdit(compte: any) {
-    if (this.roleService.hasDCRole()) {
-      this.editingCompte = { ...compte };
-    }
+    this.editingCompte = { ...compte };
   }
 
   cancelEdit() {
@@ -77,33 +80,31 @@ export class ComptesComponent implements OnInit {
   }
 
   updateCompte(compte: any) {
-    if (this.editingCompte && this.roleService.hasDCRole()) {
-      this.compteService.updateCompte(compte.nomCompte, {
-        solde: compte.solde,
-        etat: compte.etat
-      }).subscribe({
-        next: (response) => {
-          console.log('Compte mis à jour:', response);
-          this.loadComptes();
-          this.editingCompte = null;
-          this.importMessage = {
-            type: 'success',
-            text: 'Compte mis à jour avec succès'
-          };
-        },
-        error: (error) => {
-          console.error('Erreur lors de la mise à jour:', error);
-          this.importMessage = {
-            type: 'error',
-            text: error.message
-          };
-        }
-      });
-    }
+    this.compteService.updateCompte(compte.nomCompte, {
+      solde: compte.solde,
+      etat: compte.etat
+    }).subscribe({
+      next: (response) => {
+        console.log('Compte mis à jour:', response);
+        this.loadComptes();
+        this.editingCompte = null;
+        this.importMessage = {
+          type: 'success',
+          text: 'Compte mis à jour avec succès'
+        };
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour:', error);
+        this.importMessage = {
+          type: 'error',
+          text: error.message
+        };
+      }
+    });
   }
 
   deleteCompte(nomCompte: string) {
-    if (this.roleService.hasDCRole() && confirm('Êtes-vous sûr de vouloir supprimer ce compte ?')) {
+    if(confirm('Êtes-vous sûr de vouloir supprimer ce compte ?')) {
       this.compteService.deleteCompte(nomCompte).subscribe({
         next: (response) => {
           this.loadComptes();
@@ -124,14 +125,12 @@ export class ComptesComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
-    if (this.roleService.hasDCRole()) {
-      this.selectedFile = event.target.files[0];
-      this.importMessage = null;
-    }
+    this.selectedFile = event.target.files[0];
+    this.importMessage = null;
   }
 
   uploadFile() {
-    if (this.selectedFile && this.roleService.hasDCRole()) {
+    if (this.selectedFile) {
       this.importMessage = null;
       this.compteService.importComptes(this.selectedFile).subscribe({
         next: (response) => {
@@ -160,4 +159,13 @@ export class ComptesComponent implements OnInit {
       };
     }
   }
+  getStatusClass(status: string): string {
+    const statusMap: Record<string, string> = {
+      'ACTIF': 'status-active',
+      'BLOQUÉ': 'status-blocked',
+      'FERMÉ': 'status-closed'
+    };
+    return statusMap[status] || 'status-default';
+  }
+  
 }
