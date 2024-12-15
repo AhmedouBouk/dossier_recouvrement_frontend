@@ -1,0 +1,85 @@
+/* Style général pour la page */
+.container {
+  width: 80%;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+}
+
+/* Style du tableau */
+.dossiers-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.dossiers-table th, .dossiers-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.dossiers-table th {
+  background-color: #f2f2f2;
+}
+
+/* Boutons d'actions */
+.btn-supprimer, .btn-voir-modifier, .btn-details {
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-supprimer {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-voir-modifier {
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-details {
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+/* Mettre à jour les couleurs des boutons au survol */
+.btn-supprimer:hover {
+  background-color: darkred;
+}
+
+.btn-voir-modifier:hover {
+  background-color: darkblue;
+}
+
+.btn-details:hover {
+  background-color: darkgreen;
+}
+
+/* Formulaire d'importation CSV */
+.import-container {
+  margin-bottom: 20px;
+}
+
+.import-container label {
+  font-weight: bold;
+}
+
+.import-container button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.import-container button:hover {
+  background-color: #45a049;
+}

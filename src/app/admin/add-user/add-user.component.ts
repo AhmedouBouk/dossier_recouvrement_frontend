@@ -14,7 +14,7 @@ export class AddUserComponent {
     name: '',
     email: '',
     password: '',
-    role: 'CONSULTANT'
+    role: ''
   };
 
   successMessage: string = '';  // Variable to hold the success message
