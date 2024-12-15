@@ -14,6 +14,7 @@ import { Router } from '@angular/router';  // Import de Router pour la navigatio
 export class DossiersRecouvrementListComponent implements OnInit {
   dossiers: DossierRecouvrement[] = [];
   file: File | null = null;
+  selectedFile: File | null = null;
 
   constructor(
     private dossierService: DossierRecouvrementService,
@@ -25,7 +26,7 @@ export class DossiersRecouvrementListComponent implements OnInit {
   ngOnInit(): void {
     this.getDossiers();
   }
-
+  
   getDossiers(): void {
     this.dossierService.getDossiers().subscribe((data: DossierRecouvrement[]) => {
       this.dossiers = data;
@@ -40,13 +41,15 @@ export class DossiersRecouvrementListComponent implements OnInit {
 
   onFileChange(event: any): void {
     this.file = event.target.files[0];
+    this.selectedFile = event.target.files[0];
   }
+  
 
   onSubmit(): void {
     if (this.file) {
       const formData = new FormData();
       formData.append('file', this.file, this.file.name);
-
+      window.location.reload();
       this.http.post(`${environment.apiUrl}/DossierRecouvrement/detection-impayes`, formData).subscribe(
         (response) => {
           console.log('Fichier traité avec succès', response);

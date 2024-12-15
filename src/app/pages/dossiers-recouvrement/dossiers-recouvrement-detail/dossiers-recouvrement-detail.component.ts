@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement';
-
+import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-dossiers-recouvrement-detail',
   templateUrl: './dossiers-recouvrement-detail.component.html',
@@ -13,7 +12,10 @@ export class DossiersRecouvrementDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private dossierService: DossierRecouvrementService
+    private dossierService: DossierRecouvrementService,
+    private router: Router
+
+
   ) { }
 
   ngOnInit(): void {
@@ -21,5 +23,8 @@ export class DossiersRecouvrementDetailComponent implements OnInit {
     this.dossierService.getDossierById(id).subscribe((data) => {
       this.dossier = data;
     });
+  }
+  goBack(): void{
+    this.router.navigate(['/dossiers-recouvrement']);
   }
 }

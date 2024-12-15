@@ -1,85 +1,293 @@
-/* Style général pour la page */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  font-family: sans-serif;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 4px;
+}
+
 .container {
-  width: 80%;
-  margin: 20px auto;
-  font-family: Arial, sans-serif;
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  min-height: 100vh;
 }
 
-/* Style du tableau */
-.dossiers-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+.page-header {
+  margin-bottom: 32px;
+  background: white;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.dossiers-table th, .dossiers-table td {
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
+.title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.dossiers-table th {
-  background-color: #f2f2f2;
+.title h2 {
+  color: #1e293b;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
 }
 
-/* Boutons d'actions */
-.btn-supprimer, .btn-voir-modifier, .btn-details {
-  padding: 8px 15px;
-  font-size: 14px;
-  cursor: pointer;
+.title i {
+  color: #6366f1;
+  font-size: 2rem;
 }
 
-.btn-supprimer {
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 5px;
+.card-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-bottom: 32px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-.btn-voir-modifier {
-  background-color: blue;
-  color: white;
-  border: none;
-  border-radius: 5px;
+.card-container:hover {
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
-.btn-details {
-  background-color: green;
-  color: white;
-  border: none;
-  border-radius: 5px;
+.import-section {
+  padding: 24px;
 }
 
-/* Mettre à jour les couleurs des boutons au survol */
-.btn-supprimer:hover {
-  background-color: darkred;
-}
-
-.btn-voir-modifier:hover {
-  background-color: darkblue;
-}
-
-.btn-details:hover {
-  background-color: darkgreen;
-}
-
-/* Formulaire d'importation CSV */
-.import-container {
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-.import-container label {
-  font-weight: bold;
+.section-header h3 {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.import-container button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px;
+.section-header h3 i {
+  color: #6366f1;
+}
+
+.import-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.file-input-wrapper {
+  position: relative;
+}
+
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: white;
+  border: 2px dashed #cbd5e1;
+  border-radius: 50px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.import-container button:hover {
-  background-color: #45a049;
+.file-label:hover {
+  border-color: #6366f1;
+  background: #f8fafc;
+}
+
+.file-label.has-file {
+  border-color: #10b981;
+  background: #f0fdfa;
+}
+
+.file-label i {
+  color: #64748b;
+}
+
+.file-label.has-file i {
+  color: #10b981;
+}
+
+.file-label span {
+  font-size: 14px;
+  color: #475569;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.import-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #6366f1;
+  color: white;
+}
+
+.import-btn:hover:not(:disabled) {
+  background-color: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.table-container {
+  overflow-x: auto;
+  padding: 24px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+}
+
+th {
+  background-color: #f8fafc;
+  padding: 16px;
+  text-align: left;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.id-cell {
+  font-family: 'Roboto Mono', monospace;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.amount {
+  font-family: 'Roboto Mono', monospace;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.open {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.status-badge.closed {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.delete-btn,
+.edit-btn,
+.details-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-btn {
+  background-color: #fca5a5;
+  color: #991b1b;
+}
+
+.delete-btn:hover {
+  background-color: #f87171;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #93c5fd;
+  color: #1e40af;
+}
+
+.edit-btn:hover {
+  background-color: #60a5fa;
+  color: white;
+}
+
+.details-btn {
+  background-color: #a7f3d0;
+  color: #047857;
+}
+
+.details-btn:hover {
+  background-color: #6ee7b7;
+  color: white;
 }

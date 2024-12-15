@@ -1,38 +1,80 @@
-<div class="detail-container">
-    <h2>Détails du Dossier de Recouvrement</h2>
-  
-    <div class="detail-item">
-      <span class="label">Numéro de Compte:</span>
-      <span class="value">{{ dossier.accountNumber }}</span>
-    </div>
-  
-    <div class="detail-item">
-      <span class="label">Impaye:</span>
-      <span class="value">{{ dossier.impaye }}</span>
-    </div>
-  
-    <div class="detail-item">
-      <span class="label">Status:</span>
-      <span class="value">{{ dossier.status }}</span>
-    </div>
-  
-    <div class="detail-item">
-      <span class="label">Sold:</span>
-      <span class="value">{{ dossier.sold }}</span>
-    </div>
-  
-    <div class="detail-item">
-      <span class="label">PR:</span>
-      <span class="value">{{ dossier.PR }}</span>
-    </div>
-  
-    <div class="detail-item">
-      <span class="label">Encour:</span>
-      <span class="value">{{ dossier.encour }}</span>
-    </div>
-  
-    <div class="btn-container">
-      <button class="btn-info">Retour</button>
+<div class="container">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title">
+        <i class="material-icons">info</i>
+        <h2>Détails du Dossier de Recouvrement</h2>
+      </div>
+      <button class="back-btn" (click)="goBack()">
+        <i class="material-icons">arrow_back</i>
+        Retour
+      </button>
     </div>
   </div>
-  
+
+  <div class="card-container">
+    <div class="detail-item">
+      <div class="icon-container">
+        <i class="material-icons">account_balance</i>
+      </div>
+      <div class="info-container">
+        <span class="label">Numéro de Compte:</span>
+        <span class="value">{{ dossier.accountNumber }}</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <div class="icon-container">
+        <i class="material-icons">money_off</i>
+      </div>
+      <div class="info-container">
+        <span class="label">Impaye:</span>
+        <span class="value">{{ dossier.impaye | number:'1.2-2' }} MRU</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <div class="icon-container">
+        <i class="material-icons">info</i>
+      </div>
+      <div class="info-container">
+        <span class="label">Status:</span>
+        <span class="value">
+          <span class="status-badge" [ngClass]="dossier.status.toLowerCase()">
+            {{ dossier.status }}
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <div class="icon-container">
+        <i class="material-icons">attach_money</i>
+      </div>
+      <div class="info-container">
+        <span class="label">Sold:</span>
+        <span class="value">{{ dossier.sold | number:'1.2-2' }} MRU</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <div class="icon-container">
+        <i class="material-icons">credit_score</i>
+      </div>
+      <div class="info-container">
+        <span class="label">PR:</span>
+        <span class="value">{{ dossier.PR | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <div class="icon-container">
+        <i class="material-icons">trending_up</i>
+      </div>
+      <div class="info-container">
+        <span class="label">Encour:</span>
+        <span class="value">{{ dossier.encour | number:'1.2-2' }} MRU</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,23 +1,55 @@
 <div class="container">
-    <h2>Modifier un Dossier de Recouvrement</h2>
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title">
+        <i class="material-icons">edit</i>
+        <h2>Modifier un Dossier de Recouvrement</h2>
+      </div>
+      <button class="back-btn" (click)="goBack()">
+        <i class="material-icons">arrow_back</i>
+        Retour
+      </button>
+    </div>
+  </div>
+
+  <div class="card-container">
     <form (ngSubmit)="updateDossier()">
       <div class="form-group">
-        <label for="accountNumber">Numéro de Compte</label>
+        <label for="accountNumber">
+          <i class="material-icons">account_balance</i>
+          Numéro de Compte
+        </label>
         <input type="text" class="form-control" id="accountNumber" [(ngModel)]="dossier.accountNumber" name="accountNumber" required />
       </div>
       <div class="form-group">
-        <label for="impaye">Impaye</label>
+        <label for="impaye">
+          <i class="material-icons">money_off</i>
+          Impaye
+        </label>
         <input type="number" class="form-control" id="impaye" [(ngModel)]="dossier.impaye" name="impaye" required />
       </div>
       <div class="form-group">
-        <label for="status">Status</label>
-        <input type="text" class="form-control" id="status" [(ngModel)]="dossier.status" name="status" required />
+        <label for="status">
+          <i class="material-icons">info</i>
+          Status
+        </label>
+        <select class="form-control" id="status" [(ngModel)]="dossier.status" name="status" required>
+          <option value="open">Open</option>
+          <option value="closed">Closed</option>
+          <option value="pending">Pending</option>
+        </select>
       </div>
       <div class="form-group">
-        <label for="sold">Sold</label>
+        <label for="sold">
+          <i class="material-icons">attach_money</i>
+          Sold
+        </label>
         <input type="number" class="form-control" id="sold" [(ngModel)]="dossier.sold" name="sold" required />
       </div>
-      <button type="submit" class="btn btn-primary">Mettre à jour le Dossier</button>
+      <button type="submit" class="save-btn">
+        <i class="material-icons">save</i>
+        Mettre à jour le Dossier
+      </button>
     </form>
   </div>
-  
+</div>
