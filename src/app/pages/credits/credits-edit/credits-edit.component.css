@@ -1,148 +1,248 @@
+/* Container Styles */
 .container {
     padding: 24px;
     max-width: 1200px;
     margin: 0 auto;
   }
   
-  .header {
+  /* Page Header */
+  .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
   }
   
-  h2 {
+  .header-content {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  
+  .title {
     color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .credit-id {
+    color: #64748b;
+    font-size: 16px;
     margin: 0;
   }
   
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #f1f5f9;
+    color: #334155;
+  }
+  
+  /* Alert Styles */
   .alert {
-    padding: 12px;
-    border-radius: 4px;
-    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   
   .alert.error {
     background-color: #fee2e2;
-    border: 1px solid #ef4444;
-    color: #b91c1c;
+    border: 1px solid #fecaca;
+    color: #dc2626;
   }
   
-  .edit-form {
+  /* Card Container */
+  .card-container {
     background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .card-container:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+  
+  /* Form Sections */
+  .form-section {
     padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .section-title {
+    color: #334155;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
   }
   
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
-    margin-bottom: 24px;
   }
   
+  /* Form Groups */
   .form-group {
     display: flex;
     flex-direction: column;
+    gap: 8px;
   }
   
   label {
-    margin-bottom: 8px;
-    color: #4b5563;
+    color: #64748b;
+    font-size: 14px;
     font-weight: 500;
   }
   
-  input[type="text"],
-  input[type="number"],
-  input[type="date"] {
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-  }
-  
-  input[type="text"]:focus,
-  input[type="number"]:focus,
-  input[type="date"]:focus {
-    border-color: #3b82f6;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-  }
-  
-  .documents-section {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
-  }
-  
-  .documents-section h3 {
-    margin-bottom: 16px;
-    color: #2c3e50;
-  }
-  
-  .documents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 16px;
-  }
-  
-  .file-input-group {
-    margin-bottom: 16px;
-  }
-  
-  .file-input-wrapper {
+  .input-with-icon {
     position: relative;
     display: flex;
     align-items: center;
-    margin-top: 8px;
   }
   
-  input[type="file"] {
-    padding: 8px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
+  .input-with-icon i {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    font-size: 20px;
+  }
+  
+  input, select {
     width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #334155;
+    transition: all 0.3s ease;
   }
   
-  .file-name {
-    margin-left: 8px;
-    color: #6b7280;
+  input:focus, select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Document Section */
+  .documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  
+  .document-item {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .document-item:hover {
+    background: #f1f5f9;
+  }
+  
+  .document-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #334155;
+  }
+  
+  .file-input-container {
+    position: relative;
+  }
+  
+  .file-input-container input[type="file"] {
+    display: none;
+  }
+  
+  .file-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .file-label:hover {
+    border-color: #3b82f6;
+    background: #f8fafc;
+  }
+  
+  .file-label i {
+    color: #64748b;
+  }
+  
+  .file-label span {
     font-size: 14px;
+    color: #64748b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   
   .remove-file {
-    background: none;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: #ef4444;
+    color: white;
     border: none;
-    color: #ef4444;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: 18px;
-    padding: 4px 8px;
-    margin-left: 8px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
   }
   
   .remove-file:hover {
-    background-color: #fee2e2;
+    background: #dc2626;
+    transform: scale(1.1);
   }
   
+  /* Form Actions */
   .form-actions {
+    padding: 24px;
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
+    gap: 16px;
   }
   
-  button {
+  .submit-btn, .cancel-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -154,8 +254,9 @@
     border: none;
   }
   
-  .submit-btn:hover {
+  .submit-btn:hover:not(:disabled) {
     background-color: #2563eb;
+    transform: translateY(-1px);
   }
   
   .submit-btn:disabled {
@@ -164,34 +265,29 @@
   }
   
   .cancel-btn {
-    background-color: white;
-    color: #4b5563;
-    border: 1px solid #d1d5db;
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
   }
   
   .cancel-btn:hover {
-    background-color: #f3f4f6;
+    background-color: #e2e8f0;
+    color: #334155;
   }
   
-  /* Loading state styles */
-  .loading {
-    opacity: 0.7;
-    pointer-events: none;
-  }
-  
-  /* Error state styles for inputs */
-  input.ng-invalid.ng-touched {
-    border-color: #ef4444;
-  }
-  
-  /* Success state styles for inputs */
-  input.ng-valid.ng-touched {
-    border-color: #10b981;
-  }
-  
-  /* Responsive adjustments */
+  /* Responsive Design */
   @media (max-width: 768px) {
     .container {
+      padding: 16px;
+    }
+  
+    .page-header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+    }
+  
+    .form-section {
       padding: 16px;
     }
   
@@ -204,60 +300,11 @@
     }
   
     .form-actions {
-      flex-direction: column;
+      flex-direction: column-reverse;
     }
   
-    .form-actions button {
+    .submit-btn, .cancel-btn {
       width: 100%;
-    }
-  
-    .header {
-      flex-direction: column;
-      gap: 12px;
-    }
-  
-    .header button {
-      width: 100%;
-    }
-  }
-  
-  /* Accessibility improvements */
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      transition: none !important;
-    }
-  }
-  
-  /* Focus states for accessibility */
-  button:focus,
-  input:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-  }
-  
-  /* High contrast mode improvements */
-  @media (forced-colors: active) {
-    button {
-      border: 1px solid currentColor;
-    }
-  }
-  
-  /* Print styles */
-  @media print {
-    .container {
-      padding: 0;
-      box-shadow: none;
-    }
-  
-    button {
-      display: none;
-    }
-  
-    input {
-      border: none;
-    }
-  
-    .file-input-wrapper {
-      display: none;
+      justify-content: center;
     }
   }
