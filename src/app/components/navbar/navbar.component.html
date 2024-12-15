@@ -1,0 +1,20 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<div class="navbar">
+  <div class="navbar-logo">
+    <img src="logo.png" alt="Logo" />
+  </div>
+  <div class="search-bar">
+    <input type="text" placeholder="Rechercher..." />
+    <button class="btn-search">Rechercher</button>
+  </div>
+  <div class="user-actions">
+    <span class="user-profile">
+      <span class="material-icons">account_circle</span> <!-- Icône utilisateur -->
+      <span>{{ userName }}</span>
+    </span>
+    <button class="btn-logout" (click)="logout()">
+      <span class="material-icons">logout</span> Déconnexion
+    </button>
+  </div>
+  

@@ -1,0 +1,89 @@
+/* Style principal de la sidebar */
+.sidebar {
+  background-color: #b2b282; /* Couleur principale de la sidebar */
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.main-content {
+  margin-left: 270px; /* Décalage pour prendre en compte la largeur de la sidebar + espace supplémentaire */
+  padding: 20px; /* Espacement interne */
+}
+
+/* Logo circulaire */
+.logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%; /* Logo circulaire */
+  border: 2px solid white;
+  margin-right: 15px;
+}
+
+.logo-text h3 {
+  font-size: 20px; /* Texte plus grand */
+  color: black; /* Titre en noir */
+  font-family: 'Poppins', sans-serif; /* Police élégante */
+  margin: 0;
+}
+
+.logo-text p {
+  font-size: 12px; /* Sous-titre légèrement réduit */
+  color: black;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Menu des liens */
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.menu li {
+  margin: 15px 0;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: black; /* Texte noir */
+  font-size: 16px; /* Texte légèrement agrandi */
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.menu li a i {
+  font-size: 18px; /* Taille des icônes augmentée */
+  margin-right: 10px;
+}
+
+/* Effet au survol */
+.menu li a:hover,
+.menu li a.routerLinkActive {
+  background-color: #6e6e6e; /* Gris foncé */
+  color: white; /* Texte blanc au survol */
+  font-weight: bold;
+}
+
+/* Section titres */
+.section-title {
+  color: black;
+  font-size: 16px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+}
