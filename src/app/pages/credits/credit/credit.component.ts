@@ -88,4 +88,18 @@ export class CreditComponent implements OnInit {
   closeDetails() {
     this.selectedCredit = null;
   }
+
+  getStatusClass(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'En cours': 'active',
+      'En attente': 'pending',
+      'Clôturé': 'closed',
+      'Approuvé': 'active',
+      'Refusé': 'closed',
+      'En traitement': 'pending'
+      // Add more status mappings as needed
+    };
+    
+    return statusMap[status] || 'pending';
+  }
 }

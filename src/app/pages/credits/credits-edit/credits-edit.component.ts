@@ -110,4 +110,49 @@ export class CreditEditComponent implements OnInit {
   removeFile(fileType: string) {
     delete this.files[fileType];
   }
+
+  documentTypes = [
+    'demande',
+    'etude',
+    'bulletinSalaire',
+    'domiciliation',
+    'pvComite',
+    'bonPourAval',
+    'reconnaissanceDeDette',
+    'contrat',
+    'tableauAmortissement'
+  ];
+
+
+  // Get appropriate icon for each document type
+  getDocumentIcon(docType: string): string {
+    const iconMap: { [key: string]: string } = {
+      'demande': 'description',
+      'etude': 'analytics',
+      'bulletinSalaire': 'receipt_long',
+      'domiciliation': 'home',
+      'pvComite': 'groups',
+      'bonPourAval': 'verified',
+      'reconnaissanceDeDette': 'gavel',
+      'contrat': 'assignment',
+      'tableauAmortissement': 'table_chart'
+    };
+    return iconMap[docType] || 'file_present';
+  }
+
+  // Get readable label for each document type
+  getDocumentLabel(docType: string): string {
+    const labelMap: { [key: string]: string } = {
+      'demande': 'Demande',
+      'etude': 'Étude',
+      'bulletinSalaire': 'Bulletin de Salaire',
+      'domiciliation': 'Domiciliation',
+      'pvComite': 'PV Comité',
+      'bonPourAval': 'Bon Pour Aval',
+      'reconnaissanceDeDette': 'Reconnaissance de Dette',
+      'contrat': 'Contrat',
+      'tableauAmortissement': 'Tableau d\'Amortissement'
+    };
+    return labelMap[docType] || docType;
+  }
 }

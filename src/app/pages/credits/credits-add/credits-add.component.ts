@@ -40,6 +40,18 @@ export class CreditAddComponent implements OnInit {
       return;
     }
   }
+  documentTypes = [
+    'demande',
+    'etude',
+    'bulletinSalaire',
+    'domiciliation',
+    'pvComite',
+    'bonPourAval',
+    'reconnaissanceDeDette',
+    'contrat',
+    'tableauAmortissement'
+  ];
+
 
   onFileSelected(event: any, fileType: string) {
     const file = event.target.files[0];
@@ -47,7 +59,9 @@ export class CreditAddComponent implements OnInit {
       this.files[fileType] = file;
     }
   }
-
+  isAllFilesUploaded(): boolean {
+    return this.documentTypes.every(docType => this.files[docType]);
+  }
   getFileName(fileType: string): string {
     return this.files[fileType]?.name || 'Aucun fichier sélectionné';
   }
@@ -97,5 +111,34 @@ export class CreditAddComponent implements OnInit {
 
   cancel() {
     this.router.navigate(['/credits']);
+  }
+  getDocumentIcon(docType: string): string {
+    const iconMap: { [key: string]: string } = {
+      'demande': 'description',
+      'etude': 'analytics',
+      'bulletinSalaire': 'receipt_long',
+      'domiciliation': 'home',
+      'pvComite': 'groups',
+      'bonPourAval': 'verified',
+      'reconnaissanceDeDette': 'gavel',
+      'contrat': 'assignment',
+      'tableauAmortissement': 'table_chart'
+    };
+    return iconMap[docType] || 'file_present';
+  }
+
+  getDocumentLabel(docType: string): string {
+    const labelMap: { [key: string]: string } = {
+      'demande': 'Demande',
+      'etude': 'Étude',
+      'bulletinSalaire': 'Bulletin de Salaire',
+      'domiciliation': 'Domiciliation',
+      'pvComite': 'PV Comité',
+      'bonPourAval': 'Bon Pour Aval',
+      'reconnaissanceDeDette': 'Reconnaissance de Dette',
+      'contrat': 'Contrat',
+      'tableauAmortissement': 'Tableau d\'Amortissement'
+    };
+    return labelMap[docType] || docType;
   }
 }

@@ -1,187 +1,182 @@
-<div class="container" *ngIf="credit">
-    <div class="header">
-      <h2>Modifier le Crédit</h2>
-      <button class="cancel-btn" (click)="cancel()">Retour</button>
+<div class="container">
+    <div class="page-header">
+      <div class="header-content">
+        <h2 class="title">
+          <i class="material-icons">edit</i>
+          Modifier le Crédit
+        </h2>
+        <p class="credit-id">ID Crédit: #{{ creditId }}</p>
+      </div>
+      <button class="back-btn" (click)="cancel()">
+        <i class="material-icons">arrow_back</i>
+        Retour
+      </button>
     </div>
   
     <div class="alert error" *ngIf="errorMessage">
+      <i class="material-icons">error</i>
       {{ errorMessage }}
     </div>
   
-    <form (ngSubmit)="updateCredit()" #editForm="ngForm" class="edit-form">
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="idCompte">ID Compte</label>
-          <input 
-            id="idCompte"
-            [(ngModel)]="credit.idCompte"
-            name="idCompte"
-            type="text"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="idGarantie">ID Garantie</label>
-          <input 
-            id="idGarantie"
-            [(ngModel)]="credit.idGarantie"
-            name="idGarantie"
-            type="text"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="montant">Montant</label>
-          <input 
-            id="montant"
-            [(ngModel)]="credit.montant"
-            name="montant"
-            type="number"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="tauxInteret">Taux d'intérêt</label>
-          <input 
-            id="tauxInteret"
-            [(ngModel)]="credit.tauxInteret"
-            name="tauxInteret"
-            type="number"
-            step="0.01"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="duree">Durée (mois)</label>
-          <input 
-            id="duree"
-            [(ngModel)]="credit.duree"
-            name="duree"
-            type="number"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="dateDebut">Date de début</label>
-          <input 
-            id="dateDebut"
-            [(ngModel)]="credit.dateDebut"
-            name="dateDebut"
-            type="date"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="statut">Statut</label>
-          <input 
-            id="statut"
-            [(ngModel)]="credit.statut"
-            name="statut"
-            type="text"
-            required>
-        </div>
-  
-        <div class="form-group">
-          <label for="refTransaction">Référence Transaction</label>
-          <input 
-            id="refTransaction"
-            [(ngModel)]="credit.refTransaction"
-            name="refTransaction"
-            type="text">
-        </div>
-      </div>
-  
-      <div class="documents-section">
-        <h3>Documents</h3>
-        <div class="documents-grid">
-          <div class="file-input-group">
-            <label>Demande</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'demande')">
-              <span class="file-name">{{ getFileName('demande') }}</span>
-              <button type="button" *ngIf="files['demande']" (click)="removeFile('demande')" class="remove-file">×</button>
+    <div class="card-container">
+      <form (ngSubmit)="updateCredit()" #editForm="ngForm" class="edit-form">
+        <div class="form-section">
+          <h3 class="section-title">Informations principales</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="idCompte">ID Compte</label>
+              <div class="input-with-icon">
+                <i class="material-icons">account_circle</i>
+                <input 
+                  id="idCompte"
+                  [(ngModel)]="credit.idCompte"
+                  name="idCompte"
+                  type="text"
+                  required>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>Étude</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'etude')">
-              <span class="file-name">{{ getFileName('etude') }}</span>
-              <button type="button" *ngIf="files['etude']" (click)="removeFile('etude')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="idGarantie">ID Garantie</label>
+              <div class="input-with-icon">
+                <i class="material-icons">security</i>
+                <input 
+                  id="idGarantie"
+                  [(ngModel)]="credit.idGarantie"
+                  name="idGarantie"
+                  type="text"
+                  required>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>Bulletin de Salaire</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'bulletinSalaire')">
-              <span class="file-name">{{ getFileName('bulletinSalaire') }}</span>
-              <button type="button" *ngIf="files['bulletinSalaire']" (click)="removeFile('bulletinSalaire')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="montant">Montant</label>
+              <div class="input-with-icon">
+                <i class="material-icons">euro</i>
+                <input 
+                  id="montant"
+                  [(ngModel)]="credit.montant"
+                  name="montant"
+                  type="number"
+                  required>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>Domiciliation</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'domiciliation')">
-              <span class="file-name">{{ getFileName('domiciliation') }}</span>
-              <button type="button" *ngIf="files['domiciliation']" (click)="removeFile('domiciliation')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="tauxInteret">Taux d'intérêt (%)</label>
+              <div class="input-with-icon">
+                <i class="material-icons">percent</i>
+                <input 
+                  id="tauxInteret"
+                  [(ngModel)]="credit.tauxInteret"
+                  name="tauxInteret"
+                  type="number"
+                  step="0.01"
+                  required>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>PV Comité</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'pvComite')">
-              <span class="file-name">{{ getFileName('pvComite') }}</span>
-              <button type="button" *ngIf="files['pvComite']" (click)="removeFile('pvComite')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="duree">Durée (mois)</label>
+              <div class="input-with-icon">
+                <i class="material-icons">calendar_today</i>
+                <input 
+                  id="duree"
+                  [(ngModel)]="credit.duree"
+                  name="duree"
+                  type="number"
+                  required>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>Bon Pour Aval</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'bonPourAval')">
-              <span class="file-name">{{ getFileName('bonPourAval') }}</span>
-              <button type="button" *ngIf="files['bonPourAval']" (click)="removeFile('bonPourAval')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="dateDebut">Date de début</label>
+              <div class="input-with-icon">
+                <i class="material-icons">event</i>
+                <input 
+                  id="dateDebut"
+                  [(ngModel)]="credit.dateDebut"
+                  name="dateDebut"
+                  type="date"
+                  required>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>Reconnaissance de Dette</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'reconnaissanceDeDette')">
-              <span class="file-name">{{ getFileName('reconnaissanceDeDette') }}</span>
-              <button type="button" *ngIf="files['reconnaissanceDeDette']" (click)="removeFile('reconnaissanceDeDette')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="statut">Statut</label>
+              <div class="input-with-icon">
+                <i class="material-icons">flag</i>
+                <select 
+                  id="statut"
+                  [(ngModel)]="credit.statut"
+                  name="statut"
+                  required>
+                  <option value="En cours">En cours</option>
+                  <option value="En attente">En attente</option>
+                  <option value="Clôturé">Clôturé</option>
+                  <option value="Approuvé">Approuvé</option>
+                  <option value="Refusé">Refusé</option>
+                </select>
+              </div>
             </div>
-          </div>
   
-          <div class="file-input-group">
-            <label>Contrat</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'contrat')">
-              <span class="file-name">{{ getFileName('contrat') }}</span>
-              <button type="button" *ngIf="files['contrat']" (click)="removeFile('contrat')" class="remove-file">×</button>
-            </div>
-          </div>
-  
-          <div class="file-input-group">
-            <label>Tableau d'Amortissement</label>
-            <div class="file-input-wrapper">
-              <input type="file" (change)="onFileSelected($event, 'tableauAmortissement')">
-              <span class="file-name">{{ getFileName('tableauAmortissement') }}</span>
-              <button type="button" *ngIf="files['tableauAmortissement']" (click)="removeFile('tableauAmortissement')" class="remove-file">×</button>
+            <div class="form-group">
+              <label for="refTransaction">Référence Transaction</label>
+              <div class="input-with-icon">
+                <i class="material-icons">receipt</i>
+                <input 
+                  id="refTransaction"
+                  [(ngModel)]="credit.refTransaction"
+                  name="refTransaction"
+                  type="text">
+              </div>
             </div>
           </div>
         </div>
-      </div>
   
-      <div class="form-actions">
-        <button type="submit" [disabled]="isLoading" class="submit-btn">
-          {{ isLoading ? 'Mise à jour...' : 'Mettre à jour' }}
-        </button>
-        <button type="button" (click)="cancel()" class="cancel-btn">Annuler</button>
-      </div>
-    </form>
+        <div class="form-section">
+          <h3 class="section-title">Documents</h3>
+          <div class="documents-grid">
+            <div class="document-item" *ngFor="let doc of documentTypes">
+              <div class="document-header">
+                <i class="material-icons">{{ getDocumentIcon(doc) }}</i>
+                <span>{{ getDocumentLabel(doc) }}</span>
+              </div>
+              <div class="file-input-container">
+                <input 
+                  type="file" 
+                  [id]="doc"
+                  (change)="onFileSelected($event, doc)"
+                  [accept]="'.pdf,.doc,.docx'">
+                <label [for]="doc" class="file-label">
+                  <i class="material-icons">upload_file</i>
+                  <span>{{ getFileName(doc) || 'Choisir un fichier' }}</span>
+                </label>
+                <button 
+                  type="button" 
+                  class="remove-file" 
+                  *ngIf="files[doc]"
+                  (click)="removeFile(doc)">
+                  <i class="material-icons">close</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="cancel()">
+            <i class="material-icons">close</i>
+            Annuler
+          </button>
+          <button 
+            type="submit" 
+            class="submit-btn" 
+            [disabled]="!editForm.form.valid || isLoading">
+            <i class="material-icons">save</i>
+            {{ isLoading ? 'Mise à jour...' : 'Mettre à jour' }}
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
