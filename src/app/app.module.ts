@@ -12,6 +12,7 @@ import { AddUserComponent } from './admin/add-user/add-user.component';
 import { DossiersRecouvrementListComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-list/dossiers-recouvrement-list.component';
 import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-detail/dossiers-recouvrement-detail.component';
 import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
+import { RoleGuard } from './shared/guards/role.guard';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement
     FormsModule
   ],
   providers: [
+    RoleGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptorService,

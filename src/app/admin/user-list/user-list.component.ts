@@ -3,7 +3,7 @@ import { AdminService } from '../admin.service';
 import { Router } from '@angular/router';
 import { User } from '../../shared/models/user.model';
 import { UserDataService } from '../../shared/services/user-data.service';  // Import the UserDataService
-
+import { AuthService } from 'src/app/auth/auth.service';
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
@@ -11,15 +11,18 @@ import { UserDataService } from '../../shared/services/user-data.service';  // I
 })
 export class UserListComponent implements OnInit {
   users: User[] = [];
+  userName: string = '';
 
   constructor(
     private adminService: AdminService,
     private router: Router,
-    private userDataService: UserDataService
+    private userDataService: UserDataService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.fetchUsers();
+    this.userName = this.authService.getLoggedInUserName();
   }
 
   fetchUsers() {
@@ -54,5 +57,8 @@ export class UserListComponent implements OnInit {
         }
       );
     }
+  }
+  logout(): void {
+    this.authService.logout();
   }
 }
