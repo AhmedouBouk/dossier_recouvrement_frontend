@@ -1,0 +1,17 @@
+{
+    "cSpell.words": [
+        "Garantie",
+        "Statut"
+    ],
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "vlan",
+            "database": "recouvrement_bnm",
+            "username": "postgres"
+        }
+    ]
+}

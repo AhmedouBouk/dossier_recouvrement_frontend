@@ -1,0 +1,40 @@
+<div class="container">
+  <h2>Gestion des Garanties</h2>
+
+  <!-- Ajout d'une garantie -->
+  <div class="form-section" *ngIf="garantieRoleService.hasRole(['DO'])">
+    <h3>Ajouter une Garantie</h3>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="newGarantie.typeGarantie" placeholder="Type de garantie" class="form-control">
+      <input type="number" [(ngModel)]="newGarantie.valeur" placeholder="Valeur (MRU)" class="form-control">
+      <input type="file" (change)="onFileSelected($event)" accept=".pdf" class="form-control">
+      <button class="btn btn-primary" (click)="addGarantie()">Ajouter</button>
+    </div>
+  </div>
+
+  <!-- Table des garanties -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Valeur</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let garantie of garanties">
+          <td>{{ garantie.idGarantie }}</td>
+          <td>{{ garantie.typeGarantie }}</td>
+          <td>{{ garantie.valeur | number:'1.2-2' }} MRU</td>
+          <td>
+            <button class="btn btn-success" *ngIf="garantieRoleService.hasRole(['DO'])" (click)="startEdit(garantie)">Modifier</button>
+            <button class="btn btn-danger" *ngIf="garantieRoleService.hasRole(['DO'])" (click)="deleteGarantie(garantie.idGarantie)">Supprimer</button>
+            <button class="btn btn-info" (click)="downloadPdf(garantie.idGarantie)">Télécharger</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,185 @@
+<div class="container">
+    <div class="page-header">
+      <div class="header-content">
+        <h2 class="title">
+          <i class="material-icons">add_circle</i>
+          Nouveau Crédit
+        </h2>
+      </div>
+      <button class="back-btn" (click)="cancel()">
+        <i class="material-icons">arrow_back</i>
+        Retour
+      </button>
+    </div>
+  
+    <div class="alert error" *ngIf="errorMessage">
+      <i class="material-icons">error</i>
+      {{ errorMessage }}
+    </div>
+  
+    <div class="card-container">
+      <form (ngSubmit)="addCredit()" #addForm="ngForm" class="add-form">
+        <div class="form-section">
+          <h3 class="section-title">Informations du crédit</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="idCompte">ID Compte</label>
+              <div class="input-with-icon">
+                <i class="material-icons">account_circle</i>
+                <input 
+                  id="idCompte"
+                  [(ngModel)]="creditForm.idCompte"
+                  name="idCompte"
+                  type="text"
+                  required>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="idGarantie">ID Garantie</label>
+              <div class="input-with-icon">
+                <i class="material-icons">security</i>
+                <input 
+                  id="idGarantie"
+                  [(ngModel)]="creditForm.idGarantie"
+                  name="idGarantie"
+                  type="text"
+                  required>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="montant">Montant</label>
+              <div class="input-with-icon">
+                <i class="material-icons">euro</i>
+                <input 
+                  id="montant"
+                  [(ngModel)]="creditForm.montant"
+                  name="montant"
+                  type="number"
+                  min="0"
+                  required>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="tauxInteret">Taux d'intérêt (%)</label>
+              <div class="input-with-icon">
+                <i class="material-icons">percent</i>
+                <input 
+                  id="tauxInteret"
+                  [(ngModel)]="creditForm.tauxInteret"
+                  name="tauxInteret"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  required>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="duree">Durée (mois)</label>
+              <div class="input-with-icon">
+                <i class="material-icons">calendar_today</i>
+                <input 
+                  id="duree"
+                  [(ngModel)]="creditForm.duree"
+                  name="duree"
+                  type="number"
+                  min="1"
+                  required>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="dateDebut">Date de début</label>
+              <div class="input-with-icon">
+                <i class="material-icons">event</i>
+                <input 
+                  id="dateDebut"
+                  [(ngModel)]="creditForm.dateDebut"
+                  name="dateDebut"
+                  type="date"
+                  required>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="statut">Statut</label>
+              <div class="input-with-icon">
+                <i class="material-icons">flag</i>
+                <select 
+                  id="statut"
+                  [(ngModel)]="creditForm.statut"
+                  name="statut"
+                  required>
+                  <option value="En cours">En cours</option>
+                  <option value="En attente">En attente</option>
+                  <option value="Approuvé">Approuvé</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label for="refTransaction">Référence Transaction</label>
+              <div class="input-with-icon">
+                <i class="material-icons">receipt</i>
+                <input 
+                  id="refTransaction"
+                  [(ngModel)]="creditForm.refTransaction"
+                  name="refTransaction"
+                  type="text">
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-section">
+          <h3 class="section-title">Documents requis</h3>
+          <p class="section-description">Tous les documents sont obligatoires pour la création d'un nouveau crédit</p>
+          <div class="documents-grid">
+            <div class="document-item" *ngFor="let doc of documentTypes">
+              <div class="document-header">
+                <i class="material-icons">{{ getDocumentIcon(doc) }}</i>
+                <span>{{ getDocumentLabel(doc) }}</span>
+              </div>
+              <div class="file-input-container">
+                <input 
+                  type="file" 
+                  [id]="doc"
+                  (change)="onFileSelected($event, doc)"
+                  [accept]="'.pdf,.doc,.docx'"
+                  required>
+                <label [for]="doc" class="file-label" [class.has-file]="files[doc]">
+                  <i class="material-icons">{{ files[doc] ? 'check_circle' : 'upload_file' }}</i>
+                  <span>{{ getFileName(doc) || 'Choisir un fichier' }}</span>
+                </label>
+                <button 
+                  type="button" 
+                  class="remove-file" 
+                  *ngIf="files[doc]"
+                  (click)="removeFile(doc)">
+                  <i class="material-icons">close</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="cancel()">
+            <i class="material-icons">close</i>
+            Annuler
+          </button>
+          <button 
+            type="submit" 
+            class="submit-btn" 
+            [disabled]="!addForm.form.valid || !isAllFilesUploaded() || isLoading">
+            <i class="material-icons">save</i>
+            {{ isLoading ? 'Création...' : 'Créer le crédit' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>

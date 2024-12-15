@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AdminService } from '../admin.service';
 import { Router } from '@angular/router';
 import { User } from '../../shared/models/user.model';
+import { UserDataService } from '../../shared/services/user-data.service';
 
 @Component({
   selector: 'app-add-user',
@@ -13,10 +14,11 @@ export class AddUserComponent {
     name: '',
     email: '',
     password: '',
-    role: 'CONSULTANT'
+    role: ''
   };
 
   successMessage: string = '';  // Variable to hold the success message
+  userDataService: any;
 
   constructor(private adminService: AdminService, private router: Router) {}
 
@@ -37,5 +39,14 @@ export class AddUserComponent {
 
   navigateToUserList() {
     this.router.navigate(['/admin/user-list']);
+  }
+
+  navigateBack() {
+    this.router.navigate(['/admin/user-list']);
+  }
+
+  logout() {
+    this.userDataService.clearUser();
+    this.router.navigate(['/login']);
   }
 }
