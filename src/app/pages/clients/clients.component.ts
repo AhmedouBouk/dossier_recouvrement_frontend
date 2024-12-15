@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ClientService } from '../../shared/services/client.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RoleService } from '../../shared/services/role.service';
 
 @Component({
   selector: 'app-clients',
@@ -19,21 +20,26 @@ export class ClientsComponent implements OnInit {
   importMessage: { type: 'success' | 'error', text: string } | null = null;
   editingClient: any = null;
 
-  constructor(private clientService: ClientService) { }
+  constructor(
+    private clientService: ClientService,
+    public roleService: RoleService
+  ) { }
 
   ngOnInit() {
     this.loadClients();
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
+    if (this.roleService.hasEditPermission()) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedFile = file;
+      }
     }
   }
 
   importClients() {
-    if (this.selectedFile) {
+    if (this.selectedFile && this.roleService.hasEditPermission()) {
       this.importMessage = null;
       this.clientService.importClients(this.selectedFile).subscribe({
         next: (response) => {
@@ -90,7 +96,9 @@ export class ClientsComponent implements OnInit {
   }
 
   startEdit(client: any) {
-    this.editingClient = { ...client };
+    if (this.roleService.hasEditPermission()) {
+      this.editingClient = { ...client };
+    }
   }
 
   cancelEdit() {
@@ -98,7 +106,7 @@ export class ClientsComponent implements OnInit {
   }
 
   updateClient() {
-    if (this.editingClient) {
+    if (this.editingClient && this.roleService.hasEditPermission()) {
       this.clientService.updateClient(this.editingClient.nni, this.editingClient).subscribe({
         next: (response) => {
           console.log('Update successful:', response);
@@ -113,7 +121,7 @@ export class ClientsComponent implements OnInit {
   }
 
   deleteClient(nni: number) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
+    if (this.roleService.hasEditPermission() && confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
       this.clientService.deleteClient(nni).subscribe({
         next: () => {
           this.loadClients();
