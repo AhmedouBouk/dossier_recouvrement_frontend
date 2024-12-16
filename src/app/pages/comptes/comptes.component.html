@@ -1,93 +1,161 @@
 <div class="container">
-  <h2>Gestion des Comptes</h2>
 
-  <!-- Import Section - Only visible for DC role -->
-  <div *ngIf="roleService.hasEditPermission()" class="import-section">
-    <div class="import-section-header">
-      <h3>Importer des comptes</h3>
-      <div class="import-section-actions">
-        <label for="file-input" class="file-input-label">Choisir un fichier</label>
-        <input 
-          type="file" 
-          id="file-input"
-          (change)="onFileSelected($event)" 
-          accept=".csv"
-          class="file-input">
-        <button 
-          [disabled]="!selectedFile" 
-          (click)="uploadFile()" 
-          class="import-button">
-          {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
-        </button>
+
+  <!-- Import Section -->
+  <div *ngIf="roleService.hasEditPermission()" class="card-container">
+    <div class="import-section">
+      <div class="section-header">
+        <h3>
+          <i class="material-icons">upload_file</i>
+          Importer des comptes
+        </h3>
+        <div class="import-actions">
+          <div class="file-input-wrapper">
+            <input 
+              type="file" 
+              id="file-input"
+              (change)="onFileSelected($event)" 
+              accept=".csv"
+              #fileInput>
+            <label for="file-input" class="file-label" [class.has-file]="selectedFile">
+              <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
+              <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
+            </label>
+          </div>
+          <button 
+            [disabled]="!selectedFile" 
+            (click)="uploadFile()" 
+            class="import-btn">
+            <i class="material-icons">cloud_upload</i>
+            {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
+        <i class="material-icons">{{ getAlertIcon(importMessage.type) }}</i>
+        {{ importMessage.text }}
       </div>
     </div>
+  </div>
 
-    <!-- Message d'import -->
-    <div *ngIf="importMessage" [class]="'alert alert-' + importMessage.type">
-      {{ importMessage.text }}
+  <!-- Search Section -->
+  <div class="card-container">
+    <div class="search-section">
+      <div class="search-grid">
+        <div class="search-field">
+          <div class="input-with-icon">
+            <i class="material-icons">account_balance_wallet</i>
+            <input [(ngModel)]="searchNomCompte" placeholder="Numéro de compte">
+          </div>
+        </div>
+        <div class="search-field">
+          <div class="input-with-icon">
+            <i class="material-icons">person</i>
+            <input [(ngModel)]="searchNom" placeholder="Nom client">
+          </div>
+        </div>
+        <div class="search-field">
+          <div class="input-with-icon">
+            <i class="material-icons">person_outline</i>
+            <input [(ngModel)]="searchPrenom" placeholder="Prénom client">
+          </div>
+        </div>
+        <div class="search-field">
+          <div class="input-with-icon">
+            <i class="material-icons">badge</i>
+            <input [(ngModel)]="searchNNI" type="number" placeholder="NNI client">
+          </div>
+        </div>
+      </div>
+      <button (click)="searchComptes()" class="search-btn">
+        <i class="material-icons">search</i>
+        Rechercher
+      </button>
     </div>
-  </div>
 
-  <!-- Search Section - Visible for all -->
-  <div class="search-section">
-    <input [(ngModel)]="searchNomCompte" placeholder="Numéro de compte" class="search-input">
-    <input [(ngModel)]="searchNom" placeholder="Nom client" class="search-input">
-    <input [(ngModel)]="searchPrenom" placeholder="Prénom client" class="search-input">
-    <input [(ngModel)]="searchNNI" type="number" placeholder="NNI client" class="search-input">
-    <button (click)="searchComptes()" class="search-button">Rechercher</button>
-  </div>
+    <!-- Accounts Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>N° Compte</th>
+            <th>Client</th>
+            <th>Catégorie</th>
+            <th>Solde</th>
+            <th>État</th>
+            <th>Date d'ouverture</th>
+            <th *ngIf="roleService.hasEditPermission()">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let compte of comptes">
+            <!-- View Mode -->
+            <ng-container *ngIf="editingCompte?.nomCompte !== compte.nomCompte">
+              <td>{{compte.nomCompte}}</td>
+              <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
+              <td>
+                <span class="category-badge">{{compte.categorie}}</span>
+              </td>
+              <td>
+                <span class="amount">{{compte.solde | number:'1.2-2'}} MRU</span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(compte.etat)">
+                  {{compte.etat}}
+                </span>
+              </td>
+              <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
+              <td *ngIf="roleService.hasEditPermission()" class="actions">
+                <div class="action-buttons">
+                  <button class="edit-btn" (click)="startEdit(compte)">
+                    <i class="material-icons">edit</i>
+                    Modifier
+                  </button>
+                  <button class="delete-btn" (click)="deleteCompte(compte.nomCompte)">
+                    <i class="material-icons">delete</i>
+                    Supprimer
+                  </button>
+                </div>
+              </td>
+            </ng-container>
 
-  <!-- Comptes Table -->
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>N° Compte</th>
-          <th>Client</th>
-          <th>Catégorie</th>
-          <th>Solde</th>
-          <th>État</th>
-          <th>Date d'ouverture</th>
-          <th *ngIf="roleService.hasEditPermission()">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let compte of comptes">
-          <!-- Mode Vue -->
-          <ng-container *ngIf="editingCompte?.nomCompte !== compte.nomCompte">
-            <td>{{compte.nomCompte}}</td>
-            <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
-            <td>{{compte.categorie}}</td>
-            <td>{{compte.solde | number:'1.2-2'}} MRU</td>
-            <td>{{compte.etat}}</td>
-            <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
-            <td *ngIf="roleService.hasEditPermission()" class="actions">
-              <button class="edit-button" (click)="startEdit(compte)">Modifier</button>
-              <button class="delete-button" (click)="deleteCompte(compte.nomCompte)">Supprimer</button>
-            </td>
-          </ng-container>
-
-          <!-- Mode Édition -->
-          <ng-container *ngIf="editingCompte?.nomCompte === compte.nomCompte">
-            <td>{{compte.nomCompte}}</td>
-            <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
-            <td>{{compte.categorie}}</td>
-            <td><input type="number" [(ngModel)]="editingCompte.solde" class="form-control"></td>
-            <td>
-              <select [(ngModel)]="editingCompte.etat" class="form-control">
-                <option value="ACTIF">ACTIF</option>
-                <option value="BLOQUÉ">BLOQUÉ</option>
-                <option value="FERMÉ">FERMÉ</option>
-              </select>
-            </td>
-            <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
-            <td class="actions">
-              <button class="save-button" (click)="updateCompte(editingCompte)">Sauvegarder</button>
-              <button class="cancel-button" (click)="cancelEdit()">Annuler</button>
-            </td>
-          </ng-container>
-        </tr>
-      </tbody>
-    </table>
+            <!-- Edit Mode -->
+            <ng-container *ngIf="editingCompte?.nomCompte === compte.nomCompte">
+              <td>{{compte.nomCompte}}</td>
+              <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
+              <td>{{compte.categorie}}</td>
+              <td>
+                <div class="edit-field">
+                  <input type="number" [(ngModel)]="editingCompte.solde" class="amount-input">
+                </div>
+              </td>
+              <td>
+                <div class="edit-field">
+                  <select [(ngModel)]="editingCompte.etat" class="status-select">
+                    <option value="ACTIF">ACTIF</option>
+                    <option value="BLOQUÉ">BLOQUÉ</option>
+                    <option value="FERMÉ">FERMÉ</option>
+                  </select>
+                </div>
+              </td>
+              <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
+              <td class="actions">
+                <div class="action-buttons">
+                  <button class="save-btn" (click)="updateCompte(editingCompte)">
+                    <i class="material-icons">save</i>
+                    Sauvegarder
+                  </button>
+                  <button class="cancel-btn" (click)="cancelEdit()">
+                    <i class="material-icons">close</i>
+                    Annuler
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

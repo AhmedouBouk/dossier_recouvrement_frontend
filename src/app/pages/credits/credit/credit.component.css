@@ -1,17 +1,24 @@
-/* Base styles and CSS Reset */
+/* Base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* Main container adjustments to work with sidebar and navbar */
+.main-content {
+  margin-left: 270px; /* Match sidebar width */
+  margin-top: 60px; /* Account for navbar height */
+  padding: 20px 30px;
   background-color: #f8f9fa;
-  transition: background-color 0.3s ease;
+  min-height: calc(100vh - 60px);
 }
 
-/* Header Styling */
+.container {
+  max-width: calc(100vw - 290px);
+}
+
+/* Header Styling - Adjusted for navbar integration */
 header {
   background-color: #ffffff;
   padding: 20px 30px;
@@ -20,70 +27,24 @@ header {
   align-items: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 30px;
-  margin: 20px 30px;
+  margin: 0 0 20px 0;
   transition: box-shadow 0.3s ease;
-}
-
-header:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   gap: 20px;
-  transition: transform 0.3s ease;
 }
 
 .logo-container img {
   height: 60px;
-  transition: transform 0.3s ease;
-}
-
-.logo-container:hover {
-  transform: translateY(-3px);
 }
 
 .logo-container h1 {
   font-size: 28px;
   color: #333;
   font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-/* User Controls */
-.user-controls {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.user-email {
-  font-size: 16px;
-  color: #333;
-  padding: 8px 15px;
-  background-color: #f8f9fa;
-  border-radius: 20px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-email i {
-  color: #333;
-  font-size: 20px;
-}
-
-/* Main Content */
-.main-content {
-  padding: 20px 30px;
-  margin-top: 20px;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
 }
 
 /* Actions Bar */
@@ -153,11 +114,6 @@ header:hover {
   transition: box-shadow 0.3s ease;
 }
 
-.table-container:hover {
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Table Styling */
 table {
   width: 100%;
   border-collapse: separate;
@@ -253,7 +209,6 @@ tbody tr:hover {
 }
 
 /* Modal Styles */
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -304,11 +259,6 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-}
-
-.close-btn:hover {
-  background-color: #f3f4f6;
-  color: #333;
 }
 
 .modal-body {
@@ -376,12 +326,6 @@ tbody tr:hover {
   color: #3b82f6;
 }
 
-.document-btn span {
-  color: #333;
-  font-size: 14px;
-  text-align: center;
-}
-
 .document-btn:hover {
   background-color: #eef2ff;
   transform: translateY(-2px);
@@ -398,11 +342,6 @@ tbody tr:hover {
   font-size: 48px;
   color: #64748b;
   margin-bottom: 15px;
-}
-
-.no-credits-message p {
-  color: #64748b;
-  font-size: 16px;
 }
 
 /* Animations */
@@ -423,20 +362,27 @@ tbody tr:hover {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .container {
+    margin-left: 0;
+    max-width: 100%;
+  }
+  
+  .details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    gap: 15px;
-    margin: 15px;
+  .main-content {
+    margin-left: 0;
     padding: 15px;
   }
 
-  .logo-container {
-    justify-content: center;
-  }
-
-  .user-controls {
-    width: 100%;
+  header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
   }
 
   .actions-bar {
@@ -456,16 +402,6 @@ tbody tr:hover {
     flex-direction: column;
   }
 
-  .view-btn, .edit-btn, .delete-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .modal-content {
-    width: 95%;
-    margin: 10px;
-  }
-
   .details-grid {
     grid-template-columns: 1fr;
   }
@@ -477,15 +413,15 @@ tbody tr:hover {
 
 /* Print Styles */
 @media print {
-  .actions-bar,
-  .action-buttons,
-  .close-btn,
-  .document-btn {
-    display: none;
+  .main-content {
+    margin: 0;
+    padding: 0;
   }
 
-  .modal-content {
-    box-shadow: none;
+  .actions-bar,
+  .action-buttons,
+  .modal-overlay {
+    display: none;
   }
 
   .table-container {
@@ -494,5 +430,13 @@ tbody tr:hover {
 
   tbody tr:hover {
     transform: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
   }
 }

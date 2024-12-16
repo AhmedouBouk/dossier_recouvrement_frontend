@@ -32,4 +32,7 @@ export class DossiersRecouvrementEditComponent implements OnInit {
       this.router.navigate(['/dossiers-recouvrement']);
     });
   }
+  goBack(): void{
+    this.router.navigate(['/dossiers-recouvrement']);
+  }
 }

@@ -1,70 +1,315 @@
+/* Navbar Styles */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #b2b282; /* Couleur de fond */
-  padding: 10px 20px;
-  border-radius: 8px; /* Bordure arrondie */
+  background-color: white;
+  margin: 16px 16px 0 286px; /* Added margin from top and sides */
+  padding: 0 24px;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border-radius: 15px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.navbar-logo img {
-  height: 40px;
-}
-
-.search-bar {
-  flex-grow: 1;
+.btn-back {
   display: flex;
   align-items: center;
-  margin: 0 20px;
-}
-
-.search-bar input {
-  flex-grow: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.btn-search {
-  background-color: #A7D7C5; /* Beige Crème */
+  gap: 5px; /* Space between icon and text */
+  background-color: #493636; /* Rouge foncé, same as Déconnexion */
+  color: white;
+  padding: 5px 10px; /* Same padding as Déconnexion */
   border: none;
-  padding: 8px 12px;
-  margin-left: 10px;
-  border-radius: 4px;
+  border-radius: 5px; /* Rounded edges */
   cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-back .material-icons {
+  font-size: 1.5rem; /* Icon size */
+}
+
+.btn-back:hover {
+  background-color: #555; /* Gris légèrement plus sombre */
+}
+
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.section-title h1 {
+  color: #1e293b;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
 }
 
 .user-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 1.2rem;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.user-profile .material-icons,
-.user-profile .fas {
-  font-size: 2rem; /* Ajuste la taille de l'icône */
-  color: #2E8B57; /* Vert émeraude */
+.user-profile:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #1e40af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #64748b;
 }
 
 .btn-logout {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background-color: #A52A2A; /* Rouge foncé */
-  color: white;
-  padding: 5px 10px;
+  gap: 8px;
+  padding: 8px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  background-color: #ef4444;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-logout:hover {
-  background-color: #8B0000; /* Rouge plus foncé */
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 270px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: white;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+}
+
+.logo {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-text h3 {
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.logo-text p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 0;
+}
+
+.menu {
+  padding: 24px 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.section-title {
+  padding: 0 12px;
+  margin: 16px 0 8px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.menu-item i {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-item:hover {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.menu-item.active {
+  background-color: #1e40af;
+  color: white;
+}
+
+.menu-item.active i {
+  color: white;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .navbar {
+    left: 240px;
+  }
+
+  .sidebar {
+    width: 240px;
+  }
+
+  .menu {
+    padding: 20px 12px;
+  }
+
+  .menu-item {
+    padding: 10px 14px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    left: 0;
+    padding: 0 16px;
+  }
+
+  .section-title h1 {
+    font-size: 20px;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .user-actions {
+    gap: 12px;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .navbar,
+  .sidebar {
+    background-color: #1e293b;
+    border-color: #334155;
+  }
+
+  .section-title h1,
+  .logo-text h3 {
+    color: white;
+  }
+
+  .user-profile {
+    background-color: #334155;
+  }
+
+  .user-profile:hover {
+    background-color: #475569;
+  }
+
+  .menu-item {
+    color: #94a3b8;
+  }
+
+  .menu-item:hover {
+    background-color: #334155;
+    color: white;
+  }
+
+  .menu-item.active {
+    background-color: #2563eb;
+  }
+}
+
+/* Focus States for Accessibility */
+.menu-item:focus-visible,
+.btn-logout:focus-visible,
+.user-profile:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }

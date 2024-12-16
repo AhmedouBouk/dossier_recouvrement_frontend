@@ -1,36 +1,87 @@
 <div class="container">
-  <h1>Liste des Dossiers de Recouvrement</h1>
+  
 
-  <!-- Formulaire d'importation de fichier CSV -->
-  <div *ngIf="hasDGCRRole()" class="import-container">
-    <label for="csvFile">Importer un fichier CSV pour la détection des impayés</label>
-    <input type="file" id="csvFile" (change)="onFileChange($event)" />
-    <button (click)="onSubmit()">Télécharger</button>
+  <div *ngIf="hasDGCRRole()" class="card-container">
+    <div class="import-section">
+      <div class="section-header">
+        <h3>
+          <i class="material-icons">upload_file</i>
+          Importer un fichier CSV
+        </h3>
+        <div class="import-actions">
+          <div class="file-input-wrapper">
+            <input 
+              type="file" 
+              id="csvFile" 
+              (change)="onFileChange($event)" 
+              accept=".csv">
+            <label for="csvFile" class="file-label" [class.has-file]="selectedFile">
+              <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
+              <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
+            </label>
+          </div>
+          <button 
+            [disabled]="!selectedFile"
+            (click)="onSubmit()" 
+            class="import-btn">
+            <i class="material-icons">cloud_upload</i>
+            {{ selectedFile ? 'Télécharger' : 'Sélectionner un fichier' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Tableau des dossiers -->
-  <table class="dossiers-table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Numéro de Compte</th>
-        <th>Status</th>
-        <th>Impaye</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let dossier of dossiers">
-        <td>{{ dossier.idDossier }}</td>
-        <td>{{ dossier.accountNumber }}</td>
-        <td>{{ dossier.status }}</td>
-        <td>{{ dossier.impaye }}</td>
-        <td>
-          <button *ngIf="hasRecouvrementRole()" (click)="deleteDossier(dossier.idDossier)" class="btn-supprimer">Supprimer</button>
-          <button *ngIf="hasRecouvrementRole()" (click)="modifyDossier(dossier.idDossier)" class="btn-voir-modifier">Modifier</button>
-          <button *ngIf="hasRecouvrementRole()" (click)="viewDossier(dossier.idDossier)" class="btn-details">Voir les détails</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="card-container">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Numéro de Compte</th>
+            <th>Status</th>
+            <th>Impaye</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dossier of dossiers">
+            <td class="id-cell">{{ dossier.idDossier }}</td>
+            <td>{{ dossier.accountNumber }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="dossier.status.toLowerCase()">
+                {{ dossier.status }}
+              </span>
+            </td>
+            <td class="amount">{{ dossier.impaye | number:'1.2-2' }} MRU</td>
+            <td class="actions">
+              <div class="action-buttons">
+                <button 
+                  *ngIf="hasRecouvrementRole()" 
+                  (click)="deleteDossier(dossier.idDossier)" 
+                  class="delete-btn">
+                  <i class="material-icons">delete</i>
+                  Supprimer
+                </button>
+                <button 
+                  *ngIf="hasRecouvrementRole()" 
+                  (click)="modifyDossier(dossier.idDossier)" 
+                  class="edit-btn">
+                  <i class="material-icons">edit</i>
+                  Modifier
+                </button>
+                <button 
+                  *ngIf="hasRecouvrementRole()" 
+                  (click)="viewDossier(dossier.idDossier)" 
+                  class="details-btn">
+                  <i class="material-icons">visibility</i>
+                  Détails
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
