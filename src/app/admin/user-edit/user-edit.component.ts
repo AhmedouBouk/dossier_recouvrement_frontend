@@ -4,6 +4,7 @@ import { AdminService } from '../admin.service';
 import { User } from '../../shared/models/user.model';
 import { UserDataService } from '../../shared/services/user-data.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -28,7 +29,8 @@ export class UserEditComponent implements OnInit {
     private route: ActivatedRoute,
     private adminService: AdminService,
     private userDataService: UserDataService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -167,9 +169,8 @@ export class UserEditComponent implements OnInit {
     this.router.navigate(['/admin/user-list']);
   }
 
-  logout() {
-    this.userDataService.clearUser();
-    this.router.navigate(['/login']);
+  logout(): void {
+    this.authService.logout();
   }
 
   // Helper method for role display

@@ -23,7 +23,11 @@ export class NavbarComponent implements OnInit {
     '/comptes': 'Gestion des Comptes',
     '/garanties': 'Gestion des Garanties',
     '/credits': 'Gestion des Crédits',
-    '/dossier-recouvrement': 'Dossiers Recouvrement'
+    '/credits/add': 'Ajouter un Crédit',
+    '/credits/edit': 'Modifier le Crédit',
+    '/dossier-recouvrement': 'Dossiers Recouvrement',
+    '/dossier-recouvrement/view': 'Détails du Dossier',
+    '/dossier-recouvrement/modify': 'Modifier le Dossier',
   };
 
   constructor(
@@ -34,7 +38,7 @@ export class NavbarComponent implements OnInit {
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event) => {
-      this.currentSection = this.routes[event.url] || 'Dashboard';
+      this.currentSection = this.routes[event.url] || this.currentSection ;
     });
   }
 
