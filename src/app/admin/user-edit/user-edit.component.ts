@@ -87,7 +87,7 @@ export class UserEditComponent implements OnInit {
         console.log('User updated successfully:', response);
         this.successMessage = 'User updated successfully!';
         this.userDataService.clearUser();
-        setTimeout(() => this.navigateToUserList(), 2000);
+        setTimeout(() => this.navigateToUserList(), 1000);
       },
       error: (error: HttpErrorResponse) => {
         console.error('Error updating user:', error);

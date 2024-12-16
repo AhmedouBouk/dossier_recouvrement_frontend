@@ -30,7 +30,7 @@ export class AddUserComponent {
         this.successMessage = 'User added successfully!';
         setTimeout(() => {
           this.router.navigate(['/admin/user-list']);  // Navigate back to the user list after 2 seconds
-        }, 2000);
+        }, 1000);
       },
       error => {
         console.error('Error adding user:', error);
