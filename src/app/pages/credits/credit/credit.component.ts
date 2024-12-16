@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CreditService } from '../../../shared/services/credit.service';
 import { CreditRoleService } from '../../../shared/services/credit-role.service';
 import { Router } from '@angular/router';
+import{AuthService} from 'src/app/auth/auth.service'
+
 
 @Component({
   selector: 'app-credit',
@@ -19,7 +21,7 @@ export class CreditComponent implements OnInit {
 
   constructor(
     private creditService: CreditService,
-    public creditRoleService: CreditRoleService,
+    public authService: AuthService,
     private router: Router
   ) {}
 

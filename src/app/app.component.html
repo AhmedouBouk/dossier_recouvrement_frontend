@@ -1,4 +1,12 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <app-sidebar *ngIf="authService.hasRoleNotAdmin() && isAuthenticated()"></app-sidebar>
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Navbar -->
+    <app-navbar *ngIf="authService.hasRoleNotAdmin() && isAuthenticated()"></app-navbar>
 
-<main>
-  <router-outlet></router-outlet>
-</main>
+    <!-- Page Content -->
+    <router-outlet></router-outlet>
+  </div>
+</div>

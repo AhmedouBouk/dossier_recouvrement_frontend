@@ -1,0 +1,73 @@
+<!-- navbar.component.html -->
+<nav class="navbar">
+  <button class="btn-back" (click)="goBack()">
+    <span class="material-icons">arrow_back</span> Retour
+  </button>
+  
+  
+  <div class="section-title">
+    <h1>{{ currentSection }}</h1>
+  </div>
+  
+  <div class="user-actions">
+    <div class="user-profile">
+      <div class="user-avatar">
+        <i class="material-icons">person</i>
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">Utilisateur</span>
+      </div>
+    </div>
+    
+    <button class="btn-logout" (click)="logout()">
+      <i class="material-icons">logout</i>
+      Déconnexion
+    </button>
+  </div>
+</nav>
+
+<!-- sidebar.component.html -->
+<aside class="sidebar">
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo BNM" class="logo-img" />
+    <div class="logo-text">
+      <h3>BNM Systeme</h3>
+      <p>Portail de gestion des dettes</p>
+    </div>
+  </div>
+  
+  <nav class="menu">
+    <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">dashboard</i>
+      Dashboard
+    </a>
+    
+    <div class="section-title">Gestion de la récupération</div>
+    
+    <a routerLink="/clients" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">people</i>
+      Clients
+    </a>
+    
+    <a routerLink="/comptes" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">account_balance</i>
+      Comptes
+    </a>
+    
+    <a routerLink="/garanties" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">security</i>
+      Garanties
+    </a>
+    
+    <a routerLink="/credits" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">credit_card</i>
+      Crédits
+    </a>
+    
+    <a routerLink="/dossier-recouvrement" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">folder_special</i>
+      Dossiers Recouvrement
+    </a>
+  </nav>
+</aside>

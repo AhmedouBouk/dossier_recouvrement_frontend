@@ -13,6 +13,10 @@ import { DossiersRecouvrementListComponent } from './pages/dossiers-recouvrement
 import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-detail/dossiers-recouvrement-detail.component';
 import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
 import { RoleGuard } from './shared/guards/role.guard';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,15 +37,23 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     UserListComponent,
     UserEditComponent,
     AddUserComponent,
+    SidebarComponent,
+    NavbarComponent,
+    DashboardComponent,
     DossiersRecouvrementListComponent,
     DossiersRecouvrementDetailComponent,
     DossiersRecouvrementEditComponent,
+
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+
+    RouterModule,
+    
+
     MatToolbarModule,
     MatCardModule,
     MatButtonModule,
@@ -53,7 +65,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatProgressSpinnerModule,
     MatTooltipModule,
     BrowserAnimationsModule
-  ],
+
+],
   providers: [
     RoleGuard,
     {

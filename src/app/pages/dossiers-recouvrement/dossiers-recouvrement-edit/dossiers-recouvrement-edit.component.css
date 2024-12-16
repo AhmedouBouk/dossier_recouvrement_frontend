@@ -1,29 +1,21 @@
+/* Base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  font-family: sans-serif;
-}
-
-body {
-  background-color: #f8fafc;
-  color: #1e293b;
-  line-height: 1.5;
-}
-
+/* Container adjustments for sidebar and navbar */
 .container {
   padding: 32px;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: calc(100vw - 290px); /* Account for sidebar */
+  margin-left: 270px; /* Match sidebar width */
+  margin-top: 60px; /* Account for navbar */
+  min-height: calc(100vh - 60px);
   background-color: #f8fafc;
-  min-height: 100vh;
 }
 
+/* Page Header */
 .page-header {
   margin-bottom: 32px;
   background: white;
@@ -81,6 +73,7 @@ body {
   font-size: 20px;
 }
 
+/* Card Container */
 .card-container {
   background: white;
   border-radius: 24px;
@@ -89,12 +82,15 @@ body {
   padding: 32px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.03);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .card-container:hover {
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* Form Groups */
 .form-group {
   margin-bottom: 24px;
 }
@@ -121,6 +117,7 @@ body {
   border-radius: 8px;
   font-size: 16px;
   transition: all 0.3s ease;
+  background-color: white;
 }
 
 .form-control:focus {
@@ -129,6 +126,7 @@ body {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
+/* Select Styling */
 select.form-control {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
@@ -138,6 +136,7 @@ select.form-control {
   padding-right: 40px;
 }
 
+/* Save Button */
 .save-btn {
   display: flex;
   align-items: center;
@@ -151,6 +150,7 @@ select.form-control {
   transition: all 0.3s ease;
   background-color: #10b981;
   color: white;
+  margin-top: 32px;
 }
 
 .save-btn:hover {
@@ -161,4 +161,101 @@ select.form-control {
 
 .save-btn i {
   font-size: 20px;
+}
+
+/* Form Validation States */
+.form-control.ng-invalid.ng-touched {
+  border-color: #ef4444;
+}
+
+.form-control.ng-invalid.ng-touched:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+  .container {
+    max-width: calc(100vw - 290px);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 16px;
+    margin-left: 270px;
+  }
+
+  .page-header {
+    padding: 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .card-container {
+    padding: 20px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .form-control {
+    font-size: 14px;
+  }
+
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .container {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .page-header,
+  .back-btn,
+  .save-btn {
+    display: none;
+  }
+
+  .card-container {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+
+  .form-control {
+    border: none;
+    padding: 8px 0;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Focus States */
+.back-btn:focus-visible,
+.form-control:focus-visible,
+.save-btn:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
 }

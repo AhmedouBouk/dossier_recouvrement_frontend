@@ -1,34 +1,21 @@
+/* Base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  font-family: sans-serif;
-}
-
-body {
-  background-color: #f8fafc;
-  color: #1e293b;
-  line-height: 1.5;
-}
-
-:focus {
-  outline: 2px solid #6366f1;
-  outline-offset: 4px;
-}
-
+/* Container adjustments for sidebar and navbar */
 .container {
   padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: calc(100vw - 290px); /* Account for sidebar */
+  margin-left: 270px; /* Match sidebar width */
+  margin-top: 60px; /* Account for navbar */
+  min-height: calc(100vh - 60px);
   background-color: #f8fafc;
-  min-height: 100vh;
 }
 
+/* Page Header */
 .page-header {
   margin-bottom: 32px;
   background: white;
@@ -55,6 +42,7 @@ body {
   font-size: 2rem;
 }
 
+/* Card Container */
 .card-container {
   background: white;
   border-radius: 24px;
@@ -69,6 +57,7 @@ body {
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* Import Section */
 .import-section {
   padding: 24px;
 }
@@ -144,10 +133,9 @@ body {
 .file-label span {
   font-size: 14px;
   color: #475569;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
+/* Import Button */
 .import-btn {
   display: flex;
   align-items: center;
@@ -169,6 +157,7 @@ body {
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
+/* Table Styles */
 .table-container {
   overflow-x: auto;
   padding: 24px;
@@ -207,6 +196,7 @@ tbody tr:hover {
   background-color: #f8fafc;
 }
 
+/* Table Cell Styles */
 .id-cell {
   font-family: 'Roboto Mono', monospace;
   color: #6366f1;
@@ -219,6 +209,7 @@ tbody tr:hover {
   font-weight: 500;
 }
 
+/* Status Badges */
 .status-badge {
   padding: 6px 12px;
   border-radius: 50px;
@@ -242,6 +233,7 @@ tbody tr:hover {
   color: #d97706;
 }
 
+/* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 12px;
@@ -270,6 +262,8 @@ tbody tr:hover {
 .delete-btn:hover {
   background-color: #f87171;
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
 }
 
 .edit-btn {
@@ -280,6 +274,8 @@ tbody tr:hover {
 .edit-btn:hover {
   background-color: #60a5fa;
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
 }
 
 .details-btn {
@@ -290,4 +286,96 @@ tbody tr:hover {
 .details-btn:hover {
   background-color: #6ee7b7;
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(110, 231, 183, 0.2);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+  .container {
+    max-width: calc(100vw - 290px);
+  }
+  
+  .import-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 16px;
+    margin-left: 270px;
+  }
+
+  .page-header {
+    padding: 20px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .import-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .file-label {
+    min-width: auto;
+  }
+
+  .import-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .delete-btn,
+  .edit-btn,
+  .details-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .container {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .page-header,
+  .import-section {
+    display: none;
+  }
+
+  .card-container {
+    box-shadow: none;
+    border: none;
+  }
+
+  .action-buttons {
+    display: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Focus States */
+button:focus-visible,
+.file-label:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
 }
