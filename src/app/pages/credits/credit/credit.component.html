@@ -28,7 +28,7 @@
         <tbody>
           <tr *ngFor="let credit of credits">
             <td>{{ credit.idCredit }}</td>
-            <td>{{ credit.idCompte }}</td>
+            <td>{{ credit.compte?.nomCompte }}</td>
             <td>{{ credit.montant | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td>{{ credit.dateDebut | date:'dd/MM/yyyy' }}</td>
             <td>

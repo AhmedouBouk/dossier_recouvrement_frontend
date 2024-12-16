@@ -31,7 +31,8 @@ export class CreditComponent implements OnInit {
   
   loadCredits() {
     this.creditService.getAllCredits().subscribe({
-      next: (data) => (this.credits = data),
+      next: (data) => (this.credits = data ,console.log(this.credits)),
+      
       error: (err) => {
         console.error('Error loading credits:', err);
       }
