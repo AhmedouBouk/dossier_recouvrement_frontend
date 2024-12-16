@@ -22,9 +22,9 @@ const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'auth/login', component: LoginComponent },
  
-  { path: 'clients', component: ClientsComponent},
-  { path: 'comptes', component: ComptesComponent},
-  { path: 'dashboard', component: DashboardComponent },
+  { path: 'clients', component: ClientsComponent,canActivate: [AuthGuard]},
+  { path: 'comptes', component: ComptesComponent,canActivate: [AuthGuard]},
+  { path: 'dashboard', component: DashboardComponent ,canActivate: [AuthGuard]},
  
 
   { 
@@ -43,31 +43,38 @@ const routes: Routes = [
  
   { 
     path: 'dossier-recouvrement', 
-    component: DossiersRecouvrementListComponent,
+    component: DossiersRecouvrementListComponent
+    ,canActivate: [AuthGuard]
   },
   { 
     path: 'dossier-recouvrement/view/:id', 
-    component: DossiersRecouvrementDetailComponent,
+    component: DossiersRecouvrementDetailComponent
+    ,canActivate: [AuthGuard]
   },
   { 
     path: 'dossier-recouvrement/modify/:id', 
-    component: DossiersRecouvrementEditComponent,
+    component: DossiersRecouvrementEditComponent
+    ,canActivate: [AuthGuard]
   },
   {
     path: 'credits',
     component: CreditComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'credits/add',
-    component: CreditAddComponent,  // Note: Changed from CreditComponent
+    component: CreditAddComponent,
+    canActivate: [AuthGuard]  // Note: Changed from CreditComponent
   },
   {
     path: 'credits/edit/:id',  // Added :id parameter
-    component: CreditEditComponent,  // Note: Changed from CreditComponent
+    component: CreditEditComponent
+    ,canActivate: [AuthGuard] // Note: Changed from CreditComponent
   },
   {
     path: 'garanties',
-    component: GarantiesComponent,
+    component: GarantiesComponent
+    ,canActivate: [AuthGuard]
   }
 
 ];

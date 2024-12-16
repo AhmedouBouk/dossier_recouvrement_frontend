@@ -68,13 +68,9 @@ export class LoginComponent {
         break;
       case 'DO':
       case 'DC':
-        this.router.navigate(['/credits']);
-        break;
       case 'RECOUVREMENT':
-        this.router.navigate(['/dossiers-recouvrement']);
-        break;
-        case 'DGCR':
-          this.router.navigate(['/dossiers-recouvrement']);
+      case 'DGCR':
+          this.router.navigate(['/dashboard']);
           break;
       default:
         this.errorMessage = 'Rôle non reconnu';
