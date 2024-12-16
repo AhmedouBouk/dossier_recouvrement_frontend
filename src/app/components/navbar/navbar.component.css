@@ -19,22 +19,43 @@
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 5px; /* Space between icon and text */
-  background-color: #493636; /* Rouge foncé, same as Déconnexion */
-  color: white;
-  padding: 5px 10px; /* Same padding as Déconnexion */
+  gap: 8px;
+  padding: 8px 20px;
   border: none;
-  border-radius: 5px; /* Rounded edges */
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
+  background-color: #1e40af;  /* Blue color to differentiate from logout */
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-back .material-icons {
-  font-size: 1.5rem; /* Icon size */
+  font-size: 20px;
 }
 
 .btn-back:hover {
-  background-color: #555; /* Gris légèrement plus sombre */
+  background-color: #1e3a8a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .btn-back {
+    background-color: #2563eb;
+  }
+
+  .btn-back:hover {
+    background-color: #1d4ed8;
+  }
+}
+
+/* Focus States for Accessibility */
+.btn-back:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 

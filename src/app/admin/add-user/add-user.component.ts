@@ -3,6 +3,7 @@ import { AdminService } from '../admin.service';
 import { Router } from '@angular/router';
 import { User } from '../../shared/models/user.model';
 import { UserDataService } from '../../shared/services/user-data.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-add-user',
@@ -20,7 +21,7 @@ export class AddUserComponent {
   successMessage: string = '';  // Variable to hold the success message
   userDataService: any;
 
-  constructor(private adminService: AdminService, private router: Router) {}
+  constructor(private adminService: AdminService, private router: Router,private authService: AuthService) {}
 
   onSubmit() {
     this.adminService.addUser(this.user).subscribe(
@@ -45,8 +46,7 @@ export class AddUserComponent {
     this.router.navigate(['/admin/user-list']);
   }
 
-  logout() {
-    this.userDataService.clearUser();
-    this.router.navigate(['/login']);
+  logout(): void {
+    this.authService.logout();
   }
 }
