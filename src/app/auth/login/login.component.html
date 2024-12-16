@@ -17,6 +17,7 @@
         name="username"
         required
         [class.error]="errorMessage"
+        (input)="onInputChange()"
         autocomplete="email">
     </div>
     <div class="input-group">
@@ -28,6 +29,7 @@
         name="password"
         required
         [class.error]="errorMessage"
+        (input)="onInputChange()"
         autocomplete="current-password">
     </div>
 
@@ -39,7 +41,7 @@
       type="submit" 
       class="login-btn" 
       id="login-btn"
-      [disabled]="isLoading">
+      [disabled]="isLoading || (!email && !password)">
       {{ isLoading ? 'Chargement...' : 'Connexion' }}
     </button>
   </form>

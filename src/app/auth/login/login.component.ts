@@ -23,13 +23,15 @@ export class LoginComponent {
   }
 
   onSubmit() {
+    // Reset error state
+    this.errorMessage = '';
+
     if (!this.email || !this.password) {
       this.errorMessage = 'Veuillez remplir tous les champs';
       return;
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
 
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
@@ -49,6 +51,7 @@ export class LoginComponent {
         } else {
           this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
         }
+        this.isLoading = false;
       },
       complete: () => {
         this.isLoading = false;
@@ -78,4 +81,11 @@ export class LoginComponent {
         break;
     }
   }
+
+  onInputChange() {
+    if (this.errorMessage) {
+      this.errorMessage = '';
+    }
+  }
+
 }
