@@ -1,4 +1,4 @@
-
+import{Credit} from './credit.model';
 export class DossierRecouvrement {
     idDossier: number;
     accountNumber: string;
@@ -11,6 +11,7 @@ export class DossierRecouvrement {
     ajout: number;
     encour: string;
     principearemboursse: number;
+    credit: Credit // Ajouter le credit dans le constructeur
   
     constructor(
       idDossier: number,
@@ -23,7 +24,9 @@ export class DossierRecouvrement {
       PRP: string,
       ajout: number,
       encour: string,
-      principearemboursse: number
+      principearemboursse: number,
+      credit: Credit // Ajouter le credit dans le constructeur
+
     ) {
       this.idDossier = idDossier;
       this.accountNumber = accountNumber;
@@ -36,6 +39,7 @@ export class DossierRecouvrement {
       this.ajout = ajout;
       this.encour = encour;
       this.principearemboursse = principearemboursse;
+      this.credit=credit;
     }
   }
   

@@ -32,11 +32,21 @@ export class DossiersRecouvrementListComponent implements OnInit {
     });
   }
 
-  deleteDossier(idDossier: number): void {
-    this.dossierService.deleteDossier(idDossier).subscribe(() => {
-      this.getDossiers();  // Recharger la liste après la suppression
+  deleteDossier(event: Event, idDossier: number): void {
+    event.preventDefault();  // Empêche le rechargement de la page
+  
+    this.dossierService.deleteDossier(idDossier).subscribe({
+      next: () => {
+        // Mise à jour de la liste des dossiers sans recharger la page
+        this.dossiers = this.dossiers.filter(dossier => dossier.idDossier !== idDossier);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la suppression du dossier', err);
+      }
     });
   }
+  
+  
 
   onFileChange(event: any): void {
     this.file = event.target.files[0];

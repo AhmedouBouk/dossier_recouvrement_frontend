@@ -1,6 +1,4 @@
 <div class="container">
-
-
   <div class="card-container">
     <div class="detail-item">
       <div class="icon-container">
@@ -63,6 +61,20 @@
       <div class="info-container">
         <span class="label">Encour:</span>
         <span class="value">{{ dossier.encour | number:'1.2-2' }} MRU</span>
+      </div>
+    </div>
+
+    <!-- Ajouter le lien vers le credit -->
+    <div class="detail-item" *ngIf="dossier.credit">
+      <div class="icon-container">
+        <i class="material-icons">credit_score</i>
+      </div>
+      <div class="info-container">
+        <span class="label">Credit:</span>
+        <!-- Lien vers CreditComponent -->
+        <a [routerLink]="['/credits']" class="value link-to-credit">
+          {{ dossier.credit.montant | number:'1.2-2' }} MRU
+        </a>
       </div>
     </div>
   </div>
