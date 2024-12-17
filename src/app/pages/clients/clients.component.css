@@ -6,12 +6,16 @@
 
 /* Main container adjustments to work with sidebar and navbar */
 .container {
-  padding: 32px;
-  max-width: calc(100vw - 290px); /* Account for sidebar width + margin */
-  margin-left: 270px; /* Match sidebar width + padding */
+  padding: 32px 32px 32px 16px; /* Reduce left padding */
+  max-width: calc(100vw - 290px); /* Match exactly with sidebar width */
+  
+  margin-left: 257px; /* Match sidebar width + padding */
   margin-top: 60px; /* Account for navbar height */
   background-color: #f8fafc;
   min-height: calc(100vh - 60px); /* Subtract navbar height */
+  
+  
+    
 }
 
 .page-header {
@@ -48,6 +52,8 @@
   margin-bottom: 32px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.03);
+  width:105%;
+  margin-left: 0; 
 }
 
 .card-container:hover {
@@ -205,8 +211,9 @@
 
 /* Table Styles */
 .table-container {
-  overflow-x: auto;
-  padding: 24px;
+  width: 100%;       /* Take full width */
+  padding: 6px;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 table {
