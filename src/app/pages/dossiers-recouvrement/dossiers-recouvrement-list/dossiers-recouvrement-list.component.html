@@ -41,7 +41,8 @@
             <th>Numéro de Compte</th>
             <th>Status</th>
             <th>Impaye</th>
-            <th>Actions</th>
+            <th>Crédit</th> <!-- Nouvelle colonne pour afficher les informations de crédit -->
+            <th *ngIf="hasRecouvrementRole()" >Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -54,11 +55,15 @@
               </span>
             </td>
             <td class="amount">{{ dossier.impaye | number:'1.2-2' }} MRU</td>
+            <td class="credit"> 
+              <!-- Affichez ici les informations du crédit, par exemple le montant du crédit -->
+              {{ dossier.credit?.montant | number:'1.2-2' }} MRU
+            </td>
             <td class="actions">
               <div class="action-buttons">
                 <button 
                   *ngIf="hasRecouvrementRole()" 
-                  (click)="deleteDossier(dossier.idDossier)" 
+                  (click)="deleteDossier($event,dossier.idDossier)" 
                   class="delete-btn">
                   <i class="material-icons">delete</i>
                   Supprimer
