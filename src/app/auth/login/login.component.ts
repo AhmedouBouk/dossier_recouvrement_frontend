@@ -1,39 +1,57 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
-  email: string = '';
-  password: string = '';
+export class LoginComponent implements OnInit {
+  loginForm: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
+  passwordVisible: boolean = false;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private fb: FormBuilder
   ) {
     if (this.authService.isAuthenticated()) {
       this.navigateBasedOnRole(this.authService.getRole());
     }
+
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
   }
 
-  onSubmit() {
-    // Reset error state
-    this.errorMessage = '';
+  ngOnInit(): void {
+    // Add animation class after a brief delay
+    setTimeout(() => {
+      document.querySelector('.login-container')?.classList.add('visible');
+    }, 100);
+  }
 
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Veuillez remplir tous les champs';
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Veuillez remplir tous les champs correctement';
       return;
     }
 
     this.isLoading = true;
+    this.errorMessage = '';
 
-    this.authService.login(this.email, this.password).subscribe({
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login(email, password).subscribe({
       next: () => {
         const role = this.authService.getRole();
         if (role) {
@@ -48,6 +66,8 @@ export class LoginComponent {
           this.errorMessage = 'Email ou mot de passe incorrect';
         } else if (error.status === 403) {
           this.errorMessage = 'Accès non autorisé';
+        } else if (error.message.includes('Trop de tentatives')) {
+          this.errorMessage = error.message;
         } else {
           this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
         }
@@ -73,8 +93,8 @@ export class LoginComponent {
       case 'DC':
       case 'RECOUVREMENT':
       case 'DGCR':
-          this.router.navigate(['/dashboard']);
-          break;
+        this.router.navigate(['/dashboard']);
+        break;
       default:
         this.errorMessage = 'Rôle non reconnu';
         this.authService.logout();
@@ -82,10 +102,25 @@ export class LoginComponent {
     }
   }
 
-  onInputChange() {
+  onInputChange(): void {
     if (this.errorMessage) {
       this.errorMessage = '';
     }
   }
 
+  getErrorMessage(controlName: string): string {
+    const control = this.loginForm.get(controlName);
+    if (control?.errors) {
+      if (control.errors['required']) {
+        return `Le champ ${controlName} est requis`;
+      }
+      if (control.errors['email']) {
+        return 'Format d\'email invalide';
+      }
+      if (control.errors['minlength']) {
+        return 'Le mot de passe doit contenir au moins 6 caractères';
+      }
+    }
+    return '';
+  }
 }

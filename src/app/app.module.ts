@@ -6,7 +6,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { UserListComponent } from './admin/user-list/user-list.component';
 import { UserEditComponent } from './admin/user-edit/user-edit.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiInterceptorService } from './shared/services/api-interceptor.service';
 import { AddUserComponent } from './admin/add-user/add-user.component';
 import { DossiersRecouvrementListComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-list/dossiers-recouvrement-list.component';
@@ -64,7 +64,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ReactiveFormsModule
 
 ],
   providers: [
