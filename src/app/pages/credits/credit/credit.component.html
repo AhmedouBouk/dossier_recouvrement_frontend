@@ -28,7 +28,7 @@
             <th>Montant</th>
             <th>Date Début</th>
             <th>Statut</th>
-            <th>Actions</th>
+            <th *ngIf="RoleService.hasEditPermission()">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -42,8 +42,8 @@
                 {{ credit.statut }}
               </span>
             </td>
-            <td>
-              <div class="action-buttons">
+            <td *ngIf="RoleService.hasEditPermission()">
+              <div class="action-buttons" >
                 <button class="view-btn" (click)="navigateToDetails(credit.idCredit)">
                   <i class="material-icons">visibility</i>
                   Détails

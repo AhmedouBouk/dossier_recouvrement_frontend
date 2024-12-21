@@ -1,5 +1,27 @@
 <div class="container">
-
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p class="loading-text">Traitement en cours...</p>
+      <p class="loading-duration" *ngIf="loadingDuration">
+        Temps écoulé: {{ loadingDuration }}
+      </p>
+      <div class="reload-option" *ngIf="showReloadOption">
+        <p>Le chargement semble prendre plus de temps que prévu.</p>
+        <div class="reload-actions">
+          <button class="reload-btn" (click)="reloadPage()">
+            <i class="material-icons">refresh</i>
+            Recharger la page
+          </button>
+          <button class="wait-btn" (click)="showReloadOption = false">
+            <i class="material-icons">timer</i>
+            Continuer d'attendre
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Import Section -->
   <div *ngIf="roleService.hasEditPermission()" class="card-container">
@@ -16,6 +38,7 @@
               id="file-input"
               (change)="onFileSelected($event)" 
               accept=".csv"
+              [disabled]="isLoading"
               #fileInput>
             <label for="file-input" class="file-label" [class.has-file]="selectedFile">
               <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
@@ -23,19 +46,25 @@
             </label>
           </div>
           <button 
-            [disabled]="!selectedFile" 
+            [disabled]="!selectedFile || isLoading" 
             (click)="importClients()" 
             class="import-btn">
-            <i class="material-icons">cloud_upload</i>
-            {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
+            <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'cloud_upload' }}</i>
+            {{ isLoading ? 'Importation...' : (selectedFile ? 'Importer' : 'Sélectionner un fichier') }}
           </button>
         </div>
       </div>
 
       <!-- Alert Message -->
-      <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
-        <i class="material-icons">{{ importMessage.type === 'success' ? 'check_circle' : 'error' }}</i>
-        {{ importMessage.text }}
+      <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type" role="alert">
+        <i class="material-icons">
+          {{ importMessage.type === 'success' ? 'check_circle' : 
+              importMessage.type === 'warning' ? 'warning' : 'error' }}
+        </i>
+        <span class="alert-message">{{ importMessage.text }}</span>
+        <button class="alert-close" (click)="importMessage = null">
+          <i class="material-icons">close</i>
+        </button>
       </div>
     </div>
   </div>
@@ -47,25 +76,38 @@
         <div class="search-field">
           <div class="input-with-icon">
             <i class="material-icons">person</i>
-            <input [(ngModel)]="searchNom" placeholder="Nom">
+            <input 
+              [(ngModel)]="searchNom" 
+              placeholder="Nom"
+              [disabled]="isLoading">
           </div>
         </div>
         <div class="search-field">
           <div class="input-with-icon">
             <i class="material-icons">person_outline</i>
-            <input [(ngModel)]="searchPrenom" placeholder="Prénom">
+            <input 
+              [(ngModel)]="searchPrenom" 
+              placeholder="Prénom"
+              [disabled]="isLoading">
           </div>
         </div>
         <div class="search-field">
           <div class="input-with-icon">
             <i class="material-icons">badge</i>
-            <input [(ngModel)]="searchNNI" type="number" placeholder="NNI">
+            <input 
+              [(ngModel)]="searchNNI" 
+              type="number" 
+              placeholder="NNI"
+              [disabled]="isLoading">
           </div>
         </div>
       </div>
-      <button (click)="searchClients()" class="search-btn">
-        <i class="material-icons">search</i>
-        Rechercher
+      <button 
+        (click)="searchClients()" 
+        class="search-btn"
+        [disabled]="isLoading">
+        <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'search' }}</i>
+        {{ isLoading ? 'Recherche...' : 'Rechercher' }}
       </button>
     </div>
 
@@ -107,11 +149,17 @@
               <td class="amount">{{client.salaire | number:'1.2-2'}} MRU</td>
               <td *ngIf="roleService.hasEditPermission()" class="actions">
                 <div class="action-buttons">
-                  <button class="edit-btn" (click)="startEdit(client)">
+                  <button 
+                    class="edit-btn" 
+                    (click)="startEdit(client)"
+                    [disabled]="isLoading">
                     <i class="material-icons">edit</i>
                     Modifier
                   </button>
-                  <button class="delete-btn" (click)="deleteClient(client.nni)">
+                  <button 
+                    class="delete-btn" 
+                    (click)="deleteClient(client.nni)"
+                    [disabled]="isLoading">
                     <i class="material-icons">delete</i>
                     Supprimer
                   </button>
@@ -125,38 +173,60 @@
               <td class="id-cell">{{client.nif}}</td>
               <td>
                 <div class="edit-field">
-                  <input [(ngModel)]="editingClient.nom" placeholder="Nom">
+                  <input 
+                    [(ngModel)]="editingClient.nom" 
+                    placeholder="Nom"
+                    [disabled]="isLoading">
                 </div>
               </td>
               <td>
                 <div class="edit-field">
-                  <input [(ngModel)]="editingClient.prenom" placeholder="Prénom">
+                  <input 
+                    [(ngModel)]="editingClient.prenom" 
+                    placeholder="Prénom"
+                    [disabled]="isLoading">
                 </div>
               </td>
               <td>{{client.dateNaissance | date:'dd/MM/yyyy'}}</td>
               <td>
                 <div class="edit-field">
-                  <input [(ngModel)]="editingClient.adresse" placeholder="Adresse">
+                  <input 
+                    [(ngModel)]="editingClient.adresse" 
+                    placeholder="Adresse"
+                    [disabled]="isLoading">
                 </div>
               </td>
               <td>
                 <div class="edit-field">
-                  <input [(ngModel)]="editingClient.secteurActivite" placeholder="Secteur">
+                  <input 
+                    [(ngModel)]="editingClient.secteurActivite" 
+                    placeholder="Secteur"
+                    [disabled]="isLoading">
                 </div>
               </td>
               <td>{{client.genre}}</td>
               <td>
                 <div class="edit-field">
-                  <input [(ngModel)]="editingClient.salaire" type="number" placeholder="Salaire">
+                  <input 
+                    [(ngModel)]="editingClient.salaire" 
+                    type="number" 
+                    placeholder="Salaire"
+                    [disabled]="isLoading">
                 </div>
               </td>
               <td class="actions">
                 <div class="action-buttons">
-                  <button class="save-btn" (click)="updateClient()">
-                    <i class="material-icons">save</i>
-                    Sauvegarder
+                  <button 
+                    class="save-btn" 
+                    (click)="updateClient()"
+                    [disabled]="isLoading">
+                    <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'save' }}</i>
+                    {{ isLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
                   </button>
-                  <button class="cancel-btn" (click)="cancelEdit()">
+                  <button 
+                    class="cancel-btn" 
+                    (click)="cancelEdit()"
+                    [disabled]="isLoading">
                     <i class="material-icons">close</i>
                     Annuler
                   </button>
