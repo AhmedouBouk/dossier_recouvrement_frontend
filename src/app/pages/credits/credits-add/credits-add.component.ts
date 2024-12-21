@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CreditService } from '../../../shared/services/credit.service';
 import { CreditRoleService } from '../../../shared/services/credit-role.service';
+import { CreditService } from 'src/app/shared/services/credit.service';
 
 @Component({
   selector: 'app-credit-add',

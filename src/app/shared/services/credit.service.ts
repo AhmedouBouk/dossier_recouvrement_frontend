@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +21,11 @@ export class CreditService {
    * Search credits by account name.
    * @param accountName Name of the account.
    */
-  searchCredits(accountName: string): Observable<any[]> {
-    let params = new HttpParams().set('nomCompte', accountName);
+  searchCredits(searchTerm: string): Observable<any[]> {
+    let params = new HttpParams()
+      .set('nomCompte', searchTerm)
+      .set('idCredit', searchTerm)
+      .set('statut', searchTerm);
     return this.http.get<any[]>(`${this.apiUrl}/recherche`, { params });
   }
 
@@ -31,7 +34,25 @@ export class CreditService {
    * @param creditId ID of the credit.
    */
   getCreditsDetails(creditId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/lire/${creditId}`);
+    return this.http.get<any>(`${this.apiUrl}/lire/${creditId}`).pipe(
+      map(response => {
+        // Log the raw response
+        console.log('Raw credit details:', response);
+        
+        // Ensure we have a properly structured object
+        return {
+          ...response,
+          idCompte: response.idCompte || response.compte?.nomCompte || '',
+          idGarantie: response.idGarantie || response.garantie?.id || '',
+          montant: response.montant || 0,
+          tauxInteret: response.tauxInteret || 0,
+          duree: response.duree || 0,
+          dateDebut: response.dateDebut || '',
+          statut: response.statut || '',
+          refTransaction: response.refTransaction || ''
+        };
+      })
+    );
   }
 
   /**
@@ -68,4 +89,5 @@ export class CreditService {
       responseType: 'blob'
     });
   }
+  
 }

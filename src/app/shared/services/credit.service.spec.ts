@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CreditService } from './credit.service';
+import { CreditService } from '../../pages/credits/credits-edit/credit.service';
 
 describe('CreditService', () => {
   let service: CreditService;

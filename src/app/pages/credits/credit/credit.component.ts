@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CreditService } from '../../../shared/services/credit.service';
-import { CreditRoleService } from '../../../shared/services/credit-role.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
-import{AuthService} from 'src/app/auth/auth.service'
-
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { RoleService } from 'src/app/shared/services/role.service';
 
 @Component({
   selector: 'app-credit',
@@ -14,69 +14,88 @@ import{AuthService} from 'src/app/auth/auth.service'
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class CreditComponent implements OnInit {
+export class CreditComponent implements OnInit, OnDestroy {
   credits: any[] = [];
-  selectedCredit: any = null;
   searchTerm: string = '';
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+  isLoading = false;
 
   constructor(
     private creditService: CreditService,
     public authService: AuthService,
+    public RoleService: RoleService,
     private router: Router
-  ) {}
+  ) {
+    // Subscribe to search changes
+    this.searchSubject.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(300), // Wait 300ms after the last event before emitting
+      distinctUntilChanged() // Only emit if the value is different from the previous
+    ).subscribe(term => {
+      this.performSearch(term);
+    });
+  }
 
   ngOnInit(): void {
     this.loadCredits();
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   
   loadCredits() {
+    this.isLoading = true;
     this.creditService.getAllCredits().subscribe({
-      next: (data) => (this.credits = data ,console.log(this.credits)),
-      
+      next: (data) => {
+        this.credits = data;
+        this.isLoading = false;
+      },
       error: (err) => {
         console.error('Error loading credits:', err);
+        this.isLoading = false;
       }
     });
   }
 
-  searchCredits() {
-    if (this.searchTerm) {
-      this.creditService.searchCredits(this.searchTerm).subscribe({
-        next: (data) => (this.credits = data),
-        error: (err) => console.error('Erreur de recherche', err)
-      });
-    } else {
-      this.loadCredits();
-    }
+  // Called when input changes
+  onSearchChange(event: any) {
+    const term = event.target.value;
+    this.searchSubject.next(term);
   }
 
-  viewDetails(credit: any) {
-    this.creditService.getCreditsDetails(credit.idCredit).subscribe({
-      next: (details) => (this.selectedCredit = details),
-      error: (err) => console.error('Erreur de récupération des détails', err)
+  // Perform the actual search
+  private performSearch(term: string) {
+    if (!term.trim()) {
+      this.loadCredits();
+      return;
+    }
+
+    this.isLoading = true;
+    this.creditService.searchCredits(term).subscribe({
+      next: (data) => {
+        this.credits = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur de recherche', err);
+        this.isLoading = false;
+      }
     });
   }
 
-  downloadFile(fileType: string) {
-    if (this.selectedCredit) {
-      this.creditService
-        .downloadFile(this.selectedCredit.idCredit, fileType)
-        .subscribe({
-          next: (blob) => {
-            const url = window.URL.createObjectURL(blob);
-            window.open(url);
-          },
-          error: (err) => console.error('Erreur de téléchargement', err)
-        });
-    }
-  }
-
-  navigateToAdd() {
-    this.router.navigate(['/credits/add']);
+  navigateToDetails(creditId: number) {
+    this.router.navigate(['/credits/details', creditId]);
   }
 
   navigateToEdit(creditId: number) {
     this.router.navigate(['/credits/edit', creditId]);
+  }
+
+  navigateToAdd() {
+    this.router.navigate(['/credits/add']);
   }
 
   deleteCredit(creditId: number) {
@@ -88,10 +107,6 @@ export class CreditComponent implements OnInit {
     }
   }
 
-  closeDetails() {
-    this.selectedCredit = null;
-  }
-
   getStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
       'En cours': 'active',
@@ -100,9 +115,7 @@ export class CreditComponent implements OnInit {
       'Approuvé': 'active',
       'Refusé': 'closed',
       'En traitement': 'pending'
-      // Add more status mappings as needed
     };
-    
     return statusMap[status] || 'pending';
   }
 }

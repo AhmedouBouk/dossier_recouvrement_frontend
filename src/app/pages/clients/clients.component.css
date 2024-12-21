@@ -310,23 +310,25 @@ tbody tr:hover {
 }
 
 .edit-btn {
-  background-color: #93c5fd;
-  color: #1e40af;
+  background-color: #3b82f6;
+  color: white;
 }
 
 .edit-btn:hover {
-  background-color: #60a5fa;
-  color: white;
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .delete-btn {
-  background-color: #fca5a5;
-  color: #991b1b;
+  background-color: #ef4444;
+  color: white;
 }
 
 .delete-btn:hover {
-  background-color: #f87171;
-  color: white;
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .save-btn {

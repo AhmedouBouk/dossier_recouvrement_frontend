@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreditService } from '../../../shared/services/credit.service';
 import { CreditRoleService } from '../../../shared/services/credit-role.service';
+import { CreditService } from 'src/app/shared/services/credit.service';
 
 @Component({
   selector: 'app-credit-edit',
@@ -14,10 +14,31 @@ import { CreditRoleService } from '../../../shared/services/credit-role.service'
 })
 export class CreditEditComponent implements OnInit {
   creditId!: number;
-  credit: any = {};
+  credit: any = {
+    idCompte: '',
+    idGarantie: '',
+    montant: 0,
+    tauxInteret: 0,
+    duree: 0,
+    dateDebut: '',
+    statut: '',
+    refTransaction: ''
+  };
   files: { [key: string]: File } = {};
   isLoading = false;
   errorMessage = '';
+
+  documentTypes = [
+    'demande',
+    'etude',
+    'bulletinSalaire',
+    'domiciliation',
+    'pvComite',
+    'bonPourAval',
+    'reconnaissanceDeDette',
+    'contrat',
+    'tableauAmortissement'
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -42,7 +63,26 @@ export class CreditEditComponent implements OnInit {
     this.isLoading = true;
     this.creditService.getCreditsDetails(this.creditId).subscribe({
       next: (data) => {
-        this.credit = data;
+        console.log('Credit details received:', data);
+        
+        // Format the date for the input field
+        if (data.dateDebut) {
+          const date = new Date(data.dateDebut);
+          data.dateDebut = date.toISOString().split('T')[0];
+        }
+
+        this.credit = {
+          idCompte: data.idCompte || '',
+          idGarantie: data.idGarantie || '',
+          montant: data.montant || 0,
+          tauxInteret: data.tauxInteret || 0,
+          duree: data.duree || 0,
+          dateDebut: data.dateDebut || '',
+          statut: data.statut || 'En attente',
+          refTransaction: data.refTransaction || ''
+        };
+
+        console.log('Formatted credit data:', this.credit);
         this.isLoading = false;
       },
       error: (error) => {
@@ -61,29 +101,31 @@ export class CreditEditComponent implements OnInit {
   }
 
   getFileName(fileType: string): string {
-    return this.files[fileType]?.name || 'Aucun fichier sélectionné';
+    return this.files[fileType]?.name || 'Choisir un fichier';
   }
 
   updateCredit() {
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
     const formData = new FormData();
+    const creditData = {
+      idCompte: this.credit.idCompte,
+      idGarantie: this.credit.idGarantie,
+      montant: this.credit.montant,
+      tauxInteret: this.credit.tauxInteret,
+      duree: this.credit.duree,
+      dateDebut: this.credit.dateDebut,
+      statut: this.credit.statut,
+      refTransaction: this.credit.refTransaction
+    };
 
     // Add credit data
-    formData.append(
-      'credit',
-      JSON.stringify({
-        idCompte: this.credit.idCompte,
-        idGarantie: this.credit.idGarantie,
-        montant: this.credit.montant,
-        tauxInteret: this.credit.tauxInteret,
-        duree: this.credit.duree,
-        dateDebut: this.credit.dateDebut,
-        statut: this.credit.statut,
-        refTransaction: this.credit.refTransaction
-      })
-    );
+    formData.append('credit', JSON.stringify(creditData));
 
     // Add files if they exist
     Object.entries(this.files).forEach(([key, file]) => {
@@ -103,6 +145,26 @@ export class CreditEditComponent implements OnInit {
     });
   }
 
+  validateForm(): boolean {
+    if (!this.credit.idCompte || !this.credit.idGarantie) {
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
+      return false;
+    }
+    if (this.credit.montant <= 0) {
+      this.errorMessage = 'Le montant doit être supérieur à 0';
+      return false;
+    }
+    if (this.credit.tauxInteret < 0) {
+      this.errorMessage = 'Le taux d\'intérêt ne peut pas être négatif';
+      return false;
+    }
+    if (this.credit.duree <= 0) {
+      this.errorMessage = 'La durée doit être supérieure à 0';
+      return false;
+    }
+    return true;
+  }
+
   cancel() {
     this.router.navigate(['/credits']);
   }
@@ -111,20 +173,6 @@ export class CreditEditComponent implements OnInit {
     delete this.files[fileType];
   }
 
-  documentTypes = [
-    'demande',
-    'etude',
-    'bulletinSalaire',
-    'domiciliation',
-    'pvComite',
-    'bonPourAval',
-    'reconnaissanceDeDette',
-    'contrat',
-    'tableauAmortissement'
-  ];
-
-
-  // Get appropriate icon for each document type
   getDocumentIcon(docType: string): string {
     const iconMap: { [key: string]: string } = {
       'demande': 'description',
@@ -140,7 +188,6 @@ export class CreditEditComponent implements OnInit {
     return iconMap[docType] || 'file_present';
   }
 
-  // Get readable label for each document type
   getDocumentLabel(docType: string): string {
     const labelMap: { [key: string]: string } = {
       'demande': 'Demande',

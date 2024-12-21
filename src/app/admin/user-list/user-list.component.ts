@@ -20,6 +20,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   isNotificationVisible: boolean = false;
   notificationMessage: string = '';
   notificationType: 'success-snackbar' | 'error-snackbar' = 'success-snackbar';
+  userRole: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -40,6 +41,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   private initializeComponent(): void {
     this.userName = this.authService.getLoggedInUserName();
+    this.userRole = this.authService.getRole() || 'No Role';
     this.fetchUsers();
   }
 
