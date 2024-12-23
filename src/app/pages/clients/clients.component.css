@@ -1,6 +1,6 @@
 /* Base Layout */
 .container {
-  padding: 32px 32px 32px 16px;
+  padding: 32px;
   max-width: calc(100vw - 290px);
   margin-left: 257px;
   margin-top: 60px;
@@ -122,8 +122,7 @@
   margin-bottom: 32px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.03);
-  width: 105%;
-  margin-left: 0;
+  width: 100%; /* Changed from 105% to prevent overflow */
 }
 
 /* Alert Messages */
@@ -196,10 +195,20 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: nowrap; /* Prevent wrapping */
+  gap: 20px;
+}
+
+.import-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .file-input-wrapper {
   position: relative;
+  flex-shrink: 1;
 }
 
 .file-input-wrapper input[type="file"] {
@@ -216,17 +225,9 @@
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 250px;
-}
-
-.file-label:hover:not(:disabled) {
-  border-color: #6366f1;
-  background: #f8fafc;
-}
-
-.file-label.has-file {
-  border-color: #10b981;
-  background: #f0fdfa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Search Section */
