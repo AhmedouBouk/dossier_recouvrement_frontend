@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CreditRoleService } from '../../../shared/services/credit-role.service';
+import { RoleService } from '../../../shared/services/role.service';
 import { CreditService } from 'src/app/shared/services/credit.service';
+import { CreditDTO } from 'src/app/shared/models/credit.model';
 
 @Component({
   selector: 'app-credit-add',
@@ -13,90 +14,43 @@ import { CreditService } from 'src/app/shared/services/credit.service';
   imports: [CommonModule, FormsModule]
 })
 export class CreditAddComponent implements OnInit {
-  creditForm = {
+  creditForm: CreditDTO = {
     idCompte: '',
-    idGarantie: '',
-    montant: null,
-    tauxInteret: null,
-    duree: null,
+    idGarantie: 0,
+    montant: 0,
+    tauxInteret: 0,
+    duree: 0,
     dateDebut: '',
-    statut: '',
-    refTransaction: ''
+    statut: 'En attente',
+    refTransaction: '',
+    fondDossier: ''
   };
 
-  files: { [key: string]: File } = {};
   isLoading = false;
   errorMessage = '';
 
   constructor(
     private router: Router,
     private creditService: CreditService,
-    public creditRoleService: CreditRoleService
+    public roleService: RoleService
   ) {}
 
   ngOnInit(): void {
-    if (!this.creditRoleService.hasRole(['DO'])) {
+    if (!this.roleService.hasEditPermission()) {
       this.router.navigate(['/credits']);
       return;
     }
   }
-  documentTypes = [
-    'demande',
-    'etude',
-    'bulletinSalaire',
-    'domiciliation',
-    'pvComite',
-    'bonPourAval',
-    'reconnaissanceDeDette',
-    'contrat',
-    'tableauAmortissement'
-  ];
-
-
-  onFileSelected(event: any, fileType: string) {
-    const file = event.target.files[0];
-    if (file) {
-      this.files[fileType] = file;
-    }
-  }
-  isAllFilesUploaded(): boolean {
-    return this.documentTypes.every(docType => this.files[docType]);
-  }
-  getFileName(fileType: string): string {
-    return this.files[fileType]?.name || 'Aucun fichier sélectionné';
-  }
-
-  removeFile(fileType: string) {
-    delete this.files[fileType];
-  }
 
   addCredit() {
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    const formData = new FormData();
-
-    // Add credit data
-    formData.append(
-      'creditdto',
-      JSON.stringify({
-        idCompte: this.creditForm.idCompte,
-        idGarantie: this.creditForm.idGarantie,
-        montant: this.creditForm.montant,
-        tauxInteret: this.creditForm.tauxInteret,
-        duree: this.creditForm.duree,
-        dateDebut: this.creditForm.dateDebut,
-        statut: this.creditForm.statut,
-        refTransaction: this.creditForm.refTransaction
-      })
-    );
-
-    // Add files if they exist
-    Object.entries(this.files).forEach(([key, file]) => {
-      formData.append(key, file);
-    });
-
-    this.creditService.addCredit(formData).subscribe({
+    this.creditService.addCredit(this.creditForm).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/credits']);
@@ -109,36 +63,27 @@ export class CreditAddComponent implements OnInit {
     });
   }
 
-  cancel() {
-    this.router.navigate(['/credits']);
-  }
-  getDocumentIcon(docType: string): string {
-    const iconMap: { [key: string]: string } = {
-      'demande': 'description',
-      'etude': 'analytics',
-      'bulletinSalaire': 'receipt_long',
-      'domiciliation': 'home',
-      'pvComite': 'groups',
-      'bonPourAval': 'verified',
-      'reconnaissanceDeDette': 'gavel',
-      'contrat': 'assignment',
-      'tableauAmortissement': 'table_chart'
-    };
-    return iconMap[docType] || 'file_present';
+  validateForm(): boolean {
+    if (!this.creditForm.idCompte || !this.creditForm.idGarantie) {
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
+      return false;
+    }
+    if (this.creditForm.montant <= 0) {
+      this.errorMessage = 'Le montant doit être supérieur à 0';
+      return false;
+    }
+    if (this.creditForm.tauxInteret < 0) {
+      this.errorMessage = 'Le taux d\'intérêt ne peut pas être négatif';
+      return false;
+    }
+    if (this.creditForm.duree <= 0) {
+      this.errorMessage = 'La durée doit être supérieure à 0';
+      return false;
+    }
+    return true;
   }
 
-  getDocumentLabel(docType: string): string {
-    const labelMap: { [key: string]: string } = {
-      'demande': 'Demande',
-      'etude': 'Étude',
-      'bulletinSalaire': 'Bulletin de Salaire',
-      'domiciliation': 'Domiciliation',
-      'pvComite': 'PV Comité',
-      'bonPourAval': 'Bon Pour Aval',
-      'reconnaissanceDeDette': 'Reconnaissance de Dette',
-      'contrat': 'Contrat',
-      'tableauAmortissement': 'Tableau d\'Amortissement'
-    };
-    return labelMap[docType] || docType;
+  cancel() {
+    this.router.navigate(['/credits']);
   }
 }

@@ -1,6 +1,4 @@
 <div class="container">
-  
-
   <div class="alert error" *ngIf="errorMessage">
     <i class="material-icons">error</i>
     {{ errorMessage }}
@@ -12,7 +10,7 @@
         <h3 class="section-title">Informations principales</h3>
         <div class="form-grid">
           <div class="form-group">
-            <label for="idCompte">ID Compte</label>
+            <label for="idCompte">Compte</label>
             <div class="input-with-icon">
               <i class="material-icons">account_circle</i>
               <input 
@@ -29,14 +27,14 @@
           </div>
 
           <div class="form-group">
-            <label for="idGarantie">ID Garantie</label>
+            <label for="idGarantie">Garantie</label>
             <div class="input-with-icon">
               <i class="material-icons">security</i>
               <input 
                 id="idGarantie"
                 [(ngModel)]="credit.idGarantie"
                 name="idGarantie"
-                type="text"
+                type="number"
                 required
                 #idGarantie="ngModel">
             </div>
@@ -147,34 +145,21 @@
                 type="text">
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="form-section">
-        <h3 class="section-title">Documents</h3>
-        <div class="documents-grid">
-          <div class="document-item" *ngFor="let doc of documentTypes">
-            <div class="document-header">
-              <i class="material-icons">{{ getDocumentIcon(doc) }}</i>
-              <span>{{ getDocumentLabel(doc) }}</span>
-            </div>
-            <div class="file-input-container">
+          <div class="form-group">
+            <label for="fondDossier">Fond Dossier</label>
+            <div class="input-with-icon">
+              <i class="material-icons">folder</i>
               <input 
-                type="file" 
-                [id]="doc"
-                (change)="onFileSelected($event, doc)"
-                [accept]="'.pdf,.doc,.docx'">
-              <label [for]="doc" class="file-label">
-                <i class="material-icons">upload_file</i>
-                <span>{{ getFileName(doc) }}</span>
-              </label>
-              <button 
-                type="button" 
-                class="remove-file" 
-                *ngIf="files[doc]"
-                (click)="removeFile(doc)">
-                <i class="material-icons">close</i>
-              </button>
+                id="fondDossier"
+                [(ngModel)]="credit.fondDossier"
+                name="fondDossier"
+                type="text"
+                required
+                #fondDossier="ngModel">
+            </div>
+            <div class="error-message" *ngIf="fondDossier.invalid && (fondDossier.dirty || fondDossier.touched)">
+              Ce champ est requis
             </div>
           </div>
         </div>

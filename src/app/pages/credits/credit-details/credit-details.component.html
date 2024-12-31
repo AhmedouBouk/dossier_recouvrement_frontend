@@ -1,90 +1,57 @@
 <main class="main-content">
-    <div class="container">
-      
-  
-      <div class="details-content" *ngIf="creditDetails">
-        <div class="details-grid">
-          <div class="detail-item">
-            <span class="label">ID Crédit</span>
-            <span class="value">{{ creditDetails.idCredit }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">ID Compte</span>
-            <span class="value">{{ creditDetails.idCompte }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">ID Garantie</span>
-            <span class="value">{{ creditDetails.idGarantie }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Montant</span>
-            <span class="value">{{ creditDetails.montant | currency:'EUR':'symbol':'1.0-0' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Taux d'intérêt</span>
-            <span class="value">{{ creditDetails.tauxInteret }}%</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Durée</span>
-            <span class="value">{{ creditDetails.duree }} mois</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Date de début</span>
-            <span class="value">{{ creditDetails.dateDebut | date:'dd/MM/yyyy' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Statut</span>
-            <span class="value status-chip" [ngClass]="getStatusClass(creditDetails.statut)">
-              {{ creditDetails.statut }}
-            </span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Référence Transaction</span>
-            <span class="value">{{ creditDetails.refTransaction || 'Non spécifié' }}</span>
-          </div>
+  <div class="container">
+    <div class="details-content" *ngIf="creditDetails">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">ID Crédit</span>
+          <span class="value">{{ creditDetails.idCredit }}</span>
         </div>
-  
-        <div class="documents-section">
-          <h3>Documents associés</h3>
-          <div class="documents-grid">
-            <button class="document-btn" (click)="downloadFile('demande')">
-              <i class="material-icons">description</i>
-              <span>Demande</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('etude')">
-              <i class="material-icons">analytics</i>
-              <span>Étude</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('bulletinSalaire')">
-              <i class="material-icons">receipt_long</i>
-              <span>Bulletin de Salaire</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('domiciliation')">
-              <i class="material-icons">home</i>
-              <span>Domiciliation</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('pvComite')">
-              <i class="material-icons">groups</i>
-              <span>PV Comité</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('bonPourAval')">
-              <i class="material-icons">verified</i>
-              <span>Bon Pour Aval</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('reconnaissanceDeDette')">
-              <i class="material-icons">gavel</i>
-              <span>Reconnaissance de Dette</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('contrat')">
-              <i class="material-icons">assignment</i>
-              <span>Contrat</span>
-            </button>
-            <button class="document-btn" (click)="downloadFile('tableauAmortissement')">
-              <i class="material-icons">table_chart</i>
-              <span>Tableau d'Amortissement</span>
-            </button>
-          </div>
+        <div class="detail-item">
+          <span class="label">Compte</span>
+          <span class="value">{{ creditDetails.compte.nomCompte }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Garantie</span>
+          <span class="value">{{ creditDetails.garantie.idGarantie }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Montant</span>
+          <span class="value">{{ creditDetails.montant | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Taux d'intérêt</span>
+          <span class="value">{{ creditDetails.tauxInteret }}%</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Durée</span>
+          <span class="value">{{ creditDetails.duree }} mois</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Date de début</span>
+          <span class="value">{{ creditDetails.dateDebut | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Statut</span>
+          <span class="value status-chip" [ngClass]="getStatusClass(creditDetails.statut)">
+            {{ creditDetails.statut }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Référence Transaction</span>
+          <span class="value">{{ creditDetails.refTransaction || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Fond Dossier</span>
+          <span class="value">{{ creditDetails.fondDossier }}</span>
         </div>
       </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="goBack()">
+          <i class="material-icons">arrow_back</i>
+          Retour
+        </button>
+      </div>
     </div>
-  </main>
+  </div>
+</main>

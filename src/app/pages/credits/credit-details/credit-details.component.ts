@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreditService } from 'src/app/shared/services/credit.service';
+import { Credit } from 'src/app/shared/models/credit.model';
 
 @Component({
   selector: 'app-credit-details',
@@ -11,7 +12,7 @@ import { CreditService } from 'src/app/shared/services/credit.service';
   imports: [CommonModule]
 })
 export class CreditDetailsComponent implements OnInit {
-  creditDetails: any = null;
+  creditDetails: Credit | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,27 +30,13 @@ export class CreditDetailsComponent implements OnInit {
   }
 
   loadCreditDetails(creditId: number) {
-    this.creditService.getCreditsDetails(creditId).subscribe({
+    this.creditService.getCreditDetails(creditId).subscribe({
       next: (details) => this.creditDetails = details,
       error: (err) => {
         console.error('Erreur de récupération des détails', err);
         this.router.navigate(['/credits']);
       }
     });
-  }
-
-  downloadFile(fileType: string) {
-    if (this.creditDetails) {
-      this.creditService
-        .downloadFile(this.creditDetails.idCredit, fileType)
-        .subscribe({
-          next: (blob) => {
-            const url = window.URL.createObjectURL(blob);
-            window.open(url);
-          },
-          error: (err) => console.error('Erreur de téléchargement', err)
-        });
-    }
   }
 
   goBack() {

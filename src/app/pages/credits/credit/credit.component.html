@@ -7,28 +7,42 @@
         <input 
           [(ngModel)]="searchTerm" 
           (input)="onSearchChange($event)"
-          placeholder="Rechercher par ID, Compte ou Statut">
+          placeholder="Rechercher par Compte">
         <div *ngIf="isLoading" class="loading-spinner">
           <i class="material-icons rotating">sync</i>
         </div>
       </div>
-      <button *ngIf="RoleService.hasEditPermission()" class="add-credit-btn" (click)="navigateToAdd()">
+      <button *ngIf="roleService.hasEditPermission()" class="add-credit-btn" (click)="navigateToAdd()">
         <i class="material-icons">add_circle</i>
         Ajouter un Crédit
       </button>
     </div>
 
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      <i class="material-icons">error</i>
+      {{ error }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <i class="material-icons rotating">sync</i>
+      Chargement des crédits...
+    </div>
+
     <!-- Credits Table -->
-    <div class="table-container" *ngIf="credits.length > 0; else noCredits">
+    <div class="table-container" *ngIf="!isLoading && !error && credits.length > 0">
       <table>
         <thead>
           <tr>
             <th>ID Crédit</th>
-            <th>ID Compte</th>
+            <th>Compte</th>
             <th>Montant</th>
+            <th>Taux Intérêt</th>
+            <th>Durée (mois)</th>
             <th>Date Début</th>
             <th>Statut</th>
-            <th *ngIf="RoleService.hasEditPermission()">Actions</th>
+            <th *ngIf="roleService.hasEditPermission()">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -36,14 +50,16 @@
             <td>{{ credit.idCredit }}</td>
             <td>{{ credit.compte?.nomCompte }}</td>
             <td>{{ credit.montant | currency:'EUR':'symbol':'1.0-0' }}</td>
+            <td>{{ credit.tauxInteret }}%</td>
+            <td>{{ credit.duree }}</td>
             <td>{{ credit.dateDebut | date:'dd/MM/yyyy' }}</td>
             <td>
               <span class="status-chip" [ngClass]="getStatusClass(credit.statut)">
                 {{ credit.statut }}
               </span>
             </td>
-            <td *ngIf="RoleService.hasEditPermission()">
-              <div class="action-buttons" >
+            <td *ngIf="roleService.hasEditPermission()">
+              <div class="action-buttons">
                 <button class="view-btn" (click)="navigateToDetails(credit.idCredit)">
                   <i class="material-icons">visibility</i>
                   Détails
@@ -64,11 +80,9 @@
     </div>
 
     <!-- No Credits Message -->
-    <ng-template #noCredits>
-      <div class="no-credits-message">
-        <i class="material-icons">credit_card_off</i>
-        <p>Aucun crédit trouvé</p>
-      </div>
-    </ng-template>
+    <div *ngIf="!isLoading && !error && credits.length === 0" class="no-credits-message">
+      <i class="material-icons">credit_card_off</i>
+      <p>Aucun crédit trouvé</p>
+    </div>
   </div>
 </main>

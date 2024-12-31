@@ -6,6 +6,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { Credit } from '../../../shared/models/credit.model';
 
 @Component({
   selector: 'app-credit',
@@ -15,23 +16,23 @@ import { RoleService } from 'src/app/shared/services/role.service';
   imports: [CommonModule, FormsModule]
 })
 export class CreditComponent implements OnInit, OnDestroy {
-  credits: any[] = [];
+  credits: Credit[] = [];  // Initialize as empty array
   searchTerm: string = '';
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
   isLoading = false;
+  error: string | null = null;
 
   constructor(
     private creditService: CreditService,
     public authService: AuthService,
-    public RoleService: RoleService,
+    public roleService: RoleService,
     private router: Router
   ) {
-    // Subscribe to search changes
     this.searchSubject.pipe(
       takeUntil(this.destroy$),
-      debounceTime(300), // Wait 300ms after the last event before emitting
-      distinctUntilChanged() // Only emit if the value is different from the previous
+      debounceTime(300),
+      distinctUntilChanged()
     ).subscribe(term => {
       this.performSearch(term);
     });
@@ -48,6 +49,7 @@ export class CreditComponent implements OnInit, OnDestroy {
   
   loadCredits() {
     this.isLoading = true;
+    this.error = null;
     this.creditService.getAllCredits().subscribe({
       next: (data) => {
         this.credits = data;
@@ -55,18 +57,17 @@ export class CreditComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error loading credits:', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors du chargement des crédits';
         this.isLoading = false;
       }
     });
   }
 
-  // Called when input changes
   onSearchChange(event: any) {
     const term = event.target.value;
     this.searchSubject.next(term);
   }
 
-  // Perform the actual search
   private performSearch(term: string) {
     if (!term.trim()) {
       this.loadCredits();
@@ -74,6 +75,7 @@ export class CreditComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
+    this.error = null;
     this.creditService.searchCredits(term).subscribe({
       next: (data) => {
         this.credits = data;
@@ -81,17 +83,22 @@ export class CreditComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Erreur de recherche', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la recherche';
         this.isLoading = false;
       }
     });
   }
 
   navigateToDetails(creditId: number) {
-    this.router.navigate(['/credits/details', creditId]);
+    if (creditId) {
+      this.router.navigate(['/credits/details', creditId]);
+    }
   }
 
   navigateToEdit(creditId: number) {
-    this.router.navigate(['/credits/edit', creditId]);
+    if (creditId) {
+      this.router.navigate(['/credits/edit', creditId]);
+    }
   }
 
   navigateToAdd() {
@@ -99,10 +106,13 @@ export class CreditComponent implements OnInit, OnDestroy {
   }
 
   deleteCredit(creditId: number) {
-    if (confirm('Confirmer la suppression ?')) {
+    if (creditId && confirm('Confirmer la suppression ?')) {
       this.creditService.deleteCredit(creditId).subscribe({
         next: () => this.loadCredits(),
-        error: (err) => console.error('Erreur de suppression', err)
+        error: (err) => {
+          console.error('Erreur de suppression', err);
+          this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la suppression';
+        }
       });
     }
   }
