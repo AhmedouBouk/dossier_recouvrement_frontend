@@ -1,0 +1,57 @@
+<main class="main-content">
+  <div class="container">
+    <div class="details-content" *ngIf="creditDetails">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">ID Crédit</span>
+          <span class="value">{{ creditDetails.idCredit }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Compte</span>
+          <span class="value">{{ creditDetails.compte.nomCompte }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Garantie</span>
+          <span class="value">{{ creditDetails.garantie.idGarantie }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Montant</span>
+          <span class="value">{{ creditDetails.montant | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Taux d'intérêt</span>
+          <span class="value">{{ creditDetails.tauxInteret }}%</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Durée</span>
+          <span class="value">{{ creditDetails.duree }} mois</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Date de début</span>
+          <span class="value">{{ creditDetails.dateDebut | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Statut</span>
+          <span class="value status-chip" [ngClass]="getStatusClass(creditDetails.statut)">
+            {{ creditDetails.statut }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Référence Transaction</span>
+          <span class="value">{{ creditDetails.refTransaction || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Fond Dossier</span>
+          <span class="value">{{ creditDetails.fondDossier }}</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="goBack()">
+          <i class="material-icons">arrow_back</i>
+          Retour
+        </button>
+      </div>
+    </div>
+  </div>
+</main>

@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreditService } from '../../../shared/services/credit.service';
-import { CreditRoleService } from '../../../shared/services/credit-role.service';
+import { CreditService } from 'src/app/shared/services/credit.service';
+import { RoleService } from 'src/app/shared/services/role.service';
+import { CreditDTO } from 'src/app/shared/models/credit.model';
 
 @Component({
   selector: 'app-credit-edit',
@@ -14,8 +15,17 @@ import { CreditRoleService } from '../../../shared/services/credit-role.service'
 })
 export class CreditEditComponent implements OnInit {
   creditId!: number;
-  credit: any = {};
-  files: { [key: string]: File } = {};
+  credit: CreditDTO = {
+    idCompte: '',
+    idGarantie: 0,
+    montant: 0,
+    tauxInteret: 0,
+    duree: 0,
+    dateDebut: '',
+    statut: '',
+    refTransaction: '',
+    fondDossier: ''
+  };
   isLoading = false;
   errorMessage = '';
 
@@ -23,11 +33,11 @@ export class CreditEditComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private creditService: CreditService,
-    public creditRoleService: CreditRoleService
+    public roleService: RoleService
   ) {}
 
   ngOnInit(): void {
-    if (!this.creditRoleService.hasRole(['DO', 'DC'])) {
+    if (!this.roleService.hasEditPermission()) {
       this.router.navigate(['/credits']);
       return;
     }
@@ -40,9 +50,29 @@ export class CreditEditComponent implements OnInit {
 
   loadCreditDetails() {
     this.isLoading = true;
-    this.creditService.getCreditsDetails(this.creditId).subscribe({
+    this.creditService.getCreditDetails(this.creditId).subscribe({
       next: (data) => {
-        this.credit = data;
+        console.log('Credit details received:', data);
+        
+        // Format the date for the input field
+        if (data.dateDebut) {
+          const date = new Date(data.dateDebut);
+          data.dateDebut = date.toISOString().split('T')[0];
+        }
+
+        this.credit = {
+          idCompte: data.compte.nomCompte,
+          idGarantie: data.garantie.idGarantie,
+          montant: data.montant,
+          tauxInteret: data.tauxInteret,
+          duree: data.duree,
+          dateDebut: data.dateDebut,
+          statut: data.statut,
+          refTransaction: data.refTransaction,
+          fondDossier: data.fondDossier
+        };
+
+        console.log('Formatted credit data:', this.credit);
         this.isLoading = false;
       },
       error: (error) => {
@@ -53,44 +83,15 @@ export class CreditEditComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any, fileType: string) {
-    const file = event.target.files[0];
-    if (file) {
-      this.files[fileType] = file;
-    }
-  }
-
-  getFileName(fileType: string): string {
-    return this.files[fileType]?.name || 'Aucun fichier sélectionné';
-  }
-
   updateCredit() {
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    const formData = new FormData();
-
-    // Add credit data
-    formData.append(
-      'credit',
-      JSON.stringify({
-        idCompte: this.credit.idCompte,
-        idGarantie: this.credit.idGarantie,
-        montant: this.credit.montant,
-        tauxInteret: this.credit.tauxInteret,
-        duree: this.credit.duree,
-        dateDebut: this.credit.dateDebut,
-        statut: this.credit.statut,
-        refTransaction: this.credit.refTransaction
-      })
-    );
-
-    // Add files if they exist
-    Object.entries(this.files).forEach(([key, file]) => {
-      formData.append(key, file);
-    });
-
-    this.creditService.updateCredit(this.creditId, formData).subscribe({
+    this.creditService.updateCredit(this.creditId, this.credit).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/credits']);
@@ -103,56 +104,27 @@ export class CreditEditComponent implements OnInit {
     });
   }
 
+  validateForm(): boolean {
+    if (!this.credit.idCompte || !this.credit.idGarantie) {
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
+      return false;
+    }
+    if (this.credit.montant <= 0) {
+      this.errorMessage = 'Le montant doit être supérieur à 0';
+      return false;
+    }
+    if (this.credit.tauxInteret < 0) {
+      this.errorMessage = 'Le taux d\'intérêt ne peut pas être négatif';
+      return false;
+    }
+    if (this.credit.duree <= 0) {
+      this.errorMessage = 'La durée doit être supérieure à 0';
+      return false;
+    }
+    return true;
+  }
+
   cancel() {
     this.router.navigate(['/credits']);
-  }
-
-  removeFile(fileType: string) {
-    delete this.files[fileType];
-  }
-
-  documentTypes = [
-    'demande',
-    'etude',
-    'bulletinSalaire',
-    'domiciliation',
-    'pvComite',
-    'bonPourAval',
-    'reconnaissanceDeDette',
-    'contrat',
-    'tableauAmortissement'
-  ];
-
-
-  // Get appropriate icon for each document type
-  getDocumentIcon(docType: string): string {
-    const iconMap: { [key: string]: string } = {
-      'demande': 'description',
-      'etude': 'analytics',
-      'bulletinSalaire': 'receipt_long',
-      'domiciliation': 'home',
-      'pvComite': 'groups',
-      'bonPourAval': 'verified',
-      'reconnaissanceDeDette': 'gavel',
-      'contrat': 'assignment',
-      'tableauAmortissement': 'table_chart'
-    };
-    return iconMap[docType] || 'file_present';
-  }
-
-  // Get readable label for each document type
-  getDocumentLabel(docType: string): string {
-    const labelMap: { [key: string]: string } = {
-      'demande': 'Demande',
-      'etude': 'Étude',
-      'bulletinSalaire': 'Bulletin de Salaire',
-      'domiciliation': 'Domiciliation',
-      'pvComite': 'PV Comité',
-      'bonPourAval': 'Bon Pour Aval',
-      'reconnaissanceDeDette': 'Reconnaissance de Dette',
-      'contrat': 'Contrat',
-      'tableauAmortissement': 'Tableau d\'Amortissement'
-    };
-    return labelMap[docType] || docType;
   }
 }

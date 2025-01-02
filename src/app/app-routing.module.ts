@@ -17,6 +17,7 @@ import { CreditComponent } from './pages/credits/credit/credit.component';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
 import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
 import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
+import { CreditDetailsComponent } from './pages/credits/credit-details/credit-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -71,6 +72,10 @@ const routes: Routes = [
     component: CreditEditComponent
     ,canActivate: [AuthGuard] // Note: Changed from CreditComponent
   },
+  { path: 'credits/details/:id', 
+    component: CreditDetailsComponent ,
+    canActivate: [AuthGuard]
+   },
   {
     path: 'garanties',
     component: GarantiesComponent

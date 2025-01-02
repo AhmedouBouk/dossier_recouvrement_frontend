@@ -29,6 +29,7 @@ export class NavbarComponent implements OnInit {
     '/dossier-recouvrement/view': 'Détails du Dossier',
     '/dossier-recouvrement/modify': 'Modifier le Dossier',
   };
+  userRole: string = '';
 
   constructor(
     private authService: AuthService, 
@@ -44,6 +45,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.userName = this.authService.getLoggedInUserName();
+    this.userRole = this.authService.getRole() || 'No Role';
   }
 
   logout(): void {

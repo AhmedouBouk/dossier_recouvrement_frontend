@@ -4,9 +4,14 @@
     <h1>Gestion des Utilisateurs</h1>
   </div>
   <div class="user-controls">
-    <div class="user-email">
+    <div class="user-profile">
+      <div class="user-avatar">
         <i class="material-icons">person</i>
-        {{ userName }}
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">{{ userRole }}</span>
+      </div>
     </div>
     <button class="logout-btn" (click)="logout()">
       <i class="material-icons" style="font-size: 18px;">logout</i>

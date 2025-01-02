@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CreditService } from '../../../shared/services/credit.service';
-import { CreditRoleService } from '../../../shared/services/credit-role.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
-import{AuthService} from 'src/app/auth/auth.service'
-
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { RoleService } from 'src/app/shared/services/role.service';
+import { Credit } from '../../../shared/models/credit.model';
 
 @Component({
   selector: 'app-credit',
@@ -14,60 +15,89 @@ import{AuthService} from 'src/app/auth/auth.service'
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class CreditComponent implements OnInit {
-  credits: any[] = [];
-  selectedCredit: any = null;
+export class CreditComponent implements OnInit, OnDestroy {
+  credits: Credit[] = [];  // Initialize as empty array
   searchTerm: string = '';
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+  isLoading = false;
+  error: string | null = null;
 
   constructor(
     private creditService: CreditService,
     public authService: AuthService,
+    public roleService: RoleService,
     private router: Router
-  ) {}
+  ) {
+    this.searchSubject.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.performSearch(term);
+    });
+  }
 
   ngOnInit(): void {
     this.loadCredits();
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   
   loadCredits() {
+    this.isLoading = true;
+    this.error = null;
     this.creditService.getAllCredits().subscribe({
-      next: (data) => (this.credits = data ,console.log(this.credits)),
-      
+      next: (data) => {
+        this.credits = data;
+        this.isLoading = false;
+      },
       error: (err) => {
         console.error('Error loading credits:', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors du chargement des crédits';
+        this.isLoading = false;
       }
     });
   }
 
-  searchCredits() {
-    if (this.searchTerm) {
-      this.creditService.searchCredits(this.searchTerm).subscribe({
-        next: (data) => (this.credits = data),
-        error: (err) => console.error('Erreur de recherche', err)
-      });
-    } else {
-      this.loadCredits();
-    }
+  onSearchChange(event: any) {
+    const term = event.target.value;
+    this.searchSubject.next(term);
   }
 
-  viewDetails(credit: any) {
-    this.creditService.getCreditsDetails(credit.idCredit).subscribe({
-      next: (details) => (this.selectedCredit = details),
-      error: (err) => console.error('Erreur de récupération des détails', err)
+  private performSearch(term: string) {
+    if (!term.trim()) {
+      this.loadCredits();
+      return;
+    }
+
+    this.isLoading = true;
+    this.error = null;
+    this.creditService.searchCredits(term).subscribe({
+      next: (data) => {
+        this.credits = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur de recherche', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la recherche';
+        this.isLoading = false;
+      }
     });
   }
 
-  downloadFile(fileType: string) {
-    if (this.selectedCredit) {
-      this.creditService
-        .downloadFile(this.selectedCredit.idCredit, fileType)
-        .subscribe({
-          next: (blob) => {
-            const url = window.URL.createObjectURL(blob);
-            window.open(url);
-          },
-          error: (err) => console.error('Erreur de téléchargement', err)
-        });
+  navigateToDetails(creditId: number) {
+    if (creditId) {
+      this.router.navigate(['/credits/details', creditId]);
+    }
+  }
+
+  navigateToEdit(creditId: number) {
+    if (creditId) {
+      this.router.navigate(['/credits/edit', creditId]);
     }
   }
 
@@ -75,21 +105,16 @@ export class CreditComponent implements OnInit {
     this.router.navigate(['/credits/add']);
   }
 
-  navigateToEdit(creditId: number) {
-    this.router.navigate(['/credits/edit', creditId]);
-  }
-
   deleteCredit(creditId: number) {
-    if (confirm('Confirmer la suppression ?')) {
+    if (creditId && confirm('Confirmer la suppression ?')) {
       this.creditService.deleteCredit(creditId).subscribe({
         next: () => this.loadCredits(),
-        error: (err) => console.error('Erreur de suppression', err)
+        error: (err) => {
+          console.error('Erreur de suppression', err);
+          this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la suppression';
+        }
       });
     }
-  }
-
-  closeDetails() {
-    this.selectedCredit = null;
   }
 
   getStatusClass(status: string): string {
@@ -100,9 +125,7 @@ export class CreditComponent implements OnInit {
       'Approuvé': 'active',
       'Refusé': 'closed',
       'En traitement': 'pending'
-      // Add more status mappings as needed
     };
-    
     return statusMap[status] || 'pending';
   }
 }
