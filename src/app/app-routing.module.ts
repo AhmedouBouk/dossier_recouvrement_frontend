@@ -14,7 +14,6 @@ import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
 import { CreditComponent } from './pages/credits/credit/credit.component';
-import { GarantiesComponent } from './pages/garanties/garanties.component';
 import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
 import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
 import { CreditDetailsComponent } from './pages/credits/credit-details/credit-details.component';
@@ -79,11 +78,7 @@ const routes: Routes = [
     component: CreditDetailsComponent ,
     canActivate: [AuthGuard]
    },
-  {
-    path: 'garanties',
-    component: GarantiesComponent
-    ,canActivate: [AuthGuard]
-  }
+  
 
 ];
 
