@@ -11,7 +11,6 @@ export class RoleService {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      console.log(decodedToken);
       return decodedToken.role;
     }
     return '';
@@ -21,12 +20,9 @@ export class RoleService {
     return this.getUserRole() === 'DO';
   }
 
-  hasDCRole(): boolean {
-    return this.getUserRole() === 'DC';
-  }
-
+ 
   hasEditPermission(): boolean {
     const role = this.getUserRole();
-    return role === 'DO' || role === 'DC';
+    return role === 'DC';
   }
 }

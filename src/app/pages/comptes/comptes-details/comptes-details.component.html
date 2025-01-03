@@ -1,0 +1,61 @@
+<div class="container">
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title">
+          <i class="material-icons">account_balance_wallet</i>
+          <h2>Détails du Compte</h2>
+        </div>
+        <button class="back-btn" (click)="goBack()">
+          <i class="material-icons">arrow_back</i>
+          Retour
+        </button>
+      </div>
+    </div>
+  
+    <div class="card-container" *ngIf="compte">
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">fingerprint</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Numéro de Compte</span>
+          <span class="value">{{ compte.nomCompte }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">attach_money</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Solde</span>
+          <span class="value">{{ compte.solde | currency: 'MRU' }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">calendar_today</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Date d'ouverture</span>
+          <span class="value">{{ compte.dateOuverture | date: 'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">check_circle</i>
+        </div>
+        <div class="info-container">
+          <span class="label">État</span>
+          <span class="value">{{ compte.etat }}</span>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="!compte" class="card-container">
+      <p>Chargement des détails du compte...</p>
+    </div>
+  </div>
+  

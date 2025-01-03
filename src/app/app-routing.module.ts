@@ -18,6 +18,8 @@ import { GarantiesComponent } from './pages/garanties/garanties.component';
 import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
 import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
 import { CreditDetailsComponent } from './pages/credits/credit-details/credit-details.component';
+import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
+import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -26,9 +28,10 @@ const routes: Routes = [
   { path: 'clients', component: ClientsComponent,canActivate: [AuthGuard]},
   { path: 'comptes', component: ComptesComponent,canActivate: [AuthGuard]},
   { path: 'dashboard', component: DashboardComponent ,canActivate: [AuthGuard]},
- 
-
-  { 
+  { path: 'clients/details/:nni', component: ClientDetailsComponent,canActivate: [AuthGuard] }
+ ,   { path: 'comptes/details/:nomCompte', component: ComptesDetailsComponent,canActivate: [AuthGuard] }
+,
+ {
     path: 'admin', 
     children: [
       { path: 'user-list', component: UserListComponent },

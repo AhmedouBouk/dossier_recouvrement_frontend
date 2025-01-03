@@ -82,6 +82,8 @@
             <th>N° Compte</th>
             <th>Client</th>
             <th>Catégorie</th>
+            <th> libellé Catégorie</th>
+
             <th>Solde</th>
             <th>État</th>
             <th>Date d'ouverture</th>
@@ -93,9 +95,16 @@
             <!-- View Mode -->
             <ng-container *ngIf="editingCompte?.nomCompte !== compte.nomCompte">
               <td>{{compte.nomCompte}}</td>
-              <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
               <td>
+                  <a [routerLink]="['/clients/details', compte.client?.nni]" class="value link-to-client">
+                    {{ compte.client?.nom }} {{ compte.client?.prenom }}
+                  </a>
+              </td>
+                            <td>
                 <span class="category-badge">{{compte.categorie}}</span>
+              </td>
+              <td>
+                <span class="category-badge">{{compte.libelecategorie}}</span>
               </td>
               <td>
                 <span class="amount">{{compte.solde | number:'1.2-2'}} MRU</span>

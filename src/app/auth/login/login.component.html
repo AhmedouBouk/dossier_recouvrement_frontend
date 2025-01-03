@@ -18,11 +18,11 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <div class="input-group">
         <div class="input-wrapper">
-          <i class="material-icons">person</i>
+          <i class="material-icons">account_circle</i>
           <input
-            type="email"
-            formControlName="email"
-            placeholder="Adresse Email"
+            type="text"
+            formControlName="Username"
+            placeholder="Username"
             [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
             (input)="onInputChange()"
             autocomplete="email">

@@ -3,12 +3,15 @@ import { CompteService } from '../../shared/services/compte.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoleService } from '../../shared/services/role.service';
+import { RouterModule } from '@angular/router'; // Import de RouterModule
+
 @Component({
   selector: 'app-comptes',
   templateUrl: './comptes.component.html',
   styleUrls: ['./comptes.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+
+  imports: [CommonModule, FormsModule,RouterModule]
 })
 export class ComptesComponent implements OnInit {
   comptes: any[] = [];
@@ -32,10 +35,8 @@ export class ComptesComponent implements OnInit {
     this.compteService.getAllComptes().subscribe({
       next: (data) => {
         this.comptes = data;
-        console.log('Comptes chargés:', data);
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des comptes:', error);
         this.importMessage = {
           type: 'error',
           text: error.message
@@ -62,7 +63,6 @@ export class ComptesComponent implements OnInit {
         this.comptes = data;
       },
       error: (error) => {
-        console.error('Erreur lors de la recherche:', error);
         this.importMessage = {
           type: 'error',
           text: error.message
@@ -85,7 +85,6 @@ export class ComptesComponent implements OnInit {
       etat: compte.etat
     }).subscribe({
       next: (response) => {
-        console.log('Compte mis à jour:', response);
         this.loadComptes();
         this.editingCompte = null;
         this.importMessage = {
@@ -94,7 +93,6 @@ export class ComptesComponent implements OnInit {
         };
       },
       error: (error) => {
-        console.error('Erreur lors de la mise à jour:', error);
         this.importMessage = {
           type: 'error',
           text: error.message
@@ -114,7 +112,6 @@ export class ComptesComponent implements OnInit {
           };
         },
         error: (error) => {
-          console.error('Erreur lors de la suppression:', error);
           this.importMessage = {
             type: 'error',
             text: error.message
@@ -145,7 +142,6 @@ export class ComptesComponent implements OnInit {
           if (fileInput) fileInput.value = '';
         },
         error: (error) => {
-          console.error('Erreur import:', error);
           this.importMessage = {
             type: 'error',
             text: error.message

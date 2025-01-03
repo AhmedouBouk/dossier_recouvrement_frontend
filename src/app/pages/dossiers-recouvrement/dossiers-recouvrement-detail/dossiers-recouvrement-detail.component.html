@@ -6,7 +6,9 @@
       </div>
       <div class="info-container">
         <span class="label">Numéro de Compte:</span>
-        <span class="value">{{ dossier.accountNumber }}</span>
+        <a [routerLink]="['/comptes/details', dossier.accountNumber]" class="value link-to-account">
+          {{ dossier.accountNumber }}
+        </a>
       </div>
     </div>
 
@@ -72,7 +74,7 @@
       <div class="info-container">
         <span class="label">Credit:</span>
         <!-- Lien vers CreditComponent -->
-        <a [routerLink]="['/credits']" class="value link-to-credit">
+        <a [routerLink]="'credits/details/' + dossier.credit.idCredit" class="value link-to-credit">
           {{ dossier.credit.montant | number:'1.2-2' }} MRU
         </a>
       </div>
