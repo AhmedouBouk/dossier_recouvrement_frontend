@@ -50,4 +50,7 @@ export class ClientService {
       responseType: 'text'
     });
   }
+  getClientByNni(nni: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${nni}`);
+  }
 }

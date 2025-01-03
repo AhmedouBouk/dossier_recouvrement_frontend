@@ -1,0 +1,71 @@
+<div class="container">
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title">
+          <i class="material-icons">person</i>
+          <h2>Détails du Client</h2>
+        </div>
+        <button class="back-btn" (click)="goBack()">
+          <i class="material-icons">arrow_back</i>
+          Retour
+        </button>
+      </div>
+    </div>
+  
+    <div class="card-container" *ngIf="client">
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">badge</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Nom</span>
+          <span class="value">{{ client.nom }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">person</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Prénom</span>
+          <span class="value">{{ client.prenom }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">fingerprint</i>
+        </div>
+        <div class="info-container">
+          <span class="label">NNI</span>
+          <span class="value">{{ client.nni }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">home</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Adresse</span>
+          <span class="value">{{ client.adresse }}</span>
+        </div>
+      </div>
+  
+      <div class="detail-item">
+        <div class="icon-container">
+          <i class="material-icons">business</i>
+        </div>
+        <div class="info-container">
+          <span class="label">Secteur d'activité</span>
+          <span class="value">{{ client.secteurActivite }}</span>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="!client" class="card-container">
+      <p>Chargement des détails du client...</p>
+    </div>
+  </div>
+  

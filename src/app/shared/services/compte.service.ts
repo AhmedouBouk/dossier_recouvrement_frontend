@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import { RouterModule } from '@angular/router'; // Import de RouterModule
 
 @Injectable({
   providedIn: 'root'
@@ -78,7 +79,10 @@ export class CompteService {
       }
     }
 
-    console.error('Une erreur est survenue:', errorMessage);
     return throwError(() => new Error(errorMessage));
   }
+  getCompteByNomCompte(nomCompte: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${nomCompte}`);
+}
+
 }
