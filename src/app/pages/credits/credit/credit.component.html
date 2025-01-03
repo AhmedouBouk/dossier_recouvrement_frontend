@@ -16,7 +16,7 @@
         <i class="material-icons">add_circle</i>
         Ajouter un Crédit
       </button>
-      <label class="upload-btn">
+      <label *ngIf="roleService.hasEditPermission()" class="upload-btn">
         <input type="file" (change)="onFileUpload($event)" accept=".csv" hidden>
         <i class="material-icons">file_upload</i>
         Importer CSV

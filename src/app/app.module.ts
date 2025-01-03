@@ -28,6 +28,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
+import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 
 
 @NgModule({
@@ -43,6 +45,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DossiersRecouvrementListComponent,
     DossiersRecouvrementDetailComponent,
     DossiersRecouvrementEditComponent,
+    ClientDetailsComponent,
+    ComptesDetailsComponent,
 
   ],
   imports: [

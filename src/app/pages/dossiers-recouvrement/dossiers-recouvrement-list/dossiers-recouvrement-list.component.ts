@@ -41,7 +41,7 @@ export class DossiersRecouvrementListComponent implements OnInit {
         this.dossiers = this.dossiers.filter(dossier => dossier.idDossier !== idDossier);
       },
       error: (err) => {
-        console.error('Erreur lors de la suppression du dossier', err);
+
       }
     });
   }
@@ -61,7 +61,6 @@ export class DossiersRecouvrementListComponent implements OnInit {
       window.location.reload();
       this.http.post(`${environment.apiUrl}/DossierRecouvrement/detection-impayes`, formData).subscribe(
         (response) => {
-          console.log('Fichier traité avec succès', response);
           this.getDossiers();
         },
         (error) => {

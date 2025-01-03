@@ -54,7 +54,7 @@
                 {{ dossier.status }}
               </span>
             </td>
-            <td class="amount">{{ dossier.impaye | number:'1.2-2' }} MRU</td>
+            <td class="amount">{{ dossier.impaye | number:'1.0-0' }} </td>
             <td class="credit"> 
               <!-- Affichez ici les informations du crédit, par exemple le montant du crédit -->
               {{ dossier.credit?.montant | number:'1.2-2' }} MRU
