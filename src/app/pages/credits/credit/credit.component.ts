@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { RoleService } from 'src/app/shared/services/role.service';
 import { Credit } from '../../../shared/models/credit.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-credit',
@@ -132,6 +133,13 @@ export class CreditComponent implements OnInit, OnDestroy {
   onFileUpload(event: any): void {
     const file: File = event.target.files[0];
     if (!file) {
+      this.error = 'Aucun fichier sélectionné.';
+      return;
+    }
+  
+    // Vérifier que le fichier est au format CSV
+    if (!file.name.endsWith('.csv')) {
+      this.error = 'Le fichier doit être au format CSV.';
       return;
     }
   
@@ -143,12 +151,21 @@ export class CreditComponent implements OnInit, OnDestroy {
   
     this.creditService.uploadCSV(formData).subscribe({
       next: (response: any) => {
+        console.log('Réponse du serveur :', response);
         this.loadCredits(); // Recharge la liste des crédits après l'upload
         this.isLoading = false;
+        this.error = null; // Réinitialiser l'erreur en cas de succès
       },
-      error: (err: string | null) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Erreur lors de l\'upload du fichier CSV :', err);
-        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de l\'upload';
+  
+        // Gérer l'erreur en fonction de la réponse du serveur
+        if (err.error && typeof err.error === 'string') {
+          this.error = err.error; // Utiliser le message d'erreur du serveur
+        } else {
+          this.error = 'Une erreur est survenue lors de l\'upload.';
+        }
+  
         this.isLoading = false;
       }
     });
