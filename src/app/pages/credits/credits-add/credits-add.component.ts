@@ -16,7 +16,8 @@ import { CreditDTO } from 'src/app/shared/models/credit.model';
 export class CreditAddComponent implements OnInit {
   creditForm: CreditDTO = {
     idCompte: '',
-    idGarantie: 0,
+    typeGarantie: '',
+    valeurGarantie: 0,
     montant: 0,
     tauxInteret: 0,
     duree: 0,
@@ -64,7 +65,7 @@ export class CreditAddComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    if (!this.creditForm.idCompte || !this.creditForm.idGarantie) {
+    if (!this.creditForm.idCompte ) {
       this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
       return false;
     }

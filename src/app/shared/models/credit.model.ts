@@ -3,15 +3,14 @@ export interface Credit {
   compte: {
       nomCompte: string;
   };
-  garantie: {
-      idGarantie: number;
-  };
   montant: number;
   tauxInteret: number;
   duree: number;
   dateDebut: string;
   statut: string;
   refTransaction: string;
+  typeGarantie: string;
+  valeurGarantie: number;
   fondDossier: string;
 }
 
@@ -22,7 +21,8 @@ export interface CreditDTO {
   dateDebut: string;
   statut: string;
   refTransaction: string;
+  typeGarantie: string;
+  valeurGarantie: number;
   idCompte: string;
-  idGarantie: number;
   fondDossier: string;
 }

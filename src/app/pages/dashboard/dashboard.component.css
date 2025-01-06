@@ -60,35 +60,6 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* Trend Indicator */
-.stat-card small {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #64748b;
-}
-
-/* Positive Trend */
-.stat-card small.positive {
-  color: #10b981;
-}
-
-.stat-card small.positive::before {
-  content: '↑';
-  font-size: 16px;
-}
-
-/* Negative Trend */
-.stat-card small.negative {
-  color: #ef4444;
-}
-
-.stat-card small.negative::before {
-  content: '↓';
-  font-size: 16px;
-}
 
 /* Card Variants */
 .stat-card:nth-child(1) {

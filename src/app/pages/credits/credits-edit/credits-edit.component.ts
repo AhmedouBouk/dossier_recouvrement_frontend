@@ -17,7 +17,8 @@ export class CreditEditComponent implements OnInit {
   creditId!: number;
   credit: CreditDTO = {
     idCompte: '',
-    idGarantie: 0,
+    typeGarantie: '',
+    valeurGarantie: 0,
     montant: 0,
     tauxInteret: 0,
     duree: 0,
@@ -62,7 +63,8 @@ export class CreditEditComponent implements OnInit {
 
         this.credit = {
           idCompte: data.compte.nomCompte,
-          idGarantie: data.garantie.idGarantie,
+          typeGarantie: data.typeGarantie,
+          valeurGarantie: data.valeurGarantie,
           montant: data.montant,
           tauxInteret: data.tauxInteret,
           duree: data.duree,
@@ -105,7 +107,7 @@ export class CreditEditComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    if (!this.credit.idCompte || !this.credit.idGarantie) {
+    if (!this.credit.idCompte) {
       this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
       return false;
     }

@@ -128,4 +128,30 @@ export class CreditComponent implements OnInit, OnDestroy {
     };
     return statusMap[status] || 'pending';
   }
+
+  onFileUpload(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) {
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    this.isLoading = true;
+    this.error = null;
+  
+    this.creditService.uploadCSV(formData).subscribe({
+      next: (response: any) => {
+        this.loadCredits(); // Recharge la liste des crédits après l'upload
+        this.isLoading = false;
+      },
+      error: (err: string | null) => {
+        console.error('Erreur lors de l\'upload du fichier CSV :', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de l\'upload';
+        this.isLoading = false;
+      }
+    });
+  }
+  
 }

@@ -11,6 +11,10 @@ export class CreditService {
 
   constructor(private http: HttpClient) {}
 
+  uploadCSV(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/import-credit`, formData);
+  }
+  
   getAllCredits(): Observable<Credit[]> {
     return this.http.get<Credit[]>(`${this.apiUrl}/Affichage`);
   }
