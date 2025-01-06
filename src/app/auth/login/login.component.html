@@ -21,8 +21,8 @@
           <i class="material-icons">account_circle</i>
           <input
             type="text"
-            formControlName="Username"
-            placeholder="Username"
+            formControlName="email"
+            placeholder="email"
             [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
             (input)="onInputChange()"
             autocomplete="email">
