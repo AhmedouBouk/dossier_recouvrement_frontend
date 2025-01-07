@@ -21,7 +21,6 @@ export class NavbarComponent implements OnInit {
     '/dashboard': 'Dashboard',
     '/clients': 'Gestion des Clients',
     '/comptes': 'Gestion des Comptes',
-    '/garanties': 'Gestion des Garanties',
     '/credits': 'Gestion des Crédits',
     '/credits/add': 'Ajouter un Crédit',
     '/credits/edit': 'Modifier le Crédit',

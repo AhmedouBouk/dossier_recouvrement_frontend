@@ -63,10 +63,10 @@
               <div class="action-buttons">
                 <button 
                   *ngIf="hasRecouvrementRole()" 
-                  (click)="deleteDossier($event,dossier.idDossier)" 
-                  class="delete-btn">
-                  <i class="material-icons">delete</i>
-                  Supprimer
+                  (click)="viewDossier(dossier.idDossier)" 
+                  class="details-btn">
+                  <i class="material-icons">visibility</i>
+                  Détails
                 </button>
                 <button 
                   *ngIf="hasRecouvrementRole()" 
@@ -76,12 +76,12 @@
                   Modifier
                 </button>
                 <button 
-                  *ngIf="hasRecouvrementRole()" 
-                  (click)="viewDossier(dossier.idDossier)" 
-                  class="details-btn">
-                  <i class="material-icons">visibility</i>
-                  Détails
-                </button>
+                *ngIf="hasRecouvrementRole()" 
+                (click)="deleteDossier($event,dossier.idDossier)" 
+                class="delete-btn">
+                <i class="material-icons">delete</i>
+                Supprimer
+              </button>
               </div>
             </td>
           </tr>

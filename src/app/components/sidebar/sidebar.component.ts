@@ -17,7 +17,6 @@ export class SidebarComponent {
     '/dashboard': 'Dashboard',
     '/clients': 'Gestion des Clients',
     '/comptes': 'Gestion des Comptes',
-    '/garanties': 'Gestion des Garanties',
     '/credits': 'Gestion des Crédits',
     '/dossier-recouvrement': 'Dossiers Recouvrement'
   };

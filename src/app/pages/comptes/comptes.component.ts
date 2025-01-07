@@ -131,7 +131,6 @@ export class ComptesComponent implements OnInit {
       this.importMessage = null;
       this.compteService.importComptes(this.selectedFile).subscribe({
         next: (response) => {
-          console.log('Réponse import:', response);
           this.importMessage = {
             type: 'success',
             text: `Import réussi: ${response.count || 0} comptes importés`
