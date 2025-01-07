@@ -151,7 +151,6 @@ export class CreditComponent implements OnInit, OnDestroy {
   
     this.creditService.uploadCSV(formData).subscribe({
       next: (response: any) => {
-        console.log('Réponse du serveur :', response);
         this.loadCredits(); // Recharge la liste des crédits après l'upload
         this.isLoading = false;
         this.error = null; // Réinitialiser l'erreur en cas de succès
@@ -170,5 +169,14 @@ export class CreditComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  getAlertIcon(type: 'success' | 'error'): string {
+    const iconMap: Record<'success' | 'error', string> = {
+      'success': 'check_circle',
+      'error': 'error'
+    };
+    return iconMap[type];
+  }
+  
   
 }

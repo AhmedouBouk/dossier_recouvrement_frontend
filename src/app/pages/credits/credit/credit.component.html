@@ -44,7 +44,7 @@
             <th>Durée (mois)</th>
             <th>Date Début</th>
             <th>Statut</th>
-            <th *ngIf="roleService.hasEditPermission()">Actions</th>
+            <th *ngIf="roleService.hasDORole()">Actions</th>
           </tr>
         </thead>
         <tbody>
