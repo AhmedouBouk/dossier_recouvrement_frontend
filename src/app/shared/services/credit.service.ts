@@ -35,7 +35,13 @@ export class CreditService {
   }
 
   updateCredit(creditId: number, creditDTO: CreditDTO): Observable<Credit> {
-    return this.http.put<Credit>(`${this.apiUrl}/update/${creditId}`, creditDTO);
+    // Convertir l'objet creditDTO en chaîne JSON
+    const creditDTOString = JSON.stringify(creditDTO);
+  
+    // Ajouter le paramètre 'credit' à l'URL
+    const url = `${this.apiUrl}/update/${creditId}?credit=${encodeURIComponent(creditDTOString)}`;
+  
+    return this.http.put<Credit>(url, null); // Envoyer une requête PUT avec un corps vide
   }
 
   deleteCredit(creditId: number): Observable<any> {

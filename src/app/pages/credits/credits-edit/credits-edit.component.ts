@@ -38,7 +38,7 @@ export class CreditEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (!this.roleService.hasEditPermission()) {
+    if (!this.roleService.hasDORole()) {
       this.router.navigate(['/credits']);
       return;
     }

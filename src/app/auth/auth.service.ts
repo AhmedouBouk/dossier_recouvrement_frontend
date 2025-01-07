@@ -96,20 +96,17 @@ export class AuthService implements OnDestroy {
 
   hasRecouvrementRole(): boolean {
     const role = this.getUserRole();
-    console.log('Role actuel:', role);
     return role === 'RECOUVREMENT';
   }
 
   hasDGCRRole(): boolean {
     const role = this.getUserRole();
-    console.log('Role actuel:', role);
     return role === 'DGCR';
   }
 
-  hasDODCRole(): boolean {
+  hasDORole(): boolean {
     const role = this.getUserRole();
-    console.log('Role actuel:', role);
-    return role === 'DO' || role === 'DC';
+    return role === 'DO' ;
   }
 
   hasRoleNotAdmin(): boolean {
