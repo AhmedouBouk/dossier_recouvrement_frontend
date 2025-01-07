@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Credit, CreditDTO } from '../models/credit.model';
 
@@ -9,7 +9,9 @@ import { Credit, CreditDTO } from '../models/credit.model';
 export class CreditService {
   private apiUrl = 'http://localhost:8080/api/credit';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    
+  }
 
   uploadCSV(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/import-credit`, formData);
@@ -39,4 +41,12 @@ export class CreditService {
   deleteCredit(creditId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/delete/${creditId}`);
   }
+  rechercherParNomCompte(nomCompte: string): Observable<Credit[]> {
+    const url = `${this.apiUrl}/recherche?nomCompte=${nomCompte}`;
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+    return this.http.get<Credit[]>(url, { headers });
+  }
+ 
 }

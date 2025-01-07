@@ -1,6 +1,19 @@
 <div class="container">
-  
-
+  <div class="search-section">
+    <div class="search-grid">
+      <input 
+        type="text" 
+        [(ngModel)]="searchAccountNumber" 
+        placeholder="Rechercher par numéro de compte"
+        (keyup.enter)="searchDossier()"
+        class="search-input"
+      />
+      <button (click)="searchDossier()" class="search-btn">
+        <i class="material-icons">search</i>
+        Rechercher
+      </button>
+    </div>
+  </div>
   <div *ngIf="hasDGCRRole()" class="card-container">
     <div class="import-section">
       <div class="section-header">

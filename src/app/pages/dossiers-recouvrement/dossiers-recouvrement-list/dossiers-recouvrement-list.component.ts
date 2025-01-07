@@ -14,6 +14,7 @@ export class DossiersRecouvrementListComponent implements OnInit {
   dossiers: DossierRecouvrement[] = [];
   file: File | null = null;
   selectedFile: File | null = null;
+  searchAccountNumber: string = ''; 
 
   constructor(
     private dossierService: DossierRecouvrementService,
@@ -64,7 +65,6 @@ export class DossiersRecouvrementListComponent implements OnInit {
           this.getDossiers();
         },
         (error) => {
-          console.error('Erreur lors du traitement du fichier', error);
         }
       );
     }
@@ -85,5 +85,21 @@ export class DossiersRecouvrementListComponent implements OnInit {
   // Méthode pour voir les détails d'un dossier
   viewDossier(idDossier: number): void {
     this.router.navigate([`/dossier-recouvrement/view/${idDossier}`]);  // Redirige vers une page de détails
+  }
+  searchDossier(): void {
+    if (this.searchAccountNumber) {
+      this.dossierService.rechercherParAccountNumber(this.searchAccountNumber).subscribe({
+        next: (dossier) => {
+          // Si un dossier est trouvé, affichez-le dans un tableau ou redirigez vers une page de détails
+          this.dossiers = [dossier]; // Affiche uniquement le dossier trouvé
+        },
+        error: (err) => {
+          this.dossiers = []; // Efface la liste si aucun dossier n'est trouvé
+        }
+      });
+    } else {
+      // Si le champ de recherche est vide, rechargez tous les dossiers
+      this.getDossiers();
+    }
   }
 }

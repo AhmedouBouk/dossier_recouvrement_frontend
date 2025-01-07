@@ -12,6 +12,7 @@ export interface Credit {
   typeGarantie: string;
   valeurGarantie: number;
   fondDossier: string;
+  
 }
 
 export interface CreditDTO {
