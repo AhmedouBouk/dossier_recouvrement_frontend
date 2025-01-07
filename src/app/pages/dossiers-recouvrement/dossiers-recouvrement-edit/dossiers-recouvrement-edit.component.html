@@ -1,8 +1,7 @@
 <div class="container">
-  
-
   <div class="card-container">
     <form (ngSubmit)="updateDossier()">
+      <!-- Formulaire existant pour mettre à jour le dossier -->
       <div class="form-group">
         <label for="accountNumber">
           <i class="material-icons">account_balance</i>
@@ -24,10 +23,8 @@
         </label>
         <select class="form-control" id="status" [(ngModel)]="dossier.status" name="status" required>
           <option value="Reçu par le recouvrement">Reçu par le recouvrement</option>
-          <option value="PA ">PA </option>
+          <option value="PA">PA</option>
           <option value="AUTRE">AUTRE</option>
-
-        
         </select>
       </div>
       <div class="form-group">
@@ -37,10 +34,33 @@
         </label>
         <input type="number" class="form-control" id="sold" [(ngModel)]="dossier.sold" name="sold" required />
       </div>
-      <button type="submit" class="save-btn">
-        <i class="material-icons">save</i>
-        Mettre à jour le Dossier
+
+      <!-- Boutons pour mettre à jour le dossier et afficher le formulaire de crédit -->
+   <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center;">
+  <button type="submit" class="save-btn">
+    <i class="material-icons">save</i>
+    Mettre à jour le Dossier
+  </button>
+  <button type="button" class="credit-btn" (click)="toggleCreditForm()">
+    <i class="material-icons">credit_card</i>
+    Crédit
+  </button>
+</div>
+
+    <!-- Formulaire pour ajouter un crédit (affiché avec une animation) -->
+    <form *ngIf="showCreditForm" (ngSubmit)="ajouterCredit()" class="add-credit-form" [@slideInOut]>
+      <div class="form-group">
+        <label for="creditId">
+          <i class="material-icons">credit_card</i>
+          Sélectionner un Crédit
+        </label>
+        <select class="form-control" id="creditId" [(ngModel)]="selectedCreditId" name="creditId" required>
+          <option *ngFor="let credit of credits" [value]="credit.idCredit">
+            Crédit #{{ credit.idCredit }} - Montant: {{ credit.montant }} - Statut: {{ credit.statut }}
+          </option>
+        </select>
+      </div>
+      <button type="submit" class="credit-btn">
+        Ajouter un Crédit
       </button>
     </form>
-  </div>
-</div>

@@ -74,8 +74,8 @@
       <div class="info-container">
         <span class="label">Credit:</span>
         <!-- Lien vers CreditComponent -->
-        <a [routerLink]="'credits/details/' + dossier.credit.idCredit" class="value link-to-credit">
-          {{ dossier.credit.montant | number:'1.2-2' }} MRU
+        <a [routerLink]="['/credits/details', dossier.credit.idCredit]" class="value link-to-credit">
+          {{ dossier.credit.montant | number:'1.0-0' }} MRU
         </a>
       </div>
     </div>

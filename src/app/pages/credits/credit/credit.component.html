@@ -66,11 +66,11 @@
                   <i class="material-icons">visibility</i>
                   Détails
                 </button>
-                <button class="edit-btn" (click)="navigateToEdit(credit.idCredit)" *ngIf="authService.hasDODCRole">
+                <button class="edit-btn" (click)="navigateToEdit(credit.idCredit)" >
                   <i class="material-icons">edit</i>
                   Modifier
                 </button>
-                <button class="delete-btn" (click)="deleteCredit(credit.idCredit)" *ngIf="authService.hasDODCRole">
+                <button class="delete-btn" (click)="deleteCredit(credit.idCredit)" >
                   <i class="material-icons">delete</i>
                   Supprimer
                 </button>
