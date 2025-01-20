@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { CompteService } from '../../../shared/services/compte.service';
 
+
 @Component({
   selector: 'app-comptes-details',
   templateUrl: './comptes-details.component.html',

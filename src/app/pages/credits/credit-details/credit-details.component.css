@@ -179,3 +179,13 @@
       transform: none;
     }
   }
+  
+  .detail-item .value a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .detail-item .value a:hover {
+    text-decoration: underline;
+  }
