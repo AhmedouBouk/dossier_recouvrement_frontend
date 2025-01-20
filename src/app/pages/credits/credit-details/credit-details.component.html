@@ -46,7 +46,12 @@
         </div>
         <div class="detail-item">
           <span class="label">Fond Dossier</span>
-          <span class="value">{{ creditDetails.fondDossier }}</span>
+          <span class="value">
+            <a [href]="creditDetails.fondDossier" target="_blank" *ngIf="creditDetails.fondDossier">
+              Télécharger le dossier
+            </a>
+            <span *ngIf="!creditDetails.fondDossier">Non spécifié</span>
+          </span>
         </div>
       </div>
 
