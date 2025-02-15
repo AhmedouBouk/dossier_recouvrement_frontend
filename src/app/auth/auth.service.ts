@@ -18,7 +18,7 @@ interface DecodedToken {
   providedIn: 'root'
 })
 export class AuthService implements OnDestroy {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = `https://dossiers-recouvrement-backend-1.onrender.com/api/auth`;
   private tokenCheckInterval!: Subscription;
   private readonly CHECK_INTERVAL = 60000; // Check every minute
   private failedAttempts = 0;
