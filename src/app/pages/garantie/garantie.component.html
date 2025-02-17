@@ -1,0 +1,236 @@
+<div class="container">
+  
+
+    <div class="card-container" *ngIf="garantieRoleService.hasRole(['DO'])">
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="material-icons">add_circle</i>
+          Nouvelle Garantie
+        </h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="typeGarantie">Type de garantie</label>
+            <div class="input-with-icon">
+              <i class="material-icons">category</i>
+              <input 
+                id="typeGarantie"
+                type="text" 
+                [(ngModel)]="newGarantie.typeGarantie" 
+                placeholder="Type de garantie"
+                required>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label for="valeur">Valeur (MRU)</label>
+            <div class="input-with-icon">
+              <i class="material-icons">paid</i>
+              <input 
+                id="valeur"
+                type="number" 
+                [(ngModel)]="newGarantie.valeur" 
+                placeholder="Valeur"
+                required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <div class="input-with-icon">
+              <i class="material-icons"></i>
+              <input 
+                id="description"
+                type="text" 
+                [(ngModel)]="newGarantie.description" 
+                placeholder="description"
+                required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="fonDossier">FonDossier</label>
+            <div class="input-with-icon">
+              <i class="material-icons"></i>
+              <input 
+                id="fondDossier"
+                type="text" 
+                [(ngModel)]="newGarantie.fonDossier" 
+                placeholder="fonDossier"
+                required>
+            </div>
+          </div>
+  
+
+        </div>
+        
+        <div class="form-actions">
+          <button 
+            class="submit-btn" 
+            (click)="addGarantie()"
+            [disabled]="!newGarantie.typeGarantie || !newGarantie.valeur || !file">
+            <i class="material-icons">save</i>
+            Ajouter la garantie
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card-container">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Valeur</th>
+              <th>Description</th>
+              <th>FonDossier</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let garantie of garanties">
+              <td>{{ garantie.idGarantie }}</td>
+              <td>{{ garantie.typeGarantie }}</td>
+              <td>
+                <span class="amount">{{ garantie.valeur | number:'1.2-2' }} MRU</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="edit-btn" 
+                    *ngIf="garantieRoleService.hasRole(['DO'])"
+                    (click)="startEdit(garantie)">
+                    <i class="material-icons">edit</i>
+                    Modifier
+                  </button>
+                  <button 
+                    class="delete-btn" 
+                    *ngIf="garantieRoleService.hasRole(['DO'])"
+                    (click)="deleteGarantie(garantie.idGarantie)">
+                    <i class="material-icons">delete</i>
+                    Supprimer
+                  </button>
+                </div>
+              </td>
+              <td>{{ garantie.description }}</td>
+              <td>
+                <span class="amount">{{ garantie.valeur | number:'1.2-2' }} MRU</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="edit-btn" 
+                    *ngIf="garantieRoleService.hasRole(['DO'])"
+                    (click)="startEdit(garantie)">
+                    <i class="material-icons">edit</i>
+                    Modifier
+                  </button>
+                  <button 
+                    class="delete-btn" 
+                    *ngIf="garantieRoleService.hasRole(['DO'])"
+                    (click)="deleteGarantie(garantie.idGarantie)">
+                    <i class="material-icons">delete</i>
+                    Supprimer
+                  </button>
+                </div>
+              </td>
+              <td>{{ garantie.fonDossier }}</td>
+              <td>
+                <span class="amount">{{ garantie.valeur | number:'1.2-2' }} MRU</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="edit-btn" 
+                    *ngIf="garantieRoleService.hasRole(['DO'])"
+                    (click)="startEdit(garantie)">
+                    <i class="material-icons">edit</i>
+                    Modifier
+                  </button>
+                  <button 
+                    class="delete-btn" 
+                    *ngIf="garantieRoleService.hasRole(['DO'])"
+                    (click)="deleteGarantie(garantie.idGarantie)">
+                    <i class="material-icons">delete</i>
+                    Supprimer
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- Modal d'édition -->
+    <div class="modal-overlay" *ngIf="editMode" (click)="cancelEdit()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Modifier la Garantie</h3>
+          <button class="close-btn" (click)="cancelEdit()">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="editType">Type de garantie</label>
+            <div class="input-with-icon">
+              <i class="material-icons">category</i>
+              <input 
+                id="editType"
+                type="text" 
+                [(ngModel)]="selectedGarantie!.typeGarantie" 
+                placeholder="Type de garantie">
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label for="editValeur">Valeur (MRU)</label>
+            <div class="input-with-icon">
+              <i class="material-icons">paid</i>
+              <input 
+                id="editValeur"
+                type="number" 
+                [(ngModel)]="selectedGarantie!.valeur" 
+                placeholder="Valeur">
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                  <label for="editType">Description</label>
+                  <div class="input-with-icon">
+                    <i class="material-icons"></i>
+                    <input 
+                      id="editDescription"
+                      type="text" 
+                      [(ngModel)]="selectedGarantie!.description" 
+                      placeholder="Description">
+                  </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                      <label for="editType">FonDossier</label>
+                      <div class="input-with-icon">
+                        <i class="material-icons"></i>
+                        <input 
+                          id="editFonDossier"
+                          type="text" 
+                          [(ngModel)]="selectedGarantie!.fonDossier" 
+                          placeholder="FonDossier">
+                      </div>
+                    </div>
+          </div>
+  
+          <div class="form-actions">
+            <button class="cancel-btn" (click)="cancelEdit()">
+              <i class="material-icons">close</i>
+              Annuler
+            </button>
+            <button class="submit-btn" (click)="updateGarantie()">
+              <i class="material-icons">save</i>
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

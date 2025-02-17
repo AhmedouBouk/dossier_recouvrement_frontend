@@ -13,6 +13,7 @@ import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvreme
 import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
+import { GarantieComponent } from './pages/garanties/garantie.component';
 import { CreditComponent } from './pages/credits/credit/credit.component';
 import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
 import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
@@ -36,7 +37,12 @@ const routes: Routes = [
       { path: 'user-list', component: UserListComponent },
       { path: 'user-edit', component: UserEditComponent },
       { path: 'user-edit/:id', component: UserEditComponent },
-      { path: 'users/add', component: AddUserComponent }
+      { path: 'users/add', component: AddUserComponent },
+      {
+        path: 'garanties',
+        component: GarantieComponent
+        ,canActivate: [AuthGuard]
+      }
     ],
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ADMIN' }

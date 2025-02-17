@@ -17,8 +17,7 @@ export class CreditEditComponent implements OnInit {
   creditId!: number;
   credit: CreditDTO = {
     idCompte: '',
-    typeGarantie: '',
-    valeurGarantie: 0,
+    idGarantie: 0,
     montant: 0,
     tauxInteret: 0,
     duree: 0,
@@ -63,8 +62,7 @@ export class CreditEditComponent implements OnInit {
 
         this.credit = {
           idCompte: data.compte.nomCompte,
-          typeGarantie: data.typeGarantie,
-          valeurGarantie: data.valeurGarantie,
+          idGarantie: data.garantie.idGarantie,
           montant: data.montant,
           tauxInteret: data.tauxInteret,
           duree: data.duree,

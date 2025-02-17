@@ -30,6 +30,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
+import { GarantieComponent } from './pages/garantie/garantie.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes
     DossiersRecouvrementEditComponent,
     ClientDetailsComponent,
     ComptesDetailsComponent,
+    GarantieComponent,
 
   ],
   imports: [

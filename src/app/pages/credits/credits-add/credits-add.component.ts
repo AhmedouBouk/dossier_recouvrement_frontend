@@ -16,8 +16,7 @@ import { CreditDTO } from 'src/app/shared/models/credit.model';
 export class CreditAddComponent implements OnInit {
   creditForm: CreditDTO = {
     idCompte: '',
-    typeGarantie: '',
-    valeurGarantie: 0,
+    idGarantie: 0,
     montant: 0,
     tauxInteret: 0,
     duree: 0,
