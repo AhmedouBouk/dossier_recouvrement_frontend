@@ -13,7 +13,7 @@ import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvreme
 import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
-import { GarantieComponent } from './pages/garanties/garantie.component';
+import { GarantieComponent } from './pages/garantie/garantie.component';
 import { CreditComponent } from './pages/credits/credit/credit.component';
 import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
 import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';

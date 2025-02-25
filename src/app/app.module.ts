@@ -46,19 +46,14 @@ import { GarantieComponent } from './pages/garantie/garantie.component';
     DossiersRecouvrementDetailComponent,
     DossiersRecouvrementEditComponent,
     ClientDetailsComponent,
-    ComptesDetailsComponent,
-    GarantieComponent,
-
+    ComptesDetailsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-
     RouterModule,
-    
-
     MatToolbarModule,
     MatCardModule,
     MatButtonModule,
@@ -70,9 +65,9 @@ import { GarantieComponent } from './pages/garantie/garantie.component';
     MatProgressSpinnerModule,
     MatTooltipModule,
     BrowserAnimationsModule,
-    ReactiveFormsModule
-
-],
+    ReactiveFormsModule,
+    GarantieComponent
+  ],
   providers: [
     RoleGuard,
     {

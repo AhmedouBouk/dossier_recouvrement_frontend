@@ -11,7 +11,7 @@ import { GarantieRoleService } from '../../shared/services/garantie-role.service
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class GarantiesComponent implements OnInit {
+export class GarantieComponent implements OnInit {
   garanties: Garantie[] = [];
   selectedGarantie: Garantie | null = null;
   newGarantie: Partial<Garantie> = {};
@@ -41,7 +41,7 @@ export class GarantiesComponent implements OnInit {
 
   // Ajouter une garantie
   addGarantie() {
-    if (this.newGarantie.typeGarantie && this.newGarantie.valeur && this.file) {
+    if (this.newGarantie.typeGarantie && this.newGarantie.valeur && this.newGarantie.description && this.newGarantie.fonDossier) {
       this.garantieService.createGarantie(
         this.newGarantie.typeGarantie,
         this.newGarantie.valeur,
@@ -52,7 +52,6 @@ export class GarantiesComponent implements OnInit {
           console.log('Garantie créée:', data);
           this.loadGaranties();
           this.newGarantie = {};
-          this.file = null;
         },
         error: (error) => {
           console.error('Erreur lors de la création de la garantie:', error);
