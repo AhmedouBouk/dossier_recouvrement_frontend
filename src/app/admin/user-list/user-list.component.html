@@ -3,6 +3,10 @@
     <img src="assets/logo.png" alt="Logo" class="logo">
     <h1>Gestion des Utilisateurs</h1>
   </div>
+  <div class="nav-bar">
+    <button class="active">Utilisateurs</button>
+    <button (click)="navigateToRoles()">Rôles</button>
+  </div>
   <div class="user-controls">
     <div class="user-profile">
       <div class="user-avatar">
@@ -44,9 +48,9 @@
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
             <td>
-              <span class="role-chip" [ngClass]="getRoleClass(user.role)">
-                {{ user.role }}
-              </span>
+              
+                {{ user.role.name }}
+             
             </td>
             <td>
               <div class="action-buttons">

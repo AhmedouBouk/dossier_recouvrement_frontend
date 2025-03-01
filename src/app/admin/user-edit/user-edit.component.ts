@@ -20,6 +20,7 @@ export class UserEditComponent implements OnInit {
     role: ''
   };
 
+  roles: any[] = [];
   currentUserName: string = '';
   successMessage: string = '';
   errorMessage: string = '';
@@ -35,6 +36,7 @@ export class UserEditComponent implements OnInit {
 
   ngOnInit() {
     this.loadUserData();
+    this.loadRoles();
   }
 
   private loadUserData() {
@@ -65,6 +67,13 @@ export class UserEditComponent implements OnInit {
         this.navigateBack();
       }
     }
+  }
+
+  private loadRoles() {
+    this.adminService.getAllRoles().subscribe(roles => {
+      this.roles = roles;
+      console.log('Roles chargés:', this.roles);
+    });
   }
 
   onSubmit() {

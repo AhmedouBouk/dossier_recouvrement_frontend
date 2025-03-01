@@ -19,6 +19,7 @@ import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.c
 import { CreditDetailsComponent } from './pages/credits/credit-details/credit-details.component';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
+import { RoleListComponent } from './admin/role-list/role-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -36,10 +37,11 @@ const routes: Routes = [
       { path: 'user-list', component: UserListComponent },
       { path: 'user-edit', component: UserEditComponent },
       { path: 'user-edit/:id', component: UserEditComponent },
-      { path: 'users/add', component: AddUserComponent }
+      { path: 'users/add', component: AddUserComponent },
+      { path: 'roles', component: RoleListComponent },
     ],
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'ADMIN' }
+    data: { role: 'ROLE_ADMIN' }
   },
 
   // Non-admin routes - accessible by all authenticated users

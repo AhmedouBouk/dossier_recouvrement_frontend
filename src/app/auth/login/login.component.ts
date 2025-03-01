@@ -30,7 +30,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Add animation class after a brief delay
     setTimeout(() => {
       document.querySelector('.login-container')?.classList.add('visible');
     }, 100);
@@ -40,65 +39,37 @@ export class LoginComponent implements OnInit {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Veuillez remplir tous les champs correctement';
-      return;
-    }
-
+  onSubmit() {
+    if (this.loginForm.invalid) return;
+  
     this.isLoading = true;
-    this.errorMessage = '';
-
-    const { email, password } = this.loginForm.value;
-
-    this.authService.login(email, password).subscribe({
+    this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        const role = this.authService.getRole();
-        if (role) {
-          this.navigateBasedOnRole(role);
-        } else {
-          this.errorMessage = 'Token invalide';
-          this.authService.logout();
-        }
+        const userRole = this.authService.getUserRole();
+        console.log("User logged in with role:", userRole); // Debugging log
+        this.navigateBasedOnRole(userRole);
       },
-      error: (error) => {
-        if (error.status === 401) {
-          this.errorMessage = 'Email ou mot de passe incorrect';
-        } else if (error.status === 403) {
-          this.errorMessage = 'Accès non autorisé';
-        } else if (error.message.includes('Trop de tentatives')) {
-          this.errorMessage = error.message;
-        } else {
-          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-        }
-        this.isLoading = false;
-      },
-      complete: () => {
+      error: err => {
+        this.errorMessage = 'Invalid credentials';
         this.isLoading = false;
       }
     });
   }
+  
 
   private navigateBasedOnRole(role: string | null) {
+    console.log("User role:", role); // Debugging log
     if (!role) {
       this.errorMessage = 'Rôle non défini';
       return;
     }
 
-    switch(role) {
-      case 'ADMIN':
-        this.router.navigate(['/admin/user-list']);
-        break;
-      case 'DO':
-      case 'DC':
-      case 'RECOUVREMENT':
-      case 'DGCR':
-        this.router.navigate(['/dashboard']);
-        break;
-      default:
-        this.errorMessage = 'Rôle non reconnu';
-        this.authService.logout();
-        break;
+    if (role === 'ROLE_ADMIN') {
+      console.log("Navigating to /admin/");
+      this.router.navigate(['/admin/']);
+    } else {
+      console.log("Navigating to /dashboard");
+      this.router.navigate(['/dashboard']);
     }
   }
 

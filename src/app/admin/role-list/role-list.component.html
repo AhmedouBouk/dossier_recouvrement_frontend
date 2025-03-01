@@ -1,0 +1,76 @@
+<header>
+    <div class="logo-container">
+      <img src="assets/logo.png" alt="Logo" class="logo">
+      <h1>Gestion des Rôles</h1>
+    </div>
+<div class="nav-bar">
+  <button (click)="navigateToUsers()">
+    <i class="material-icons">group</i> Utilisateurs
+  </button>
+  <button class="active">
+    <i class="material-icons">verified_user</i> Rôles
+  </button>
+</div>
+
+  </header>
+  
+  <main class="main-content">
+    <div class="container">
+      <div class="actions-bar">
+        <button class="add-role-btn" (click)="openForm()">
+          <i class="material-icons">add</i>
+          Nouveau Rôle
+        </button>
+      </div>
+  
+      <!-- Popup Form for Adding/Editing Role -->
+      <div class="popup-overlay" *ngIf="showForm">
+        <div class="popup-content">
+          <h2>{{ isEditing ? 'Modifier' : 'Créer' }} un Rôle</h2>
+          <form [formGroup]="roleForm" (ngSubmit)="submitRole()">
+            <label>Nom du Rôle:</label>
+            <input type="text" formControlName="roleName" required>
+  
+            <label>Permissions:</label>
+            <div class="permissions" formArrayName="permissions">
+              <label *ngFor="let perm of allPermissions; let i = index">
+                <input type="checkbox" [value]="perm" (change)="onPermissionChange($event, perm)">
+                {{ perm }}
+              </label>
+            </div>
+              
+  
+            <div class="form-buttons">
+              <button type="submit">{{ isEditing ? 'Modifier' : 'Créer' }}</button>
+              <button type="button" class="cancel-btn" (click)="closeForm()">Annuler</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Permissions</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let role of roles">
+              <td>{{ role.name }}</td>
+              <td>{{ getPermissionNames(role) }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="edit-btn" (click)="openForm(role)">Modifier</button>
+                  <button class="delete-btn" (click)="deleteRole(role.id)">Supprimer</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  
