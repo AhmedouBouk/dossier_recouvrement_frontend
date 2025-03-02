@@ -8,16 +8,12 @@ import { RoleGuard } from './shared/guards/role.guard';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 import { AddUserComponent } from './admin/add-user/add-user.component';
-import { DossiersRecouvrementListComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-list/dossiers-recouvrement-list.component';
-import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-detail/dossiers-recouvrement-detail.component';
-import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
+import { DossierRecouvrementListComponent } from './pages/dossiers/dossier-recouvrement-list/dossier-recouvrement-list.component';
+import { DossierRecouvrementDetailsComponent } from './pages/dossiers/dossier-recouvrement-details/dossier-recouvrement-details.component';
+import { DossierRecouvrementAddComponent } from './pages/dossiers/dossier-recouvrement-add/dossier-recouvrement-add.component';
+import { DossierRecouvrementEditComponent } from './pages/dossiers/dossier-recouvrement-edit/dossier-recouvrement-edit.component';
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
-import { GarantieComponent } from './pages/garantie/garantie.component';
-import { CreditComponent } from './pages/credits/credit/credit.component';
-import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
-import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
-import { CreditDetailsComponent } from './pages/credits/credit-details/credit-details.component';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
@@ -39,15 +35,8 @@ const routes: Routes = [
       { path: 'user-edit', component: UserEditComponent },
       { path: 'user-edit/:id', component: UserEditComponent },
       { path: 'users/add', component: AddUserComponent },
-<<<<<<< HEAD
       { path: 'roles', component: RoleListComponent },
-=======
-      {
-        path: 'garanties',
-        component: GarantieComponent
-        ,canActivate: [AuthGuard]
-      }
->>>>>>> afb18362ed29ba1e444688c12534af44925ba72e
+
     ],
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ROLE_ADMIN' }
@@ -56,39 +45,25 @@ const routes: Routes = [
   // Non-admin routes - accessible by all authenticated users
  
   { 
-    path: 'dossier-recouvrement', 
-    component: DossiersRecouvrementListComponent
+    path: 'dossiers', 
+    component: DossierRecouvrementListComponent
     ,canActivate: [AuthGuard]
   },
   { 
-    path: 'dossier-recouvrement/view/:id', 
-    component: DossiersRecouvrementDetailComponent
+    path: 'dossiers/view/:id', 
+    component: DossierRecouvrementDetailsComponent
+    ,canActivate: [AuthGuard]
+  },
+  {
+    path: 'dossiers/add',
+    component: DossierRecouvrementAddComponent
     ,canActivate: [AuthGuard]
   },
   { 
     path: 'dossier-recouvrement/modify/:id', 
-    component: DossiersRecouvrementEditComponent
+    component: DossierRecouvrementEditComponent
     ,canActivate: [AuthGuard]
   },
-  {
-    path: 'credits',
-    component: CreditComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'credits/add',
-    component: CreditAddComponent,
-    canActivate: [AuthGuard]  // Note: Changed from CreditComponent
-  },
-  {
-    path: 'credits/edit/:id',  // Added :id parameter
-    component: CreditEditComponent
-    ,canActivate: [AuthGuard] // Note: Changed from CreditComponent
-  },
-  { path: 'credits/details/:id', 
-    component: CreditDetailsComponent ,
-    canActivate: [AuthGuard]
-   },
   
 
 ];

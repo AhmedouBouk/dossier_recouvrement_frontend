@@ -1,0 +1,173 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { RoleService } from '../../../shared/services/role.service';
+import { DossierRecouvrementService } from '../../../shared/services/dossier-recouvrement.service';
+import { DossierRecouvrement } from '../../../shared/models/dossier-recouvrement.model';
+
+@Component({
+  selector: 'app-dossier-recouvrement-list',
+  templateUrl: './dossier-recouvrement-list.component.html',
+  styleUrls: ['./dossier-recouvrement-list.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
+})
+export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
+  dossiers: DossierRecouvrement[] = [];
+  searchTerm: string = '';
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+  isLoading = false;
+  error: string | null = null;
+
+  constructor(
+    private dossierService: DossierRecouvrementService,
+    public roleService: RoleService,
+    private router: Router
+  ) {
+    this.searchSubject.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.performSearch(term);
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadDossiers();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+  
+  loadDossiers() {
+    this.isLoading = true;
+    this.error = null;
+    this.dossierService.getDossiers().subscribe({
+      next: (data) => {
+        this.dossiers = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading dossiers:', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors du chargement des dossiers';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onSearchChange(event: any) {
+    const term = event.target.value;
+    this.searchSubject.next(term);
+  }
+
+  private performSearch(term : string ) {
+    if (!term.trim()) {
+      this.loadDossiers();
+      return;
+    }
+
+    this.isLoading = true;
+    this.error = null;
+    this.dossierService.searchDossiers({ nomClient: term }).subscribe({
+      next: (data) => {
+        this.dossiers = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur de recherche', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la recherche';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  navigateToDetails(dossierId: number) {
+    if (dossierId) {
+      this.router.navigate(['/dossiers/details', dossierId]);
+    }
+  }
+
+  navigateToEdit(dossierId: number) {
+    if (dossierId) {
+      this.router.navigate(['/dossiers/edit', dossierId]);
+    }
+  }
+
+  navigateToAdd() {
+    this.router.navigate(['/dossiers/add']);
+  }
+
+  deleteDossier(dossierId: number) {
+    if (dossierId && confirm('Confirmer la suppression ?')) {
+      this.dossierService.deleteDossier(dossierId).subscribe({
+        next: () => this.loadDossiers(),
+        error: (err) => {
+          console.error('Erreur de suppression', err);
+          this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la suppression';
+        }
+      });
+    }
+  }
+
+  getValidationStatusClass(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'Initiale': 'pending',
+      'Validé': 'active',
+      'Non Validé': 'closed'
+    };
+    return statusMap[status] || 'pending';
+  }
+
+  onFileUpload(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) {
+      this.error = 'Aucun fichier sélectionné.';
+      return;
+    }
+  
+    if (!file.name.endsWith('.csv')) {
+      this.error = 'Le fichier doit être au format CSV.';
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    this.isLoading = true;
+    this.error = null;
+  
+    this.dossierService.importDossiers(file).subscribe({
+      next: (response: any) => {
+        this.loadDossiers();
+        this.isLoading = false;
+        this.error = null;
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Erreur lors de l\'upload du fichier CSV :', err);
+  
+        if (err.error && typeof err.error === 'string') {
+          this.error = err.error;
+        } else {
+          this.error = 'Une erreur est survenue lors de l\'upload.';
+        }
+  
+        this.isLoading = false;
+      }
+    });
+  }
+
+  getAlertIcon(type: 'success' | 'error'): string {
+    const iconMap: Record<'success' | 'error', string> = {
+      'success': 'check_circle',
+      'error': 'error'
+    };
+    return iconMap[type];
+  }
+}

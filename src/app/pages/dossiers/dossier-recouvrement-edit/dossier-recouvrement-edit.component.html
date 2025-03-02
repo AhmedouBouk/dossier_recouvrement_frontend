@@ -1,0 +1,270 @@
+<div class="container">
+  <div class="alert error" *ngIf="errorMessage">
+    <i class="material-icons">error</i>
+    {{ errorMessage }}
+  </div>
+
+  <div class="card-container">
+    <form (ngSubmit)="updateDossier()" #editForm="ngForm" class="edit-form">
+      <div class="form-section">
+        <h3 class="section-title">Informations principales</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="numeroCompte">Numéro de Compte</label>
+            <div class="input-with-icon">
+              <i class="material-icons">account_balance</i>
+              <input 
+                id="numeroCompte"
+                [(ngModel)]="dossier.compte.nomCompte"
+                name="numeroCompte"
+                type="text"
+                required
+                #numeroCompte="ngModel">
+            </div>
+            <div class="error-message" *ngIf="numeroCompte.invalid && (numeroCompte.dirty || numeroCompte.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="engagementTotal">Engagement Total</label>
+            <div class="input-with-icon">
+              <i class="material-icons">euro</i>
+              <input 
+                id="engagementTotal"
+                [(ngModel)]="dossier.engagementTotal"
+                name="engagementTotal"
+                type="number"
+                min="0"
+                required
+                #engagementTotal="ngModel">
+            </div>
+            <div class="error-message" *ngIf="engagementTotal.invalid && (engagementTotal.dirty || engagementTotal.touched)">
+              Ce champ est requis et doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="montantPrincipal">Montant Principal</label>
+            <div class="input-with-icon">
+              <i class="material-icons">payments</i>
+              <input 
+                id="montantPrincipal"
+                [(ngModel)]="dossier.montantPrincipal"
+                name="montantPrincipal"
+                type="number"
+                min="0"
+                required
+                #montantPrincipal="ngModel">
+            </div>
+            <div class="error-message" *ngIf="montantPrincipal.invalid && (montantPrincipal.dirty || montantPrincipal.touched)">
+              Ce champ est requis et doit être supérieur à 0
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interetContractuel">Intérêt Contractuel</label>
+            <div class="input-with-icon">
+              <i class="material-icons">trending_up</i>
+              <input 
+                id="interetContractuel"
+                [(ngModel)]="dossier.interetContractuel"
+                name="interetContractuel"
+                type="number"
+                min="0"
+                required
+                #interetContractuel="ngModel">
+            </div>
+            <div class="error-message" *ngIf="interetContractuel.invalid && (interetContractuel.dirty || interetContractuel.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interetRetard">Intérêt de Retard</label>
+            <div class="input-with-icon">
+              <i class="material-icons">warning</i>
+              <input 
+                id="interetRetard"
+                [(ngModel)]="dossier.interetRetard"
+                name="interetRetard"
+                type="number"
+                min="0"
+                required
+                #interetRetard="ngModel">
+            </div>
+            <div class="error-message" *ngIf="interetRetard.invalid && (interetRetard.dirty || interetRetard.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="naturesEngagement">Origines de l'engagement</label>
+            <div class="input-with-icon">
+              <i class="material-icons">source</i>
+              <input 
+                id="naturesEngagement"
+                [(ngModel)]="dossier.naturesEngagement"
+                name="naturesEngagement"
+                type="text"
+                required
+                #originesEngagement="ngModel">
+            </div>
+            <div class="error-message" *ngIf="originesEngagement.invalid && (originesEngagement.dirty || originesEngagement.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="agenceOuvertureCompte">Agence d'ouverture</label>
+            <div class="input-with-icon">
+              <i class="material-icons">business</i>
+              <input 
+                id="agenceOuverture"
+                [(ngModel)]="dossier.agenceOuvertureCompte"
+                name="agenceOuvertureCompte"
+                type="text"
+                required
+                #agenceOuverture="ngModel">
+            </div>
+            <div class="error-message" *ngIf="agenceOuverture.invalid && (agenceOuverture.dirty || agenceOuverture.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesChèques">Références Chèques</label>
+            <div class="input-with-icon">
+              <i class="material-icons">receipt</i>
+              <input 
+                id="referencesChèques"
+                [(ngModel)]="dossier.referencesChecks"
+                name="referencesChèques"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesCredits">Références Crédits</label>
+            <div class="input-with-icon">
+              <i class="material-icons">credit_card</i>
+              <input 
+                id="referencesCredits"
+                [(ngModel)]="dossier.referencesCredits"
+                name="referencesCredits"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesCautions">Références Cautions</label>
+            <div class="input-with-icon">
+              <i class="material-icons">security</i>
+              <input 
+                id="referencesCautions"
+                [(ngModel)]="dossier.referencesCautions"
+                name="referencesCautions"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesLC">Références LC</label>
+            <div class="input-with-icon">
+              <i class="material-icons">description</i>
+              <input 
+                id="referencesLC"
+                [(ngModel)]="dossier.referencesLC"
+                name="referencesLC"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="provision">Provision</label>
+            <div class="input-with-icon">
+              <i class="material-icons">savings</i>
+              <input 
+                id="provision"
+                [(ngModel)]="dossier.provision"
+                name="provision"
+                type="number"
+                min="0"
+                required
+                #provision="ngModel">
+            </div>
+            <div class="error-message" *ngIf="provision.invalid && (provision.dirty || provision.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="garantiesValeur">Garanties Valeur</label>
+            <div class="input-with-icon">
+              <i class="material-icons">shield</i>
+              <input 
+                id="garantiesValeur"
+                [(ngModel)]="dossier.garantiesValeur"
+                name="garantiesValeur"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status</label>
+            <div class="input-with-icon">
+              <i class="material-icons">flag</i>
+              <select 
+                id="status"
+                [(ngModel)]="dossier.status"
+                name="status"
+                required
+                #status="ngModel">
+                <option value="En cours">En cours</option>
+                <option value="En attente">En attente</option>
+                <option value="Clôturé">Clôturé</option>
+              </select>
+            </div>
+            <div class="error-message" *ngIf="status.invalid && (status.dirty || status.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="etatValidation">État de Validation</label>
+            <div class="input-with-icon">
+              <i class="material-icons">verified</i>
+              <select 
+                id="etatValidation"
+                [(ngModel)]="dossier.etatValidation"
+                name="etatValidation"
+                required
+                #etatValidation="ngModel">
+                <option value="Initiale">Initiale</option>
+                <option value="Validé">Validé</option>
+                <option value="Non Validé">Non Validé</option>
+              </select>
+            </div>
+            <div class="error-message" *ngIf="etatValidation.invalid && (etatValidation.dirty || etatValidation.touched)">
+              Ce champ est requis
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="cancel()">
+          <i class="material-icons">close</i>
+          Annuler
+        </button>
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          [disabled]="!editForm.form.valid || isLoading">
+          <i class="material-icons">save</i>
+          {{ isLoading ? 'Mise à jour...' : 'Mettre à jour' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

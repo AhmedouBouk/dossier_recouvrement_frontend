@@ -1,0 +1,83 @@
+<main class="main-content">
+  <div class="container">
+    <div class="details-content" *ngIf="dossierDetails">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">ID Dossier</span>
+          <span class="value">{{ dossierDetails.idDossier }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Numéro de Compte</span>
+          <span class="value">{{ dossierDetails.compte?.nomCompte }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Engagement Total</span>
+          <span class="value">{{ dossierDetails.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Montant Principal</span>
+          <span class="value">{{ dossierDetails.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Intérêt Contractuel</span>
+          <span class="value">{{ dossierDetails.interetContractuel | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Intérêt de Retard</span>
+          <span class="value">{{ dossierDetails.interetRetard | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Origines de l'engagement</span>
+          <span class="value">{{ dossierDetails.naturesEngagement }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Agence d'ouverture</span>
+          <span class="value">{{ dossierDetails.agenceOuvertureCompte }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Références Chèques</span>
+          <span class="value">{{ dossierDetails.referencesChecks || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Références Crédits</span>
+          <span class="value">{{ dossierDetails.referencesCredits || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Références Cautions</span>
+          <span class="value">{{ dossierDetails.referencesCautions || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Références LC</span>
+          <span class="value">{{ dossierDetails.referencesLC || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Provision</span>
+          <span class="value">{{ dossierDetails.provision | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Garanties Valeur</span>
+          <span class="value">{{ dossierDetails.garantiesValeur || 'Non spécifié' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Status</span>
+          <span class="value status-chip" [ngClass]="getStatusClass(dossierDetails.status)">
+            {{ dossierDetails.status }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="label">État de Validation</span>
+          <span class="value status-chip" [ngClass]="getStatusClass(dossierDetails.etatValidation)">
+            {{ dossierDetails.etatValidation }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="back-btn" (click)="goBack()">
+          <i class="material-icons">arrow_back</i>
+          Retour
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
