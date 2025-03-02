@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 interface DecodedToken {
   sub: string;  // email
   role: string;
+  permissions: string[];
   exp: number;
   iat: number;
 }
@@ -51,7 +52,7 @@ export class AuthService implements OnDestroy {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   private setupTokenExpirationCheck(): void {
@@ -119,6 +120,25 @@ export class AuthService implements OnDestroy {
       return null;
     }
   }
+
+  getUserPermissions(): string[] {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+    
+    const decodedToken = this.decodeToken(token);
+    if (!decodedToken || !decodedToken.permissions) return [];
+    
+    return decodedToken.permissions;
+  }
+  
+  hasPermission(permission: string): boolean {
+    const permissions = this.getUserPermissions();
+    return permissions.includes(permission) ;  // boolean 
+  }
+
+
+
+  
 
   isAdmin(): boolean {
     return this.getUserRole() === 'ROLE_ADMIN';

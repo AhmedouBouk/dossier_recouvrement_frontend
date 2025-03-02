@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoleService {
-  constructor() {}
+  constructor(private authService: AuthService) {}
 
   getUserRole(): string {
     const token = localStorage.getItem('token');
@@ -17,12 +18,52 @@ export class RoleService {
   }
 
   hasDORole(): boolean {
-    return this.getUserRole() === 'DO';
+    // Vérifier si l'utilisateur a les permissions liées aux opérations de crédit
+    return this.authService.hasPermission('CREATE_CREDIT') || 
+           this.authService.hasPermission('UPDATE_CREDIT') || 
+           this.getUserRole() === 'DIRECTION_OPERATIONS';
+  }
+  hasEditPermission(): boolean {
+    // Vérifier si l'utilisateur a les permissions liées aux opérations de crédit
+    return this.authService.hasPermission('CREATE_CREDIT') || 
+           this.authService.hasPermission('UPDATE_CREDIT') || 
+           this.getUserRole() === 'DIRECTION_OPERATIONS';
   }
 
  
-  hasEditPermission(): boolean {
-    const role = this.getUserRole();
-    return role === 'DC';
-  }
+  
+
+  // Client permissions
+hasReadClientPermission(): boolean {
+  return this.authService.hasPermission('READ_CLIENT');
+}
+
+hasUpdateClientPermission(): boolean {
+  return this.authService.hasPermission('UPDATE_CLIENT');
+}
+
+hasDeleteClientPermission(): boolean {
+  return this.authService.hasPermission('DELETE_CLIENT');
+}
+
+hasImportClientPermission(): boolean {
+  return this.authService.hasPermission('IMPORT_CLIENT');
+}
+
+// Compte permissions
+hasCreateComptePermission(): boolean {
+  return this.authService.hasPermission('CREATE_COMPTE');
+}
+
+hasReadComptePermission(): boolean {
+  return this.authService.hasPermission('READ_COMPTE');
+}
+
+hasUpdateComptePermission(): boolean {
+  return this.authService.hasPermission('UPDATE_COMPTE');
+}
+
+hasDeleteComptePermission(): boolean {
+  return this.authService.hasPermission('DELETE_COMPTE');
+}
 }

@@ -4,6 +4,8 @@ import { Router, NavigationEnd, Event } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { filter } from 'rxjs/operators';
 import { Location } from '@angular/common'; 
+import { RoleGuard } from 'src/app/shared/guards/role.guard';
+import { RoleService } from 'src/app/shared/services/role.service';
 interface RouteMap {
   [key: string]: string;
 }
@@ -29,11 +31,13 @@ export class NavbarComponent implements OnInit {
     '/dossier-recouvrement/modify': 'Modifier le Dossier',
   };
   userRole: string = '';
+  
 
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private location: Location
+    private location: Location,
+    public roleService: RoleService
   ) {
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)

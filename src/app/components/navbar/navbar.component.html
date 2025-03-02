@@ -45,12 +45,12 @@
     
     <div class="section-title">Gestion de la récupération</div>
     
-    <a routerLink="/clients" routerLinkActive="active" class="menu-item">
+    <a routerLink="/clients" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadClientPermission()">
       <i class="material-icons">people</i>
       Clients
     </a>
     
-    <a routerLink="/comptes" routerLinkActive="active" class="menu-item">
+    <a routerLink="/comptes" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadComptePermission()">
       <i class="material-icons">account_balance</i>
       Comptes
     </a>
