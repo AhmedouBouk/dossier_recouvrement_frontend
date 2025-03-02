@@ -30,7 +30,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
+<<<<<<< HEAD
+import { RoleListComponent } from './admin/role-list/role-list.component';
+=======
 import { GarantieComponent } from './pages/garantie/garantie.component';
+>>>>>>> afb18362ed29ba1e444688c12534af44925ba72e
 
 @NgModule({
   declarations: [
@@ -46,7 +50,13 @@ import { GarantieComponent } from './pages/garantie/garantie.component';
     DossiersRecouvrementDetailComponent,
     DossiersRecouvrementEditComponent,
     ClientDetailsComponent,
+<<<<<<< HEAD
+    ComptesDetailsComponent,
+    RoleListComponent,
+
+=======
     ComptesDetailsComponent
+>>>>>>> afb18362ed29ba1e444688c12534af44925ba72e
   ],
   imports: [
     BrowserModule,

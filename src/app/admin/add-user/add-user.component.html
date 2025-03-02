@@ -75,11 +75,7 @@
           <i class="material-icons">badge</i>
           <select id="role" name="role" [(ngModel)]="user.role" required class="form-control">
             <option value="" disabled selected>Select a role</option>
-            <option value="DGCR">DGCR</option>
-            <option value="RECOUVREMENT">RECOUVREMENT</option>
-            <option value="ADMIN">ADMIN</option>
-            <option value="DO">DO</option>
-            <option value="DC">DC</option>
+            <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
           </select>
         </div>
       </div>

@@ -1,8 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, interval, Subscription } from 'rxjs';
-import { AuthRequest } from '../shared/models/auth-request.model';
-import { AuthResponse } from '../shared/models/auth-response.model';
 import { environment } from './../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
@@ -10,6 +8,7 @@ import { Router } from '@angular/router';
 interface DecodedToken {
   sub: string;  // email
   role: string;
+  permissions: string[];
   exp: number;
   iat: number;
 }
@@ -21,8 +20,6 @@ export class AuthService implements OnDestroy {
   private apiUrl = `${environment.apiUrl}/auth`;
   private tokenCheckInterval!: Subscription;
   private readonly CHECK_INTERVAL = 60000; // Check every minute
-  private failedAttempts = 0;
-  private lockoutEndTime: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -37,25 +34,25 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  login(email: string, password: string): Observable<AuthResponse> {
-    const authRequest: AuthRequest = { email, password };
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, authRequest)
+  login(credentials: { email: string; password: string }) {
+    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(response => {
           localStorage.setItem('token', response.token);
           const decodedToken = this.decodeToken(response.token);
-          if (decodedToken) {
-            localStorage.setItem('userRole', decodedToken.role);
+          if (decodedToken && decodedToken.role) {
+            const formattedRole = decodedToken.role.startsWith("ROLE_") ? decodedToken.role : "ROLE_" + decodedToken.role;
+            localStorage.setItem('role', formattedRole);
           }
-          this.setupTokenExpirationCheck();
         })
       );
   }
+  
 
   logout(): void {
     localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    window.location.reload();
+    localStorage.removeItem('role');
+    this.router.navigate(['/auth/login']);
   }
 
   private setupTokenExpirationCheck(): void {
@@ -85,43 +82,13 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  private getUserRole(): string {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.role;
-    }
-    return '';
-  }
-
-  hasRecouvrementRole(): boolean {
-    const role = this.getUserRole();
-    return role === 'RECOUVREMENT';
-  }
-
-  hasDGCRRole(): boolean {
-    const role = this.getUserRole();
-    return role === 'DGCR';
-  }
-
-  hasDORole(): boolean {
-    const role = this.getUserRole();
-    return role === 'DO' ;
-  }
-
-  hasRoleNotAdmin(): boolean {
-    const role = this.getUserRole();
-    console.log('Role actuel:', role);
-    return role !== 'ADMIN';
+  getUserRole(): string {
+    const role = localStorage.getItem('role') || '';
+    return role.startsWith('ROLE_') ? role : `ROLE_${role}`;
   }
 
   getRole(): string | null {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = this.decodeToken(token);
-      return decodedToken?.role || null;
-    }
-    return null;
+    return this.getUserRole();
   }
 
   isAuthenticated(): boolean {
@@ -145,23 +112,62 @@ export class AuthService implements OnDestroy {
     return 'Utilisateur non connecté';
   }
 
-  private decodeToken(token: string): DecodedToken | null {
+  decodeToken(token: string): any {
     try {
-      return jwtDecode<DecodedToken>(token);
-    } catch (error) {
-      console.error('Error decoding token:', error);
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch (e) {
       return null;
     }
   }
 
-  // Helper methods for role-based access control
-  hasAnyRole(roles: string[]): boolean {
-    const userRole = this.getUserRole();
-    return roles.includes(userRole);
+  getUserPermissions(): string[] {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+    
+    const decodedToken = this.decodeToken(token);
+    if (!decodedToken || !decodedToken.permissions) return [];
+    
+    return decodedToken.permissions;
+  }
+  
+  hasPermission(permission: string): boolean {
+    const permissions = this.getUserPermissions();
+    return permissions.includes(permission) ;  // boolean 
+  }
+
+
+
+  
+
+  isAdmin(): boolean {
+    return this.getUserRole() === 'ROLE_ADMIN';
+  }
+
+  isNotAdmin(): boolean {
+    return this.getUserRole() !== 'ROLE_ADMIN';
   }
 
   isAuthorized(allowedRoles: string[]): boolean {
     if (!this.isAuthenticated()) return false;
-    return this.hasAnyRole(allowedRoles);
+    return allowedRoles.includes(this.getUserRole());
+  }
+
+  // Restored Methods to Prevent Errors in Other Components
+  hasRoleNotAdmin(): boolean {
+    const role = this.getUserRole();
+    return role !== 'ROLE_ADMIN';
+  }
+
+  hasRecouvrementRole(): boolean {
+    return this.getUserRole() === 'ROLE_RECOUVREMENT';
+  }
+
+  hasDGCRRole(): boolean {
+    return this.getUserRole() === 'ROLE_DGCR';
+  }
+
+  hasDORole(): boolean {
+    return this.getUserRole() === 'ROLE_DO';
   }
 }

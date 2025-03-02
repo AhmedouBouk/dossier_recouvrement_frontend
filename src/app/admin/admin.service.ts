@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './../../environments/environment';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { User } from '../shared/models/user.model';
 
 @Injectable({
@@ -35,5 +35,31 @@ export class AdminService {
   // Delete a user by ID
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/delete/${userId}`);
+  }
+
+  getAllRoles(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/roles`);
+  }
+
+  // ✅ Create a new role
+  createRole(roleData: { roleName: string; permissions: string[] }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/roles`, roleData);
+  }
+
+  // ✅ Update an existing role
+  updateRole(roleId: number, roleData: { roleName: string; permissions: string[] }): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/roles/${roleId}`, roleData);
+  }
+
+  // ✅ Delete a role
+  deleteRole(roleId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/roles/${roleId}`);
+  }
+
+  // ✅ Fetch all available permissions
+  getAllPermissions(): Observable<string[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/permissions`).pipe(
+      map((permissions: any[]) => permissions.map(p => p.name))
+    );
   }
 }

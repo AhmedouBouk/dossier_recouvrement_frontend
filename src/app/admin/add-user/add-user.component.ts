@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../admin.service';
 import { Router } from '@angular/router';
 import { User } from '../../shared/models/user.model';
@@ -10,7 +10,7 @@ import { AuthService } from 'src/app/auth/auth.service';
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.css']
 })
-export class AddUserComponent {
+export class AddUserComponent implements OnInit {
   user: Omit<User, 'id'> = {
     name: '',
     email: '',
@@ -18,10 +18,22 @@ export class AddUserComponent {
     role: ''
   };
 
+  roles: any[] = [];
   successMessage: string = '';  // Variable to hold the success message
   userDataService: any;
 
   constructor(private adminService: AdminService, private router: Router,private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.loadRoles();
+  }
+
+  loadRoles() {
+    this.adminService.getAllRoles().subscribe(roles => {
+      this.roles = roles;
+      console.log('Roles chargés:', this.roles);
+    });
+  }
 
   onSubmit() {
     this.adminService.addUser(this.user).subscribe(

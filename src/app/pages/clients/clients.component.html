@@ -24,7 +24,7 @@
   </div>
 
   <!-- Import Section -->
-  <div *ngIf="roleService.hasEditPermission()" class="card-container">
+  <div *ngIf="roleService.hasImportClientPermission()" class="card-container">
     <div class="import-section">
       <div class="section-header">
         <h3>
@@ -125,7 +125,7 @@
             <th>Secteur d'Activité</th>
             <th>Genre</th>
             <th>Salaire</th>
-            <th *ngIf="roleService.hasEditPermission()">Actions</th>
+            <th *ngIf="roleService.hasUpdateClientPermission() || roleService.hasDeleteClientPermission()">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -147,9 +147,10 @@
                 </span>
               </td>
               <td class="amount">{{client.salaire | number:'1.2-2'}} MRU</td>
-              <td *ngIf="roleService.hasEditPermission()" class="actions">
+              <td *ngIf="roleService.hasUpdateClientPermission() || roleService.hasDeleteClientPermission()" class="actions">
                 <div class="action-buttons">
                   <button 
+                    *ngIf="roleService.hasUpdateClientPermission()"
                     class="edit-btn" 
                     (click)="startEdit(client)"
                     [disabled]="isLoading">
@@ -157,6 +158,7 @@
                     Modifier
                   </button>
                   <button 
+                    *ngIf="roleService.hasDeleteClientPermission()"
                     class="delete-btn" 
                     (click)="deleteClient(client.nni)"
                     [disabled]="isLoading">

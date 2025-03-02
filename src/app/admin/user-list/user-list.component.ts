@@ -55,6 +55,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.users = response;
+          console.log(this.users);
         },
         error: (error) => {
           console.error('Error fetching users:', error);
@@ -121,5 +122,8 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   trackByUserId(index: number, user: User): number {
     return user.id;
+  }
+  navigateToRoles() {
+    this.router.navigate(['/admin/roles']);
   }
 }

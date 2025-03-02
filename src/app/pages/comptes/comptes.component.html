@@ -2,7 +2,7 @@
 
 
   <!-- Import Section -->
-  <div *ngIf="roleService.hasEditPermission()" class="card-container">
+  <div *ngIf="roleService.hasCreateComptePermission()" class="card-container">
     <div class="import-section">
       <div class="section-header">
         <h3>
@@ -87,7 +87,7 @@
             <th>Solde</th>
             <th>État</th>
             <th>Date d'ouverture</th>
-            <th *ngIf="roleService.hasEditPermission()">Actions</th>
+            <th *ngIf="roleService.hasUpdateComptePermission() || roleService.hasDeleteComptePermission()">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -115,13 +115,19 @@
                 </span>
               </td>
               <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
-              <td *ngIf="roleService.hasEditPermission()" class="actions">
+              <td *ngIf="roleService.hasUpdateComptePermission() || roleService.hasDeleteComptePermission()" class="actions">
                 <div class="action-buttons">
-                  <button class="edit-btn" (click)="startEdit(compte)">
+                  <button 
+                    *ngIf="roleService.hasUpdateComptePermission()"
+                    class="edit-btn" 
+                    (click)="startEdit(compte)">
                     <i class="material-icons">edit</i>
                     Modifier
                   </button>
-                  <button class="delete-btn" (click)="deleteCompte(compte.nomCompte)">
+                  <button 
+                    *ngIf="roleService.hasDeleteComptePermission()"
+                    class="delete-btn" 
+                    (click)="deleteCompte(compte.nomCompte)">
                     <i class="material-icons">delete</i>
                     Supprimer
                   </button>

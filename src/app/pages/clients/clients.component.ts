@@ -131,18 +131,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  onFileSelected(event: any) {
-    if (this.roleService.hasEditPermission()) {
-      const file = event.target.files[0];
-      if (file && this.validateFile(file)) {
-        this.selectedFile = file;
-        this.importMessage = null;
-      } else {
-        event.target.value = '';
-        this.selectedFile = null;
-      }
-    }
-  }
+  
 
   importClients() {
     if (!this.selectedFile) {
@@ -150,7 +139,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.roleService.hasEditPermission()) {
+    if (!this.roleService.hasImportClientPermission()) {
       this.showMessage('error', 'Vous n\'avez pas les permissions nécessaires.');
       return;
     }
@@ -233,7 +222,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   startEdit(client: any) {
-    if (this.roleService.hasEditPermission()) {
+    if (this.roleService.hasUpdateClientPermission()) {
       this.editingClient = { ...client };
     } else {
       this.showMessage('warning', 'Vous n\'avez pas les permissions pour modifier un client.');
@@ -267,7 +256,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   updateClient() {
     if (!this.editingClient) return;
 
-    if (!this.roleService.hasEditPermission()) {
+    if (!this.roleService.hasUpdateClientPermission()) {
       this.showMessage('error', 'Vous n\'avez pas les permissions nécessaires.');
       return;
     }
@@ -296,7 +285,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   deleteClient(nni: number) {
-    if (!this.roleService.hasEditPermission()) {
+    if (!this.roleService.hasDeleteClientPermission()) {
       this.showMessage('error', 'Vous n\'avez pas les permissions nécessaires.');
       return;
     }
@@ -321,5 +310,12 @@ export class ClientsComponent implements OnInit, OnDestroy {
         this.clearLoadingTimeout();
       }
     });
+  }
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.selectedFile = input.files[0];
+      console.log('Fichier sélectionné:', this.selectedFile.name); // Ajoutez cette ligne pour déboguer
+    }
   }
 }

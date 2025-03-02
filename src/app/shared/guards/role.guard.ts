@@ -6,24 +6,27 @@ import { AuthService } from '../../auth/auth.service';
   providedIn: 'root'
 })
 export class RoleGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    const userRole = this.authService.getRole();
-    const requiredRole = route.data['role'];
+    const requiredRole = route.data['role'] as string;
+    const userRole = this.authService.getUserRole();
+    
+    // Normalize roles to have ROLE_ prefix
+    const normalizedRequiredRole = requiredRole.startsWith('ROLE_') ? 
+      requiredRole : `ROLE_${requiredRole}`;
+    const normalizedUserRole = userRole.startsWith('ROLE_') ? 
+      userRole : `ROLE_${userRole}`;
 
-    // If path contains 'admin' and user is not an admin, deny access
-    if (state.url.includes('admin') && userRole !== 'ADMIN') {
-      this.router.navigate(['/auth/login']);
-      return false;
+    if (normalizedUserRole === normalizedRequiredRole) {
+      return true;
     }
 
-    // For non-admin pages, check if user has the required role OR is an admin
-    if (!state.url.includes('admin')) {
-      return userRole === requiredRole || userRole === 'ADMIN';
-    }
-
-    // For admin pages, strictly check for admin role
-    return userRole === requiredRole;
+    console.log('Access denied - Required role:', normalizedRequiredRole, 'User role:', normalizedUserRole);
+    this.router.navigate(['/dashboard']);
+    return false;
   }
 }

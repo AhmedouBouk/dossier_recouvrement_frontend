@@ -1,0 +1,620 @@
+/* Base styles and CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+/* Header Styling */
+header {
+  background-color: #ffffff;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  margin: 20px 30px;
+  transition: box-shadow 0.3s ease;
+}
+
+header:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.3s ease;
+}
+
+.logo-container img {
+  height: 60px;
+  transition: transform 0.3s ease;
+}
+
+.logo-container:hover {
+  transform: translateY(-3px);
+}
+
+.logo-container h1 {
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* User Controls */
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.user-profile:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #1e40af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #dc2626;
+}
+
+.logout-btn i {
+  transform: rotate(180deg);
+}
+
+/* Navigation Bar */
+.nav-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nav-bar button {
+  padding: 10px 20px;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.nav-bar button.active {
+  background: #10b981;
+  color: white;
+}
+
+.nav-bar button:hover:not(.active) {
+  background: #ccc;
+}
+
+/* Main Content */
+.main-content {
+  padding: 20px 30px;
+  margin-top: 20px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Add User Button */
+.add-user-btn {
+  padding: 12px 24px;
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.add-user-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Add Role Button (from pasted code) */
+.add-role-btn {
+  padding: 12px 24px;
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.add-role-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Table Container */
+.table-container {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.table-container:hover {
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead tr {
+  background-color: #f8f9fa;
+}
+
+th {
+  padding: 15px 20px;
+  text-align: left;
+  color: #333;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+td {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+}
+
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn, .delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.edit-btn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Role Chips */
+.role-chip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.role-chip.admin {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.role-chip.editor {
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+}
+
+.role-chip.manager {
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+}
+
+.role-chip.user {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* Empty State */
+.no-users-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-users-message i, .no-roles-message i {
+  font-size: 48px;
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.no-users-message p, .no-roles-message p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Empty Roles State (from pasted code) */
+.no-roles-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Popup Content */
+.popup-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transform: scale(0.95);
+  animation: popIn 0.3s ease-out forwards;
+}
+
+/* Animation for popup */
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.popup-content h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #374151;
+}
+
+/* Form Styling */
+.popup-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popup-content label {
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.popup-content input[type="text"] {
+  padding: 10px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.popup-content input[type="text"]:focus {
+  border-color: #10b981;
+  outline: none;
+}
+
+/* Permissions Selection */
+.permissions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f5f7fa;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.permissions label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eef2ff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.permissions label:hover {
+  background: #c7d2fe;
+}
+
+.permission-checkbox {
+  display: flex;
+  align-items: center;
+  background-color: #e8eef7;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: calc(50% - 10px);
+  box-sizing: border-box;
+}
+
+.permission-checkbox:hover {
+  background-color: #d1e0f7;
+}
+
+.permission-checkbox input {
+  margin-right: 8px;
+}
+
+.loading-permissions {
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  color: #666;
+}
+
+/* Form Buttons */
+.form-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-buttons button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-buttons button[type="submit"] {
+  background: #10b981;
+  color: white;
+  border: none;
+}
+
+.form-buttons button[type="submit"]:hover {
+  background: #059669;
+}
+
+.cancel-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.cancel-btn:hover {
+  background: #dc2626;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  header {
+    flex-wrap: wrap;
+    padding: 15px 20px;
+  }
+  
+  .logo-container {
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  .nav-bar, .user-controls {
+    flex: 1 1 auto;
+  }
+  
+  .nav-bar {
+    justify-content: center;
+  }
+  
+  .user-controls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px;
+    padding: 15px;
+  }
+
+  .logo-container {
+    justify-content: center;
+  }
+  
+  .nav-bar {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .nav-bar button {
+    flex: 1;
+  }
+  
+  .user-controls {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .user-profile, .logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .edit-btn, .delete-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .popup-content {
+    width: 90%;
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-container h1 {
+    font-size: 20px;
+  }
+  
+  .logo-container img {
+    height: 40px;
+  }
+  
+  .permissions {
+    max-height: 150px;
+  }
+  
+  .permission-checkbox {
+    width: 100%;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .form-buttons button {
+    width: 100%;
+  }
+}
