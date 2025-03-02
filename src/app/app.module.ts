@@ -9,9 +9,10 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiInterceptorService } from './shared/services/api-interceptor.service';
 import { AddUserComponent } from './admin/add-user/add-user.component';
-import { DossiersRecouvrementListComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-list/dossiers-recouvrement-list.component';
-import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-detail/dossiers-recouvrement-detail.component';
-import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
+import { DossierRecouvrementListComponent } from './pages/dossiers/dossier-recouvrement-list/dossier-recouvrement-list.component';
+import { DossierRecouvrementDetailsComponent } from './pages/dossiers/dossier-recouvrement-details/dossier-recouvrement-details.component';
+import { DossierRecouvrementAddComponent } from './pages/dossiers/dossier-recouvrement-add/dossier-recouvrement-add.component';
+import { DossierRecouvrementEditComponent } from './pages/dossiers/dossier-recouvrement-edit/dossier-recouvrement-edit.component';
 import { RoleGuard } from './shared/guards/role.guard';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -30,11 +31,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
-<<<<<<< HEAD
 import { RoleListComponent } from './admin/role-list/role-list.component';
-=======
-import { GarantieComponent } from './pages/garantie/garantie.component';
->>>>>>> afb18362ed29ba1e444688c12534af44925ba72e
 
 @NgModule({
   declarations: [
@@ -46,17 +43,9 @@ import { GarantieComponent } from './pages/garantie/garantie.component';
     SidebarComponent,
     NavbarComponent,
     DashboardComponent,
-    DossiersRecouvrementListComponent,
-    DossiersRecouvrementDetailComponent,
-    DossiersRecouvrementEditComponent,
     ClientDetailsComponent,
-<<<<<<< HEAD
     ComptesDetailsComponent,
-    RoleListComponent,
-
-=======
-    ComptesDetailsComponent
->>>>>>> afb18362ed29ba1e444688c12534af44925ba72e
+    RoleListComponent
   ],
   imports: [
     BrowserModule,
@@ -76,7 +65,10 @@ import { GarantieComponent } from './pages/garantie/garantie.component';
     MatTooltipModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
-    GarantieComponent
+    DossierRecouvrementListComponent,
+    DossierRecouvrementDetailsComponent,
+    DossierRecouvrementAddComponent,
+    DossierRecouvrementEditComponent,
   ],
   providers: [
     RoleGuard,

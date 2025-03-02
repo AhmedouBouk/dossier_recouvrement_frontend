@@ -1,44 +1,56 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DossierRecouvrement } from '../models/dossier-recouvrement';
+import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
 import { environment } from './../../../environments/environment';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class DossierRecouvrementService {
-  private apiUrl = `${environment.apiUrl}/DossierRecouvrement`;  // L'URL de votre backend
+  private apiUrl = `${environment.apiUrl}/dossiers`;  // Updated to match backend endpoint
 
   constructor(private http: HttpClient) {}
 
-  // Méthode pour obtenir un dossier par son ID
-  getDossierById(id: number): Observable<DossierRecouvrement> {
-    return this.http.get<DossierRecouvrement>(`${this.apiUrl}/lire/${id}`);
+  // Get all dossiers
+  getDossiers(): Observable<DossierRecouvrement[]> {
+    return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/affichage`);
   }
-// dossier-recouvrement.service.ts
-getDossiers(): Observable<DossierRecouvrement[]> {
-  return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/Affichage`);
-}
 
-  // Méthode pour mettre à jour un dossier existant
+  // Get dossier by ID
+  getDossierById(id: number): Observable<DossierRecouvrement> {
+    return this.http.get<DossierRecouvrement>(`${this.apiUrl}/${id}`);
+  }
+
+  // Create new dossier
+  createDossier(dossier: DossierRecouvrement): Observable<DossierRecouvrement> {
+    return this.http.post<DossierRecouvrement>(`${this.apiUrl}/create`, dossier);
+  }
+
+  // Update dossier
   updateDossier(id: number, dossier: DossierRecouvrement): Observable<DossierRecouvrement> {
     return this.http.put<DossierRecouvrement>(`${this.apiUrl}/update/${id}`, dossier);
   }
 
-  // Méthode pour supprimer un dossier
-  deleteDossier(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/delete/${id}`);
+  // Delete dossier
+  deleteDossier(id: number): Observable<string> {
+    return this.http.delete<string>(`${this.apiUrl}/delete/${id}`);
   }
-  ajouterCredit(dossierId: number, creditId: number): Observable<DossierRecouvrement> {
-    const url = `${this.apiUrl}/upload/${dossierId}/ajouter-credit/${creditId}`;
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
-    });
-    return this.http.post<DossierRecouvrement>(url, null, { headers });
+
+  // Search dossiers
+  searchDossiers(params: { dossierId?: number, numeroCompte?: string, nomClient?: string }): Observable<DossierRecouvrement[]> {
+    let queryParams = new URLSearchParams();
+    if (params.dossierId) queryParams.append('dossierId', params.dossierId.toString());
+    if (params.numeroCompte) queryParams.append('numeroCompte', params.numeroCompte);
+    if (params.nomClient) queryParams.append('nomClient', params.nomClient);
+
+    return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/recherche?${queryParams}`);
   }
-  rechercherParAccountNumber(accountNumber: string): Observable<DossierRecouvrement> {
-    return this.http.get<DossierRecouvrement>(`${this.apiUrl}/recherche?accountNumber=${accountNumber}`);
+
+  // Import dossiers from CSV file
+  importDossiers(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/import`, formData);
   }
 }

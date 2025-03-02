@@ -1,0 +1,214 @@
+<div class="container">
+  <div class="alert error" *ngIf="errorMessage">
+    <i class="material-icons">error</i>
+    {{ errorMessage }}
+  </div>
+
+  <div class="card-container">
+    <form (ngSubmit)="addDossier()" #addForm="ngForm" class="add-form">
+      <div class="form-section">
+        <h3 class="section-title">Informations du dossier</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="numeroCompte">Numéro de Compte</label>
+            <div class="input-with-icon">
+              <i class="material-icons">account_balance</i>
+              <input 
+                id="numeroCompte"
+                [(ngModel)]="dossierForm.compte.nomCompte"
+                name="numeroCompte"
+                type="text"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="engagementTotal">Engagement Total</label>
+            <div class="input-with-icon">
+              <i class="material-icons">euro</i>
+              <input 
+                id="engagementTotal"
+                [(ngModel)]="dossierForm.engagementTotal"
+                name="engagementTotal"
+                type="number"
+                min="0"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="montantPrincipal">Montant Principal</label>
+            <div class="input-with-icon">
+              <i class="material-icons">payments</i>
+              <input 
+                id="montantPrincipal"
+                [(ngModel)]="dossierForm.montantPrincipal"
+                name="montantPrincipal"
+                type="number"
+                min="0"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interetContractuel">Intérêt Contractuel</label>
+            <div class="input-with-icon">
+              <i class="material-icons">trending_up</i>
+              <input 
+                id="interetContractuel"
+                [(ngModel)]="dossierForm.interetContractuel"
+                name="interetContractuel"
+                type="number"
+                min="0"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interetRetard">Intérêt de Retard</label>
+            <div class="input-with-icon">
+              <i class="material-icons">warning</i>
+              <input 
+                id="interetRetard"
+                [(ngModel)]="dossierForm.interetRetard"
+                name="interetRetard"
+                type="number"
+                min="0"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="originesEngagement">Origines de l'engagement</label>
+            <div class="input-with-icon">
+              <i class="material-icons">source</i>
+              <input 
+                id="originesEngagement"
+                [(ngModel)]="dossierForm.naturesEngagement"
+                name="originesEngagement"
+                type="text"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="agenceOuverture">Agence d'ouverture</label>
+            <div class="input-with-icon">
+              <i class="material-icons">business</i>
+              <input 
+                id="agenceOuverture"
+                [(ngModel)]="dossierForm.agenceOuvertureCompte"
+                name="agenceOuverture"
+                type="text"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesChèques">Références Chèques</label>
+            <div class="input-with-icon">
+              <i class="material-icons">receipt</i>
+              <input 
+                id="referencesCheques"
+                [(ngModel)]="dossierForm.referencesChecks"
+                name="referencesCheques"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesCredits">Références Crédits</label>
+            <div class="input-with-icon">
+              <i class="material-icons">credit_card</i>
+              <input 
+                id="referencesCredits"
+                [(ngModel)]="dossierForm.referencesCredits"
+                name="referencesCredits"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesCautions">Références Cautions</label>
+            <div class="input-with-icon">
+              <i class="material-icons">security</i>
+              <input 
+                id="referencesCautions"
+                [(ngModel)]="dossierForm.referencesCautions"
+                name="referencesCautions"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="referencesLC">Références LC</label>
+            <div class="input-with-icon">
+              <i class="material-icons">description</i>
+              <input 
+                id="referencesLC"
+                [(ngModel)]="dossierForm.referencesLC"
+                name="referencesLC"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="provision">Provision</label>
+            <div class="input-with-icon">
+              <i class="material-icons">savings</i>
+              <input 
+                id="provision"
+                [(ngModel)]="dossierForm.provision"
+                name="provision"
+                type="number"
+                min="0"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="garantiesValeur">Garanties Valeur</label>
+            <div class="input-with-icon">
+              <i class="material-icons">shield</i>
+              <input 
+                id="garantiesValeur"
+                [(ngModel)]="dossierForm.garantiesValeur"
+                name="garantiesValeur"
+                type="text">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status</label>
+            <div class="input-with-icon">
+              <i class="material-icons">flag</i>
+              <select 
+                id="status"
+                [(ngModel)]="dossierForm.status"
+                name="status"
+                required>
+                <option value="En cours">En cours</option>
+                <option value="En attente">En attente</option>
+                <option value="Clôturé">Clôturé</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="cancel()">
+          <i class="material-icons">close</i>
+          Annuler
+        </button>
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          [disabled]="!addForm.form.valid || isLoading">
+          <i class="material-icons">save</i>
+          {{ isLoading ? 'Création...' : 'Créer le dossier' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
