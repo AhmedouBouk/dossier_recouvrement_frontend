@@ -13,6 +13,7 @@ import { DossiersRecouvrementDetailComponent } from './pages/dossiers-recouvreme
 import { DossiersRecouvrementEditComponent } from './pages/dossiers-recouvrement/dossiers-recouvrement-edit/dossiers-recouvrement-edit.component';
 import { ClientsComponent } from './pages/clients/clients.component';
 import { ComptesComponent } from './pages/comptes/comptes.component';
+import { GarantieComponent } from './pages/garantie/garantie.component';
 import { CreditComponent } from './pages/credits/credit/credit.component';
 import { CreditAddComponent } from './pages/credits/credits-add/credits-add.component';
 import { CreditEditComponent } from './pages/credits/credits-edit/credits-edit.component';
@@ -38,7 +39,15 @@ const routes: Routes = [
       { path: 'user-edit', component: UserEditComponent },
       { path: 'user-edit/:id', component: UserEditComponent },
       { path: 'users/add', component: AddUserComponent },
+<<<<<<< HEAD
       { path: 'roles', component: RoleListComponent },
+=======
+      {
+        path: 'garanties',
+        component: GarantieComponent
+        ,canActivate: [AuthGuard]
+      }
+>>>>>>> afb18362ed29ba1e444688c12534af44925ba72e
     ],
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ROLE_ADMIN' }

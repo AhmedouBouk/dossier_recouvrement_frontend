@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { RouterModule } from '@angular/router'; // Import de RouterModule
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompteService {
-  private apiUrl = 'http://localhost:8080/api/comptes';
+  private apiUrl = `${environment.apiUrl}/comptes`;
 
   constructor(private http: HttpClient) { }
 

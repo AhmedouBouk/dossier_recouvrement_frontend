@@ -27,35 +27,18 @@
           </div>
 
           <div class="form-group">
-            <label for="typeGarantie">Type Garantie</label>
+            <label for="idGarantie">Garantie</label>
             <div class="input-with-icon">
               <i class="material-icons">security</i>
               <input 
-                id="valeurGarantie"
-                [(ngModel)]="credit.typeGarantie"
-                name="typeGarantie"
-                type="string"
+                id="idGarantie"
+                [(ngModel)]="credit.idGarantie"
+                name="idGarantie"
+                type="number"
                 required
-                #typeGarantie="ngModel">
+                #idGarantie="ngModel">
             </div>
-            <div class="error-message" *ngIf="typeGarantie.invalid && (typeGarantie.dirty || typeGarantie.touched)">
-              Ce champ est requis
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="valeurGarantie">Valeur Garantie</label>
-            <div class="input-with-icon">
-              <i class="material-icons">euro</i>
-              <input 
-                id="valeurGarantie"
-                [(ngModel)]="credit.valeurGarantie"
-                name="valeurGarantie"
-                type="string"
-                required
-                #valeurGarantie="ngModel">
-            </div>
-            <div class="error-message" *ngIf="valeurGarantie.invalid && (valeurGarantie.dirty || valeurGarantie.touched)">
+            <div class="error-message" *ngIf="idGarantie.invalid && (idGarantie.dirty || idGarantie.touched)">
               Ce champ est requis
             </div>
           </div>
