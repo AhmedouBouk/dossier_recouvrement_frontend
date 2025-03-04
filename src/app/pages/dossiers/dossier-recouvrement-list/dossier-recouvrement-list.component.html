@@ -13,13 +13,13 @@
         </div>
       </div>
      
-      <label *ngIf="roleService.hasDORole()" class="upload-btn">
+      <label  class="upload-btn">
         <input type="file" (change)="onFileUpload($event)" accept=".csv" hidden>
         <i class="material-icons">file_upload</i>
         Importer CSV
       </label>
 
-      <button class="add-btn" (click)="navigateToAdd()" *ngIf="roleService.hasDORole()">
+      <button class="add-btn" (click)="navigateToAdd()">
         <i class="material-icons">add</i>
         Nouveau Dossier
       </button>
@@ -48,7 +48,7 @@
             <th>Montant Principal</th>
             <th>Status</th>
             <th>État de Validation</th>
-            <th *ngIf="roleService.hasDORole()">Actions</th>
+            <th >Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +67,7 @@
                 {{ dossier.etatValidation }}
               </span>
             </td>
-            <td *ngIf="roleService.hasDORole()">
+            <td>
               <div class="action-buttons">
                 <button class="view-btn" (click)="navigateToDetails(dossier.idDossier)">
                   <i class="material-icons">visibility</i>

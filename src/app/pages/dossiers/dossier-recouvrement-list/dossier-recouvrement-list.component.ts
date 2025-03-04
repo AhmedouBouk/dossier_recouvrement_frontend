@@ -152,9 +152,20 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
       error: (err: HttpErrorResponse) => {
         console.error('Erreur lors de l\'upload du fichier CSV :', err);
   
-        if (err.error && typeof err.error === 'string') {
-          this.error = err.error;
+        // Gestion améliorée des erreurs
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            // Si l'erreur est une chaîne de caractères
+            this.error = err.error;
+          } else if (err.error.message) {
+            // Si l'erreur est un objet avec une propriété 'message'
+            this.error = err.error.message;
+          } else {
+            // Si l'erreur est un objet sans propriété 'message'
+            this.error = 'Une erreur est survenue lors de l\'upload.';
+          }
         } else {
+          // Si l'erreur est une erreur réseau ou serveur
           this.error = 'Une erreur est survenue lors de l\'upload.';
         }
   
@@ -162,7 +173,6 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   getAlertIcon(type: 'success' | 'error'): string {
     const iconMap: Record<'success' | 'error', string> = {
       'success': 'check_circle',

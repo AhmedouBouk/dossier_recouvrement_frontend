@@ -52,10 +52,7 @@ export class DossierRecouvrementAddComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (!this.roleService.hasEditPermission()) {
-      this.router.navigate(['/dossiers']);
-      return;
-    }
+    
   }
 
   addDossier() {

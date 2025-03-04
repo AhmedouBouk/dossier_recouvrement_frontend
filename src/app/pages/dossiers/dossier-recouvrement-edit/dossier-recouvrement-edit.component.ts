@@ -53,10 +53,7 @@ export class DossierRecouvrementEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (!this.roleService.hasDORole()) {
-      this.router.navigate(['/dossiers']);
-      return;
-    }
+   
 
     this.route.params.subscribe(params => {
       this.dossierId = +params['id'];

@@ -17,18 +17,7 @@ export class RoleService {
     return '';
   }
 
-  hasDORole(): boolean {
-    // Vérifier si l'utilisateur a les permissions liées aux opérations de crédit
-    return this.authService.hasPermission('CREATE_CREDIT') || 
-           this.authService.hasPermission('UPDATE_CREDIT') || 
-           this.getUserRole() === 'DIRECTION_OPERATIONS';
-  }
-  hasEditPermission(): boolean {
-    // Vérifier si l'utilisateur a les permissions liées aux opérations de crédit
-    return this.authService.hasPermission('CREATE_CREDIT') || 
-           this.authService.hasPermission('UPDATE_CREDIT') || 
-           this.getUserRole() === 'DIRECTION_OPERATIONS';
-  }
+
 
  
   
