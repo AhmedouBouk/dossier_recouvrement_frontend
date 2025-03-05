@@ -17,6 +17,7 @@ import { ComptesComponent } from './pages/comptes/comptes.component';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
+import { AgenceListComponent } from './admin/agence/agence-list/agence-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -36,7 +37,7 @@ const routes: Routes = [
       { path: 'user-edit/:id', component: UserEditComponent },
       { path: 'users/add', component: AddUserComponent },
       { path: 'roles', component: RoleListComponent },
-
+      { path: 'agences', component: AgenceListComponent },
     ],
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ROLE_ADMIN' }

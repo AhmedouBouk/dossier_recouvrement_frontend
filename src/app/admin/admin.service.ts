@@ -8,57 +8,57 @@ import { User } from '../shared/models/user.model';
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = `${environment.apiUrl}/admin`;
+  private apiUrl = `${environment.apiUrl}`;
 
   constructor(private http: HttpClient) {}
 
   // Fetch all users
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users`);
+    return this.http.get<User[]>(`${this.apiUrl}/admin/users`);
   }
 
   // Fetch a user by their ID
   getUserById(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
+    return this.http.get<User>(`${this.apiUrl}/admin/users/${userId}`);
   }
 
   // Update an existing user's details
   updateUser(user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/update`, user);
+    return this.http.put<User>(`${this.apiUrl}/admin/update`, user);
   }
 
   // Add a new user
   addUser(user: Omit<User, 'id'>): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/add`, user);
+    return this.http.post<User>(`${this.apiUrl}/users`, user);
   }
 
   // Delete a user by ID
   deleteUser(userId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/delete/${userId}`);
+    return this.http.delete<void>(`${this.apiUrl}/admin/delete/${userId}`);
   }
 
   getAllRoles(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/roles`);
+    return this.http.get<any[]>(`${this.apiUrl}/admin/roles`);
   }
 
   // ✅ Create a new role
   createRole(roleData: { roleName: string; permissions: string[] }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/roles`, roleData);
+    return this.http.post<any>(`${this.apiUrl}/admin/roles`, roleData);
   }
 
   // ✅ Update an existing role
   updateRole(roleId: number, roleData: { roleName: string; permissions: string[] }): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/roles/${roleId}`, roleData);
+    return this.http.put<any>(`${this.apiUrl}/admin/roles/${roleId}`, roleData);
   }
 
   // ✅ Delete a role
-  deleteRole(roleId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/roles/${roleId}`);
+  deleteRole(roleId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/admin/roles/${roleId}`);
   }
 
   // ✅ Fetch all available permissions
   getAllPermissions(): Observable<string[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/permissions`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/admin/permissions`).pipe(
       map((permissions: any[]) => permissions.map(p => p.name))
     );
   }

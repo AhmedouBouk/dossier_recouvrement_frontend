@@ -32,6 +32,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
+import { AgenceModule } from './admin/agence/agence.module';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
     DossierRecouvrementDetailsComponent,
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
+    AgenceModule
   ],
   providers: [
     RoleGuard,
