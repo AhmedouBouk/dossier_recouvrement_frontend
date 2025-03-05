@@ -30,7 +30,7 @@
             <td>
               <input [(ngModel)]="dossier.garantiesTitre" placeholder="Titre de la garantie" />
             </td>
-            <td>{{ dossier.dateCreation | date:'dd/MM/yyyy' }}</td>
+            <td>{{ dossier.dateCreation }}</td>
             <td>
               <div class="action-buttons">
                 <input type="file" (change)="onFileUpload($event, dossier)" accept=".pdf" hidden id="file-upload-{{ dossier.id }}" />

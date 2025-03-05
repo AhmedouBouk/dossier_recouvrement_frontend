@@ -32,6 +32,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
+import { AgenceModule } from './admin/agence/agence.module';
+import { NavigationHeaderComponent } from './admin/navigation-header/navigation-header.component';
+import { SharedModule } from './shared/shared.module';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
 
 @NgModule({
@@ -48,6 +51,7 @@ import { GarantiesComponent } from './pages/garanties/garanties.component';
     ComptesDetailsComponent,
     RoleListComponent,
     GarantiesComponent
+
   ],
   imports: [
     BrowserModule,
@@ -71,6 +75,8 @@ import { GarantiesComponent } from './pages/garanties/garanties.component';
     DossierRecouvrementDetailsComponent,
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
+    AgenceModule,
+    SharedModule
   ],
   providers: [
     RoleGuard,
