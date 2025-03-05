@@ -97,12 +97,12 @@ export class AddUserComponent implements OnInit {
   }
 
   onRoleChange(): void {
-    // Afficher le champ Agence uniquement si le rôle AGENCE est sélectionné
+    // Afficher le champ Agence uniquement si le rôle sélectionné est "AGENCE"
     this.showAgenceField = this.user.role === 'AGENCE';
     
     // Si le rôle n'est pas AGENCE, réinitialiser la valeur de l'agence
     if (!this.showAgenceField) {
-      this.user.agence = '';
+      this.user.agence = null;
     }
   }
 
@@ -113,13 +113,17 @@ export class AddUserComponent implements OnInit {
     const selectedRole = this.roles.find(role => role.name === this.user.role);
     
     // Créer l'objet utilisateur à envoyer
-    const userData = {
+    const userData: any = {
       name: this.user.name,
       email: this.user.email,
       password: this.user.password,
-      role: selectedRole,
-      agenceId: this.showAgenceField ? this.user.agence : null
+      role: this.user.role // Envoyer uniquement le nom du rôle, pas l'objet complet
     };
+
+    // Ajouter agenceId seulement si le rôle est AGENCE et qu'une agence est sélectionnée
+    if (this.showAgenceField && this.user.agence) {
+      userData.agenceId = Number(this.user.agence);
+    }
 
     console.log('Sending user data:', userData);
 

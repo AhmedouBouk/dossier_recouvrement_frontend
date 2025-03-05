@@ -4,21 +4,25 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AgenceListComponent } from './agence-list/agence-list.component';
 import { AgenceFormComponent } from './agence-form/agence-form.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   declarations: [
     AgenceListComponent,
-    AgenceFormComponent
+    AgenceFormComponent,
+    
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    SharedModule
   ],
   exports: [
     AgenceListComponent,
-    AgenceFormComponent
+    AgenceFormComponent,
+    
   ]
 })
 export class AgenceModule { }

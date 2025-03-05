@@ -29,7 +29,7 @@ export class AdminService {
 
   // Add a new user
   addUser(user: Omit<User, 'id'>): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/users`, user);
+    return this.http.post<User>(`${this.apiUrl}/admin/add`, user);
   }
 
   // Delete a user by ID

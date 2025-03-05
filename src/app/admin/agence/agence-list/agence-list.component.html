@@ -1,23 +1,15 @@
 <div class="container">
-  <div class="header">
-    <h1>Gestion des Agences</h1>
-    <div class="user-info">
-      <span>{{ userName }} ({{ userRole }})</span>
-    </div>
-  </div>
+  <app-navigation-header
+  [activeSection]="'agences'"
+  [pageTitle]="'Gestion des Agences'">
+</app-navigation-header>
+<!-- Rest of your agency list content -->
 
   <div class="actions">
     <button class="btn-primary" (click)="openForm()">
       <i class="material-icons">add</i> Nouvelle Agence
     </button>
-    <div class="navigation-buttons">
-      <button class="btn-secondary" (click)="navigateToUsers()">
-        <i class="material-icons">people</i> Gestion des Utilisateurs
-      </button>
-      <button class="btn-secondary" (click)="navigateToRoles()">
-        <i class="material-icons">security</i> Gestion des Rôles
-      </button>
-    </div>
+    
   </div>
 
   <div class="notification {{ notificationType }}" *ngIf="isNotificationVisible">

@@ -1,21 +1,7 @@
-<header>
-    <div class="logo-container">
-      <img src="assets/logo.png" alt="Logo" class="logo">
-      <h1>Gestion des Rôles</h1>
-    </div>
-<div class="nav-bar">
-  <button (click)="navigateToUsers()">
-    <i class="material-icons">group</i> Utilisateurs
-  </button>
-  <button (click)="navigateToAgences()">
-    <i class="material-icons">business</i> Agences
-  </button>
-  <button class="active">
-    <i class="material-icons">verified_user</i> Rôles
-  </button>
-</div>
-
-  </header>
+<app-navigation-header
+  [activeSection]="'roles'"
+  [pageTitle]="'Gestion des Rôles'">
+</app-navigation-header>
   
   <main class="main-content">
     <div class="container">

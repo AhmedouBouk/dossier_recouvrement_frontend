@@ -33,6 +33,8 @@ import { ClientDetailsComponent } from './pages/clients/client-details/client-de
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
 import { AgenceModule } from './admin/agence/agence.module';
+import { NavigationHeaderComponent } from './admin/navigation-header/navigation-header.component';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,9 @@ import { AgenceModule } from './admin/agence/agence.module';
     DashboardComponent,
     ClientDetailsComponent,
     ComptesDetailsComponent,
-    RoleListComponent
+    RoleListComponent,
+    
+    
   ],
   imports: [
     BrowserModule,
@@ -70,7 +74,8 @@ import { AgenceModule } from './admin/agence/agence.module';
     DossierRecouvrementDetailsComponent,
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
-    AgenceModule
+    AgenceModule,
+    SharedModule
   ],
   providers: [
     RoleGuard,
