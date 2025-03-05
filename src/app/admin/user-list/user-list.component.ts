@@ -123,7 +123,12 @@ export class UserListComponent implements OnInit, OnDestroy {
   trackByUserId(index: number, user: User): number {
     return user.id;
   }
+  
   navigateToRoles() {
     this.router.navigate(['/admin/roles']);
+  }
+
+  navigateToAgences() {
+    this.router.navigate(['/admin/agences']);
   }
 }

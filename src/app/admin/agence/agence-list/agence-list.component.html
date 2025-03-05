@@ -1,0 +1,71 @@
+<div class="container">
+  <app-navigation-header
+  [activeSection]="'agences'"
+  [pageTitle]="'Gestion des Agences'">
+</app-navigation-header>
+<!-- Rest of your agency list content -->
+
+  <div class="actions">
+    <button class="btn-primary" (click)="openForm()">
+      <i class="material-icons">add</i> Nouvelle Agence
+    </button>
+    
+  </div>
+
+  <div class="notification {{ notificationType }}" *ngIf="isNotificationVisible">
+    {{ notificationMessage }}
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement des agences...</p>
+  </div>
+
+  <div class="agence-list" *ngIf="!isLoading">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let agence of agences; trackBy: trackByAgenceId">
+          <td>{{ agence.id }}</td>
+          <td>{{ agence.code }}</td>
+          <td>{{ agence.nom }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon edit" (click)="openForm(agence)" title="Modifier">
+              <i class="material-icons">edit</i>
+            </button>
+            <button class="btn-icon delete" (click)="onDeleteAgence(agence.id)" title="Supprimer">
+              <i class="material-icons">delete</i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="agences.length === 0">
+          <td colspan="4" class="no-data">Aucune agence trouvée</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal pour ajouter/modifier une agence -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ selectedAgence ? 'Modifier l\'agence' : 'Ajouter une agence' }}</h2>
+        <button class="close-button" (click)="closeForm()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <app-agence-form 
+        [agence]="selectedAgence"
+        (formSubmit)="onSaveAgence($event)"
+        (formCancel)="closeForm()">
+      </app-agence-form>
+    </div>
+  </div>
+</div>

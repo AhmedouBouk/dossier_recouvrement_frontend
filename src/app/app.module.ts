@@ -32,6 +32,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
+import { AgenceModule } from './admin/agence/agence.module';
+import { NavigationHeaderComponent } from './admin/navigation-header/navigation-header.component';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -45,7 +48,9 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
     DashboardComponent,
     ClientDetailsComponent,
     ComptesDetailsComponent,
-    RoleListComponent
+    RoleListComponent,
+    
+    
   ],
   imports: [
     BrowserModule,
@@ -69,6 +74,8 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
     DossierRecouvrementDetailsComponent,
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
+    AgenceModule,
+    SharedModule
   ],
   providers: [
     RoleGuard,

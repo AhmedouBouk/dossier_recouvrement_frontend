@@ -15,9 +15,11 @@ export class RoleListComponent implements OnInit {
   isEditing = false;
   editingRoleId: number | null = null;
   showForm = false; // ✅ Controls form popup visibility
+  userName: string = '';
+  userRole: string = '';
 
 
-  constructor(private adminService: AdminService, private fb: FormBuilder,private router: Router) {
+  constructor(private adminService: AdminService, private fb: FormBuilder, private router: Router) {
     this.roleForm = this.fb.group({
       roleName: ['', Validators.required],
       permissions: [[]]
@@ -26,10 +28,10 @@ export class RoleListComponent implements OnInit {
 
   allPermissions: string[] = [];  // ✅ Define available permissions
 
-ngOnInit(): void {
-  this.loadRoles();
-  this.loadPermissions();  // ✅ Fetch available permissions
-}
+  ngOnInit(): void {
+    this.loadRoles();
+    this.loadPermissions();  // ✅ Fetch available permissions
+  }
 
 
 
@@ -116,6 +118,7 @@ ngOnInit(): void {
   getPermissionNames(role: any): string {
     return role.permissions ? role.permissions.map((p: any) => p.name).join(', ') : 'No Permissions';
   }
+  
   editRole(role: any) {
     this.isEditing = true;
     this.editingRoleId = role.id;
@@ -124,9 +127,15 @@ ngOnInit(): void {
       permissions: role.permissions.map((p: any) => p.name)
     });
   }
+  
   navigateToUsers() {
     this.router.navigate(['/admin/user-list']);
   }
+  
+  navigateToAgences() {
+    this.router.navigate(['/admin/agences']);
+  }
+  
   onPermissionChange(event: Event, permissionName: string) {
     const checked = (event.target as HTMLInputElement).checked;
     let permissions = this.roleForm.value.permissions || [];
@@ -139,6 +148,4 @@ ngOnInit(): void {
   
     this.roleForm.patchValue({ permissions });
   }
-  
-  
 }
