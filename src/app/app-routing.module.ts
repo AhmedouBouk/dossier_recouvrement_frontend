@@ -18,6 +18,7 @@ import { ClientDetailsComponent } from './pages/clients/client-details/client-de
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
 import { AgenceListComponent } from './admin/agence/agence-list/agence-list.component';
+import { GarantiesComponent } from './pages/garanties/garanties.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -26,6 +27,8 @@ const routes: Routes = [
   { path: 'clients', component: ClientsComponent,canActivate: [AuthGuard]},
   { path: 'comptes', component: ComptesComponent,canActivate: [AuthGuard]},
   { path: 'dashboard', component: DashboardComponent ,canActivate: [AuthGuard]},
+  { path: 'garanties', component: GarantiesComponent }, // Route pour la page Garanties
+
   { path: 'clients/details/:nni', component: ClientDetailsComponent,canActivate: [AuthGuard] }
  ,   { path: 'comptes/details/:nomCompte', component: ComptesDetailsComponent,canActivate: [AuthGuard] }
 ,

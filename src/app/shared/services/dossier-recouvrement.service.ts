@@ -16,6 +16,9 @@ export class DossierRecouvrementService {
   getDossiers(): Observable<DossierRecouvrement[]> {
     return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/affichage`);
   }
+  getDossiersSansGarantie(): Observable<DossierRecouvrement[]> {
+    return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/sans-garantie`);
+  }
 
   // Get dossier by ID
   getDossierById(id: number): Observable<DossierRecouvrement> {
@@ -53,4 +56,8 @@ export class DossierRecouvrementService {
     formData.append('file', file);
     return this.http.post(`${this.apiUrl}/import`, formData);
   }
+  uploadGarantie(dossierId: number, formData: FormData): Observable<DossierRecouvrement> {
+    return this.http.post<DossierRecouvrement>(`${this.apiUrl}/${dossierId}/garantie`, formData);
+  }
+
 }

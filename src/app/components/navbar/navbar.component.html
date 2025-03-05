@@ -49,12 +49,16 @@
       <i class="material-icons">people</i>
       Clients
     </a>
-    
+
     <a routerLink="/comptes" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadComptePermission()">
       <i class="material-icons">account_balance</i>
       Comptes
     </a>
-  
+    <a routerLink="/garanties" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">verified</i>
+      garanties
+    </a>
+    
     <a routerLink="/dossiers" routerLinkActive="active" class="menu-item">
       <i class="material-icons">folder</i>
       Dossiers Recouvrement

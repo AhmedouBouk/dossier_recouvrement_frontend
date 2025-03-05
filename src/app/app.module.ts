@@ -35,6 +35,7 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
 import { AgenceModule } from './admin/agence/agence.module';
 import { NavigationHeaderComponent } from './admin/navigation-header/navigation-header.component';
 import { SharedModule } from './shared/shared.module';
+import { GarantiesComponent } from './pages/garanties/garanties.component';
 
 @NgModule({
   declarations: [
@@ -49,8 +50,8 @@ import { SharedModule } from './shared/shared.module';
     ClientDetailsComponent,
     ComptesDetailsComponent,
     RoleListComponent,
-    
-    
+    GarantiesComponent
+
   ],
   imports: [
     BrowserModule,
