@@ -32,6 +32,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
 import { RoleListComponent } from './admin/role-list/role-list.component';
+import { GarantiesComponent } from './pages/garanties/garanties.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
     DashboardComponent,
     ClientDetailsComponent,
     ComptesDetailsComponent,
-    RoleListComponent
+    RoleListComponent,
+    GarantiesComponent
   ],
   imports: [
     BrowserModule,

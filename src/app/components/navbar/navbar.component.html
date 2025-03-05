@@ -49,7 +49,10 @@
       <i class="material-icons">people</i>
       Clients
     </a>
-    
+    <a routerLink="/garanties" routerLinkActive="active" class="menu-item" >
+      <i class="material-icons">people</i>
+      garanties
+    </a>
     <a routerLink="/comptes" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadComptePermission()">
       <i class="material-icons">account_balance</i>
       Comptes

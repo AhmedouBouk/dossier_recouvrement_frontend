@@ -16,7 +16,7 @@ import { DossierRecouvrement, DossierStatus, EtatValidation } from 'src/app/shar
 export class DossierRecouvrementEditComponent implements OnInit {
   dossierId!: number;
   dossier: DossierRecouvrement = {
-      idDossier: 0,
+      id: 0,
       compte: {
           nomCompte: ''
       },
@@ -40,8 +40,9 @@ export class DossierRecouvrementEditComponent implements OnInit {
       creditsFile: '',
       cautionsFile: '',
       lcFile: '',
-      chequeFile: ''
-  };
+      chequeFile: '',
+      dateCreation: new Date() // Initialisé avec la date actuelle
+    };
   isLoading = false;
   errorMessage = '';
 
@@ -66,7 +67,7 @@ export class DossierRecouvrementEditComponent implements OnInit {
     this.dossierService.getDossierById(this.dossierId).subscribe({
       next: (data) => {
         this.dossier = {
-          idDossier: data.idDossier,
+          id: data.id,
           compte: data.compte,
           engagementTotal: data.engagementTotal,
           montantPrincipal: data.montantPrincipal,
@@ -88,7 +89,8 @@ export class DossierRecouvrementEditComponent implements OnInit {
           creditsFile: data.creditsFile,
           cautionsFile: data.cautionsFile,
           lcFile: data.lcFile,
-          chequeFile: data.chequeFile
+          chequeFile: data.chequeFile,
+          dateCreation:data.dateCreation
         };
         this.isLoading = false;
       },

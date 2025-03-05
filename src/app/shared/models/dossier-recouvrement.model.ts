@@ -12,12 +12,14 @@ export enum EtatValidation {
 }
 
 export interface DossierRecouvrement {
-    idDossier: number;
+    id: number;
     compte: {
       nomCompte: string;
     };
     engagementTotal: number;
     montantPrincipal: number;
+    temporaryFile?: File; // Fichier temporaire avant l'upload (optionnel)
+
     interetContractuel: number;
     interetRetard: number;
     naturesEngagement: string[];
@@ -37,6 +39,8 @@ export interface DossierRecouvrement {
     cautionsFile: string;
     lcFile: string;
     chequeFile: string;
+    dateCreation: Date; // Assurez-vous que cette propriété existe
+
   
   }
   

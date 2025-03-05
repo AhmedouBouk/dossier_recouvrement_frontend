@@ -53,7 +53,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.idDossier }}</td>
+            <td>{{ dossier.id }}</td>
             <td>{{ dossier.compte.nomCompte }}</td>
             <td>{{ dossier.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td>{{ dossier.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</td>
@@ -69,15 +69,15 @@
             </td>
             <td>
               <div class="action-buttons">
-                <button class="view-btn" (click)="navigateToDetails(dossier.idDossier)">
+                <button class="view-btn" (click)="navigateToDetails(dossier.id)">
                   <i class="material-icons">visibility</i>
                   Détails
                 </button>
-                <button class="edit-btn" (click)="navigateToEdit(dossier.idDossier)" >
+                <button class="edit-btn" (click)="navigateToEdit(dossier.id)" >
                   <i class="material-icons">edit</i>
                   Modifier
                 </button>
-                <button class="delete-btn" (click)="deleteDossier(dossier.idDossier)" >
+                <button class="delete-btn" (click)="deleteDossier(dossier.id)" >
                   <i class="material-icons">delete</i>
                   Supprimer
                 </button>

@@ -90,13 +90,13 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
 
   navigateToDetails(dossierId: number) {
     if (dossierId) {
-      this.router.navigate(['/dossiers/details', dossierId]);
+      this.router.navigate(['dossiers/view/', dossierId]);
     }
   }
 
   navigateToEdit(dossierId: number) {
     if (dossierId) {
-      this.router.navigate(['/dossiers/edit', dossierId]);
+      this.router.navigate(['dossier-recouvrement/modify/', dossierId]);
     }
   }
 

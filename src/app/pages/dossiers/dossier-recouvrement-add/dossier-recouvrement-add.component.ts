@@ -15,7 +15,7 @@ import { DossierRecouvrement, DossierStatus, EtatValidation } from 'src/app/shar
 })
 export class DossierRecouvrementAddComponent implements OnInit {
   dossierForm: DossierRecouvrement = {
-    idDossier: 0,
+    id: 0,
     compte: {
       nomCompte: ''
     },
@@ -38,8 +38,11 @@ export class DossierRecouvrementAddComponent implements OnInit {
     cautionsFile: '',
     lcFile: '',
     chequeFile: '',
+    
     status: DossierStatus.EN_COURS,
-    etatValidation: EtatValidation.INITIALE
+    etatValidation: EtatValidation.INITIALE,
+    dateCreation: new Date() // Initialisé avec la date actuelle
+
   };
 
   isLoading = false;
