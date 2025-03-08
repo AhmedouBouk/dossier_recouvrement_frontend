@@ -5,6 +5,7 @@ import { User } from '../../shared/models/user.model';
 import { UserDataService } from '../../shared/services/user-data.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from 'src/app/auth/auth.service';
+import { AgenceService, Agence } from '../../shared/services/agence.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -17,26 +18,32 @@ export class UserEditComponent implements OnInit {
     name: '',
     email: '',
     password: '',
-    role: ''
+    role: '',
+    userType: '',
+    agenceId: undefined
   };
 
   roles: any[] = [];
+  agences: Agence[] = [];
   currentUserName: string = '';
   successMessage: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
+  showAgenceField: boolean = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private adminService: AdminService,
-    private userDataService: UserDataService,
-    private router: Router,
-    private authService: AuthService
+    private readonly route: ActivatedRoute,
+    private readonly adminService: AdminService,
+    private readonly userDataService: UserDataService,
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly agenceService: AgenceService
   ) {}
 
   ngOnInit() {
     this.loadUserData();
     this.loadRoles();
+    this.loadAgences();
   }
 
   private loadUserData() {
@@ -45,13 +52,19 @@ export class UserEditComponent implements OnInit {
 
     if (user) {
       this.user = { ...user, password: '' };
+      this.updateAgenceFieldVisibility();
       this.isLoading = false;
     } else {
       const userId = this.route.snapshot.paramMap.get('id');
       if (userId) {
         this.adminService.getUserById(+userId).subscribe({
           next: (response) => {
-            this.user = { ...response, password: '' };
+            this.user = { 
+              ...response, 
+              password: '',
+              agenceId: response.agence?.id
+            };
+            this.updateAgenceFieldVisibility();
           },
           error: (error: HttpErrorResponse) => {
             console.error('Error fetching user details:', error);
@@ -76,19 +89,79 @@ export class UserEditComponent implements OnInit {
     });
   }
 
-  onSubmit() {
-    
+  private loadAgences(): void {
+    this.agenceService.getAllAgences().subscribe({
+      next: (response) => {
+        console.log('Raw agences API response:', response);
+        
+        // Gérer différents formats de réponse
+        if (Array.isArray(response)) {
+          this.agences = response;
+        } else if (response && typeof response === 'object') {
+          const responseObj = response as Record<string, any>;
+          
+          // Vérifier si c'est une réponse paginée de Spring Data REST
+          if (responseObj['_embedded']?.['agences']) {
+            this.agences = responseObj['_embedded']['agences'] as Agence[];
+          } else if (responseObj['_embedded']?.['agenceList']) {
+            this.agences = responseObj['_embedded']['agenceList'] as Agence[];
+          } else if (responseObj['_embedded']) {
+            // Si _embedded existe mais pas avec le nom attendu, chercher la première propriété tableau
+            const embedded = responseObj['_embedded'] as Record<string, any>;
+            const firstArrayProperty = Object.keys(embedded).find(key => Array.isArray(embedded[key]));
+            
+            if (firstArrayProperty) {
+              this.agences = embedded[firstArrayProperty] as Agence[];
+            } else {
+              console.warn('No array found in _embedded, converting response to array:', response);
+              this.agences = [response as Agence];
+            }
+          } else if (responseObj['data'] && Array.isArray(responseObj['data'])) {
+            this.agences = responseObj['data'] as Agence[];
+          } else {
+            console.warn('Response is not in expected format, converting to array:', response);
+            this.agences = [response as Agence];
+          }
+        } else {
+          console.error('Unexpected response format:', response);
+          this.agences = [];
+        }
+        
+        console.log('Processed agences:', this.agences);
+      },
+      error: (error) => {
+        console.error('Error loading agences:', error);
+      }
+    });
+  }
 
+  onUserTypeChange(): void {
+    this.updateAgenceFieldVisibility();
+  }
+
+  private updateAgenceFieldVisibility(): void {
+    // Afficher le champ Agence uniquement si le type d'utilisateur est Agence
+    this.showAgenceField = this.user.userType === 'Agence';
+    
+    // Si le champ agence est masqué, réinitialiser la valeur de l'agence
+    if (!this.showAgenceField) {
+      this.user.agenceId = undefined;
+    }
+  }
+
+  onSubmit() {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
-    const updateRequest = {
+    const updateRequest: User = {
       id: this.user.id,
       name: this.user.name.trim(),
       email: this.user.email.trim(),
       role: this.user.role,
-      password: this.user.password // Only included if changed
+      userType: this.user.userType,
+      password: this.user.password, // Only included if changed
+      agenceId: this.showAgenceField ? this.user.agenceId : undefined
     };
 
     this.adminService.updateUser(updateRequest).subscribe({
@@ -123,7 +196,9 @@ export class UserEditComponent implements OnInit {
       this.user.name.trim().length >= 2 &&
       this.isValidEmail(this.user.email) &&
       (this.user.password === '' ) &&
-      !!this.user.role
+      !!this.user.role &&
+      !!this.user.userType &&
+      (!this.showAgenceField || !!this.user.agenceId)
     );
   }
 
@@ -147,6 +222,10 @@ export class UserEditComponent implements OnInit {
         return typeof field === 'string' && (field === '' || field.length >= 6);
       case 'role':
         return typeof field === 'string' && field !== '';
+      case 'userType':
+        return typeof field === 'string' && field !== '';
+      case 'agence':
+        return !this.showAgenceField || (this.user.agenceId !== null && this.user.agenceId !== undefined);
       default:
         return true;
     }
@@ -163,6 +242,10 @@ export class UserEditComponent implements OnInit {
           return 'Password must be at least 6 characters long';
         case 'role':
           return 'Please select a role';
+        case 'userType':
+          return 'Please select a user type';
+        case 'agence':
+          return 'Please select an agency';
         default:
           return 'Invalid input';
       }

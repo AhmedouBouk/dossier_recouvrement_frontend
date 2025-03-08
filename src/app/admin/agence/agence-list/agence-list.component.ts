@@ -24,7 +24,7 @@ export class AgenceListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private agenceService: AgenceService,
+    private readonly agenceService: AgenceService,
     private router: Router,
     private authService: AuthService
   ) {}

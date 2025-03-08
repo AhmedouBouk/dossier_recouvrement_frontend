@@ -17,6 +17,7 @@ export class AddUserComponent implements OnInit {
     email: '',
     password: '',
     role: '',
+    userType: '',
     agence: ''
   };
   
@@ -96,13 +97,16 @@ export class AddUserComponent implements OnInit {
     );
   }
 
-  onRoleChange(): void {
-    // Afficher le champ Agence uniquement si le rôle sélectionné est "AGENCE"
-    this.showAgenceField = this.user.role === 'AGENCE';
+  
+
+  onUserTypeChange(): void {
+    // Si le type d'utilisateur est Agence, afficher le champ Agence
+    // Sinon, masquer le champ
+    this.showAgenceField = this.user.userType === 'Agence';
     
-    // Si le rôle n'est pas AGENCE, réinitialiser la valeur de l'agence
+    // Si le type n'est pas Agence, réinitialiser la valeur de l'agence
     if (!this.showAgenceField) {
-      this.user.agence = null;
+      this.user.agence = '';
     }
   }
 
@@ -117,7 +121,8 @@ export class AddUserComponent implements OnInit {
       name: this.user.name,
       email: this.user.email,
       password: this.user.password,
-      role: this.user.role // Envoyer uniquement le nom du rôle, pas l'objet complet
+      role: this.user.role, // Envoyer uniquement le nom du rôle, pas l'objet complet
+      userType: this.user.userType // Ajouter le type d'utilisateur
     };
 
     // Ajouter agenceId seulement si le rôle est AGENCE et qu'une agence est sélectionnée
