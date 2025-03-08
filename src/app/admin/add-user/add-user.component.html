@@ -94,7 +94,7 @@
           <i class="material-icons">business</i>
           <select id="agence" name="agence" [(ngModel)]="user.agence" required class="form-control" autocomplete="off">
             <option value="" disabled selected>Select an agency</option>
-            <option *ngFor="let agence of agences" [value]="agence.id">{{ agence.nom }} ({{ agence.code }})</option>
+            <option *ngFor="let agence of agences" [value]="agence.id">{{ agence.nom }} ({{ agence.code }}) - ID: {{ agence.id }}</option>
           </select>
         </div>
       </div>
