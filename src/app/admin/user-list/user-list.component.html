@@ -19,6 +19,7 @@
             <th>Nom</th>
             <th>Username</th>
             <th>Rôle</th>
+            <th>Type d'utilisateur</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -27,9 +28,10 @@
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
             <td>
-              
-                {{ user.role.name }}
-             
+              {{ user.role.name }}
+            </td>
+            <td>
+              {{ user.userType || 'Non défini' }}
             </td>
             <td>
               <div class="action-buttons">

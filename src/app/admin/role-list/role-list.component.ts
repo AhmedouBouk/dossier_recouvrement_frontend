@@ -148,4 +148,37 @@ export class RoleListComponent implements OnInit {
   
     this.roleForm.patchValue({ permissions });
   }
+  getPermissionClass(permission: any): string {
+    // Vérifier si la permission est un objet
+    const permName = typeof permission === 'object' 
+      ? permission.name || permission.label || JSON.stringify(permission)
+      : String(permission);
+    
+    const permString = permName.toLowerCase();
+    
+    if (permString.includes('create')) {
+      return 'create';
+    } else if (permString.includes('read') || permString.includes('view')) {
+      return 'read';
+    } else if (permString.includes('update') || permString.includes('edit')) {
+      return 'update';
+    } else if (permString.includes('delete') || permString.includes('remove')) {
+      return 'delete';
+    } else if (permString.includes('admin') || permString.includes('manage')) {
+      return 'admin';
+    }
+    return '';
+  }
+  getPermissionDisplay(permission: any): string {
+    // Si la permission est un objet, extraire son nom ou libellé
+    if (typeof permission === 'object' && permission !== null) {
+      if (permission.name) return permission.name;
+      if (permission.label) return permission.label;
+      if (permission.id) return permission.id;
+      return JSON.stringify(permission);
+    }
+    
+    // Si c'est un nombre ou une chaîne
+    return String(permission);
+  }
 }

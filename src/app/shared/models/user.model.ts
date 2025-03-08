@@ -4,5 +4,7 @@ export interface User {
     email: string;
     password?: string;
     role: any;
-    agenceId?: number;
-  }
+    userType?: string;
+    agenceId?: number | null;
+    agence?: any;
+}
