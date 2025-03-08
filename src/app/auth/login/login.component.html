@@ -15,7 +15,11 @@
       <p>Bienvenue sur votre espace de travail</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" autocomplete="off">
+      <!-- Champ caché pour tromper l'autocomplétion -->
+      <input type="text" name="_username" style="display:none">
+      <input type="password" name="_password" style="display:none">
+      
       <div class="input-group">
         <div class="input-wrapper">
           <i class="material-icons">account_circle</i>
@@ -25,7 +29,8 @@
             placeholder="email"
             [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
             (input)="onInputChange()"
-            autocomplete="email">
+            autocomplete="off"
+            name="username">
         </div>
         <small class="error-text" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
           {{ getErrorMessage('email') }}
@@ -41,7 +46,8 @@
             placeholder="Mot de passe"
             [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
             (input)="onInputChange()"
-            autocomplete="current-password">
+            autocomplete="new-password"
+            name="password">
           <button 
             type="button" 
             class="visibility-toggle"
@@ -59,7 +65,6 @@
         <span>{{ errorMessage }}</span>
       </div>
 
-<!-- Update just the button part in your HTML -->
       <button 
         type="submit" 
         class="submit-btn"
@@ -71,4 +76,3 @@
     </form>
   </div>
 </main>
-

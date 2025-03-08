@@ -168,15 +168,21 @@ tbody tr:hover {
 }
 
 .btn-icon {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
   cursor: pointer;
+  font-weight: 500;
   transition: all 0.3s ease;
+}
+
+.btn-icon i {
+  font-size: 18px;
 }
 
 .btn-icon.edit {
@@ -192,6 +198,14 @@ tbody tr:hover {
 .btn-icon:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon.edit:hover {
+  background-color: #2563eb;
+}
+
+.btn-icon.delete:hover {
+  background-color: #dc2626;
 }
 
 .no-data {
@@ -297,13 +311,13 @@ tbody tr:hover {
   
   .actions-cell {
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
   }
   
   .btn-icon {
     width: 100%;
-    border-radius: 5px;
-    height: 32px;
+    justify-content: center;
+    padding: 8px 12px;
   }
   
   .modal-content {
