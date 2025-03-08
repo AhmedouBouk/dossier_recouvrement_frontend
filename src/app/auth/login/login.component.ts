@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
     }
 
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(4)]]
     });
   }
@@ -83,10 +83,7 @@ export class LoginComponent implements OnInit {
     const control = this.loginForm.get(controlName);
     if (control?.errors) {
       if (control.errors['required']) {
-        return `Le champ ${controlName} est requis`;
-      }
-      if (control.errors['email']) {
-        return 'Format d\'email invalide';
+        return `Le champ ${controlName === 'email' ? 'nom d\'utilisateur' : 'mot de passe'} est requis`;
       }
       if (control.errors['minlength']) {
         return 'Le mot de passe doit contenir au moins 6 caractères';
