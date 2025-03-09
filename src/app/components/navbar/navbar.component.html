@@ -54,11 +54,14 @@
       <i class="material-icons">account_balance</i>
       Comptes
     </a>
-    <a routerLink="/garanties" routerLinkActive="active" class="menu-item">
+    <a routerLink="/garanties" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadGrantiePermission()">
       <i class="material-icons">verified</i>
       garanties
     </a>
-    
+      <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
+        <i class="material-icons">description</i>
+        Fichiers de chèque
+      </a>
     <a routerLink="/dossiers" routerLinkActive="active" class="menu-item">
       <i class="material-icons">folder</i>
       Dossiers Recouvrement

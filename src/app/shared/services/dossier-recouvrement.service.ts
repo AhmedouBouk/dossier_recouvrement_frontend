@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpEvent } from '@angular/common/http';
+import { catchError, Observable, of } from 'rxjs';
 import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
 import { environment } from './../../../environments/environment';
 
@@ -34,7 +34,14 @@ export class DossierRecouvrementService {
   updateDossier(id: number, dossier: DossierRecouvrement): Observable<DossierRecouvrement> {
     return this.http.put<DossierRecouvrement>(`${this.apiUrl}/update/${id}`, dossier);
   }
-
+  getChequeFileUrl(dossierId: number): Observable<string | null> {
+    return this.http.get(`${this.apiUrl}/${dossierId}/cheque-file`, { responseType: 'text' }).pipe(
+      catchError((error) => {
+        console.error('Erreur lors de la récupération de l\'URL du fichier :', error);
+        return of(null); // Retourne null en cas d'erreur
+      })
+    );
+  }
   // Delete dossier
   deleteDossier(id: number): Observable<string> {
     return this.http.delete<string>(`${this.apiUrl}/delete/${id}`);
@@ -58,6 +65,20 @@ export class DossierRecouvrementService {
   }
   uploadGarantie(dossierId: number, formData: FormData): Observable<DossierRecouvrement> {
     return this.http.post<DossierRecouvrement>(`${this.apiUrl}/${dossierId}/garantie`, formData);
+  }
+ 
+
+  // Uploader un fichier de chèque
+  uploadChequeFile(dossierId: number, file: File): Observable<DossierRecouvrement> {
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    return this.http.post<DossierRecouvrement>(`${this.apiUrl}/${dossierId}/upload-cheque`, formData);
+  }
+
+  // Supprimer un fichier de chèque
+  deleteChequeFile(dossierId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${dossierId}/cheque-files`);
   }
 
 }

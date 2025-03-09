@@ -55,4 +55,45 @@ hasUpdateComptePermission(): boolean {
 hasDeleteComptePermission(): boolean {
   return this.authService.hasPermission('DELETE_COMPTE');
 }
+// Fonctions pour les permissions liées à GRANTIE
+hasImportGrantiePermission(): boolean {
+  return this.authService.hasPermission('IMPORT_GRANTIE');
+}
+
+hasReadGrantiePermission(): boolean {
+  return this.authService.hasPermission('READ_GRANTIE');
+}
+
+hasUpdateGrantiePermission(): boolean {
+  return this.authService.hasPermission('UPDATE_GRANTIE');
+}
+
+hasDeleteGrantiePermission(): boolean {
+  return this.authService.hasPermission('DELETE_GRANTIE');
+}
+
+hasDownloadGrantiePermission(): boolean {
+  return this.authService.hasPermission('DOWNLOAD_GRANTIE');
+}
+
+// Fonctions pour les permissions liées à CHEQUE
+hasImportChequePermission(): boolean {
+  return this.authService.hasPermission('IMPORT_CHEQUE');
+}
+
+hasReadChequePermission(): boolean {
+  return this.authService.hasPermission('READ_CHEQUE');
+}
+
+hasUpdateChequePermission(): boolean {
+  return this.authService.hasPermission('UPDATE_CHEQUE');
+}
+
+hasDeleteChequePermission(): boolean {
+  return this.authService.hasPermission('DELETE_CHEQUE');
+}
+
+hasDownloadChequePermission(): boolean {
+  return this.authService.hasPermission('DOWNLOAD_CHEQUE');
+}
 }

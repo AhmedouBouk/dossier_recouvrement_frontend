@@ -13,7 +13,7 @@
         </div>
       </div>
      
-      <label  class="upload-btn">
+      <label class="upload-btn">
         <input type="file" (change)="onFileUpload($event)" accept=".csv" hidden>
         <i class="material-icons">file_upload</i>
         Importer CSV
@@ -24,7 +24,7 @@
         Nouveau Dossier
       </button>
     </div>
-
+   
     <!-- Error Message -->
     <div *ngIf="error" class="error-message">
       <i class="material-icons">error</i>
@@ -48,7 +48,7 @@
             <th>Montant Principal</th>
             <th>Status</th>
             <th>État de Validation</th>
-            <th >Actions</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -61,6 +61,10 @@
               <span class="status-chip" [ngClass]="{'status-active': dossier.status === 'EN_COURS', 'status-closed': dossier.status === 'TERMINE', 'status-pending': dossier.status === 'SUSPENDU', 'status-cancelled': dossier.status === 'ANNULE'}">
                 {{ dossier.status }}
               </span>
+            
+              
+              
+        
             </td>
             <td>
               <span class="status-chip" [ngClass]="{'status-initial': dossier.etatValidation === 'INITIALE', 'status-valid': dossier.etatValidation === 'VALIDE', 'status-invalid': dossier.etatValidation === 'NON_VALIDE'}">
@@ -73,11 +77,11 @@
                   <i class="material-icons">visibility</i>
                   Détails
                 </button>
-                <button class="edit-btn" (click)="navigateToEdit(dossier.id)" >
+                <button class="edit-btn" (click)="navigateToEdit(dossier.id)">
                   <i class="material-icons">edit</i>
                   Modifier
                 </button>
-                <button class="delete-btn" (click)="deleteDossier(dossier.id)" >
+                <button class="delete-btn" (click)="deleteDossier(dossier.id)">
                   <i class="material-icons">delete</i>
                   Supprimer
                 </button>

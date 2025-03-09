@@ -36,6 +36,7 @@ import { AgenceModule } from './admin/agence/agence.module';
 import { NavigationHeaderComponent } from './admin/navigation-header/navigation-header.component';
 import { SharedModule } from './shared/shared.module';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
+import { ChequeFileManagementComponent } from './pages/cheque-file-management/cheque-file-management.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { GarantiesComponent } from './pages/garanties/garanties.component';
     ClientDetailsComponent,
     ComptesDetailsComponent,
     RoleListComponent,
-    GarantiesComponent
+    GarantiesComponent,
+    ChequeFileManagementComponent
 
   ],
   imports: [

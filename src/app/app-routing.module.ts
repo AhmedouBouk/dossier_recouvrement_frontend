@@ -19,6 +19,7 @@ import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes
 import { RoleListComponent } from './admin/role-list/role-list.component';
 import { AgenceListComponent } from './admin/agence/agence-list/agence-list.component';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
+import { ChequeFileManagementComponent } from './pages/cheque-file-management/cheque-file-management.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -45,6 +46,7 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  { path: 'cheque-files', component: ChequeFileManagementComponent },
 
   // Non-admin routes - accessible by all authenticated users
  
