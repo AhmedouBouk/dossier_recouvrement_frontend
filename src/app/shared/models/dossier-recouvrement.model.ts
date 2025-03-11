@@ -11,6 +11,13 @@ export enum EtatValidation {
   NON_VALIDE = 'NON_VALIDE'
 }
 
+export interface Comment {
+  id?: number;
+  content: string;
+  createdAt: string; // Format ISO (ex: "2023-10-25T14:30:00.000+00:00")
+  dossier?: any;
+}
+
 export interface DossierRecouvrement {
     id: number;
     compte: {

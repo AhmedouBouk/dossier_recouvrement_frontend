@@ -60,4 +60,13 @@ export class DossierRecouvrementService {
     return this.http.post<DossierRecouvrement>(`${this.apiUrl}/${dossierId}/garantie`, formData);
   }
 
+  // Get comments for a dossier
+getComments(dossierId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`);
+}
+
+// Add a comment to a dossier
+addComment(dossierId: number, content: string): Observable<any> {
+  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, { content });
+}
 }
