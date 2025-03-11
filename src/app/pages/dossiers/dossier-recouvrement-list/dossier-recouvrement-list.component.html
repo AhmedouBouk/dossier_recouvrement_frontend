@@ -73,14 +73,20 @@
                   <i class="material-icons">visibility</i>
                   Détails
                 </button>
-                <button class="edit-btn" (click)="navigateToEdit(dossier.id)" >
+                <button class="edit-btn" (click)="navigateToEdit(dossier.id)">
                   <i class="material-icons">edit</i>
                   Modifier
                 </button>
-                <button class="delete-btn" (click)="deleteDossier(dossier.id)" >
+                <button class="delete-btn" (click)="deleteDossier(dossier.id)">
                   <i class="material-icons">delete</i>
                   Supprimer
                 </button>
+                <!-- Nouveau bouton Exporter en PDF -->
+                <button class="export-pdf-btn" (click)="exportPdf(dossier.id)">
+                  <i class="material-icons">picture_as_pdf</i>
+                  Mise en Demeure
+                </button>
+                
               </div>
             </td>
           </tr>

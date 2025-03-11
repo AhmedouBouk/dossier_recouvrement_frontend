@@ -59,5 +59,7 @@ export class DossierRecouvrementService {
   uploadGarantie(dossierId: number, formData: FormData): Observable<DossierRecouvrement> {
     return this.http.post<DossierRecouvrement>(`${this.apiUrl}/${dossierId}/garantie`, formData);
   }
-
-}
+  generatePdf(dossierId: number) {
+    return this.http.get(`${this.apiUrl}/${dossierId}/generate-pdf`, { responseType: 'blob' });
+  }
+  }

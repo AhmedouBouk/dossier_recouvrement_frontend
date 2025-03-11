@@ -55,4 +55,23 @@ hasUpdateComptePermission(): boolean {
 hasDeleteComptePermission(): boolean {
   return this.authService.hasPermission('DELETE_COMPTE');
 }
+
+// Ajoutez ces méthodes dans votre RoleService
+
+// Mise en demeure permissions
+hasCreateMiseEnDemeurePermission(): boolean {
+  return this.authService.hasPermission('CREATE_MISE_EN_DEMEURE');
+}
+
+hasReadMiseEnDemeurePermission(): boolean {
+  return this.authService.hasPermission('READ_MISE_EN_DEMEURE');
+}
+
+hasUpdateMiseEnDemeurePermission(): boolean {
+  return this.authService.hasPermission('UPDATE_MISE_EN_DEMEURE');
+}
+
+hasDeleteMiseEnDemeurePermission(): boolean {
+  return this.authService.hasPermission('DELETE_MISE_EN_DEMEURE');
+}
 }
