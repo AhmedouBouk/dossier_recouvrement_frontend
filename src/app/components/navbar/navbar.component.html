@@ -49,22 +49,38 @@
       <i class="material-icons">people</i>
       Clients
     </a>
-
     <a routerLink="/comptes" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadComptePermission()">
       <i class="material-icons">account_balance</i>
       Comptes
+    </a>
+    <a routerLink="/dossiers" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">folder</i>
+      Dossiers Recouvrement
     </a>
     <a routerLink="/garanties" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadGrantiePermission()">
       <i class="material-icons">verified</i>
       garanties
     </a>
-      <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
-        <i class="material-icons">description</i>
-        Fichiers de chèque
-      </a>
-    <a routerLink="/dossiers" routerLinkActive="active" class="menu-item">
-      <i class="material-icons">folder</i>
-      Dossiers Recouvrement
+
+    <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
+      <i class="material-icons">description</i>
+      Fichiers de chèque
     </a>
+    <a routerLink="/credits-file-management" routerLinkActive="active" class="menu-item">
+      <i class="material-icons">credit_card</i>
+Credit    </a>
+    <a routerLink="/    lc-file-management    " routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadClientPermission()">
+      <i class="material-icons">assignment</i>
+                Lettres de Crédit    </a>
+    <a routerLink="/cautions-file-management" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadClientPermission()">
+      <i class="material-icons">attach_money</i>      cautions
+    </a>
+    
+ 
+   
+   
+  
+      
+   
   </nav>
 </aside>

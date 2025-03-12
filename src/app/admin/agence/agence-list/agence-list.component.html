@@ -25,6 +25,7 @@
     <table>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Code</th>
           <th>Nom</th>
           <th>Actions</th>
@@ -32,7 +33,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let agence of agences; trackBy: trackByAgenceId">
-          
+          <td>{{ agence.id }}</td>
           <td>{{ agence.code }}</td>
           <td>{{ agence.nom }}</td>
           <td class="actions-cell">

@@ -42,7 +42,9 @@ export interface DossierRecouvrement {
     chequeFile: string;
     dateCreation: Date; // Assurez-vous que cette propriété existe
     selectedFile?: File; // Ajoutez cette propriété
-
+    selectedCreditsFile? :File
+    selectedCautionsFile?:File
+    selectedLcFile?:File
 
   
   }

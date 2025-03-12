@@ -44,6 +44,7 @@ export class AddUserComponent implements OnInit {
     this.adminService.getAllRoles().subscribe(
       (data) => {
         this.roles = data;
+        console.log('Loaded roles:', this.roles);
       },
       (error) => {
         console.error('Error loading roles:', error);
@@ -53,51 +54,15 @@ export class AddUserComponent implements OnInit {
 
   loadAgences(): void {
     this.agenceService.getAllAgences().subscribe(
-      (response) => {
-        console.log('Raw agences API response:', response);
-        
-        // Gérer différents formats de réponse
-        if (Array.isArray(response)) {
-          this.agences = response;
-        } else if (response && typeof response === 'object') {
-          const responseObj = response as Record<string, any>;
-          
-          // Vérifier si c'est une réponse paginée de Spring Data REST
-          if (responseObj['_embedded'] && responseObj['_embedded']['agences']) {
-            this.agences = responseObj['_embedded']['agences'] as Agence[];
-          } else if (responseObj['_embedded'] && responseObj['_embedded']['agenceList']) {
-            this.agences = responseObj['_embedded']['agenceList'] as Agence[];
-          } else if (responseObj['_embedded']) {
-            // Si _embedded existe mais pas avec le nom attendu, chercher la première propriété tableau
-            const embedded = responseObj['_embedded'] as Record<string, any>;
-            const firstArrayProperty = Object.keys(embedded).find(key => Array.isArray(embedded[key]));
-            
-            if (firstArrayProperty) {
-              this.agences = embedded[firstArrayProperty] as Agence[];
-            } else {
-              console.warn('No array found in _embedded, converting response to array:', response);
-              this.agences = [response as Agence];
-            }
-          } else if (responseObj['data'] && Array.isArray(responseObj['data'])) {
-            this.agences = responseObj['data'] as Agence[];
-          } else {
-            console.warn('Response is not in expected format, converting to array:', response);
-            this.agences = [response as Agence];
-          }
-        } else {
-          console.error('Unexpected response format:', response);
-          this.agences = [];
-        }
-        
-        console.log('Processed agences:', this.agences);
+      (agences) => {
+        this.agences = agences;
+        console.log('Agences chargées avec succès:', this.agences);
       },
       (error) => {
-        console.error('Error loading agences:', error);
+        console.error('Erreur lors du chargement des agences:', error);
       }
     );
   }
-
-  
 
   onUserTypeChange(): void {
     // Si le type d'utilisateur est Agence, afficher le champ Agence
@@ -113,39 +78,98 @@ export class AddUserComponent implements OnInit {
   onSubmit(): void {
     this.isLoading = true;
     
-    // Trouver l'objet rôle complet basé sur le nom sélectionné
-    const selectedRole = this.roles.find(role => role.name === this.user.role);
-    
     // Créer l'objet utilisateur à envoyer
     const userData: any = {
       name: this.user.name,
       email: this.user.email,
       password: this.user.password,
-      role: this.user.role, // Envoyer uniquement le nom du rôle, pas l'objet complet
-      userType: this.user.userType // Ajouter le type d'utilisateur
+      userType: this.user.userType
     };
 
-    // Ajouter agenceId seulement si le rôle est AGENCE et qu'une agence est sélectionnée
-    if (this.showAgenceField && this.user.agence) {
-      userData.agenceId = Number(this.user.agence);
+    // S'assurer que le rôle est au bon format (sans le préfixe ROLE_ si déjà présent)
+    if (this.user.role) {
+      // Si le rôle commence déjà par "ROLE_", l'utiliser tel quel, sinon l'utiliser directement
+      userData.role = this.user.role;
+      console.log('Role being sent:', userData.role);
+    }
+
+    // Ajouter agenceId seulement si le type d'utilisateur est Agence ou si le rôle contient "AGENCE"
+    if ((this.showAgenceField || (this.user.role && this.user.role.toUpperCase().includes('AGENCE'))) && this.user.agence) {
+      // Convertir explicitement en nombre et vérifier que c'est un nombre valide
+      const agenceId = parseInt(this.user.agence, 10);
+      if (!isNaN(agenceId)) {
+        userData.agenceId = agenceId;
+        console.log('Setting agenceId:', userData.agenceId);
+        
+        // Vérifier que l'agence existe
+        const selectedAgence = this.agences.find(a => a.id === agenceId);
+        if (selectedAgence) {
+          console.log('Selected agency:', selectedAgence.nom, '(ID:', selectedAgence.id, ')');
+        } else {
+          console.warn('Selected agency ID not found in loaded agencies:', agenceId);
+        }
+      } else {
+        console.error('Invalid agency ID:', this.user.agence);
+      }
     }
 
     console.log('Sending user data:', userData);
 
-    this.adminService.addUser(userData).subscribe(
-      () => {
+    this.adminService.addUser(userData).subscribe({
+      next: (response) => {
         this.isLoading = false;
+        console.log('User created successfully:', response);
         this.successMessage = 'User added successfully!';
         setTimeout(() => {
           this.router.navigate(['/admin/user-list']);  // Navigate back to the user list after 2 seconds
         }, 2000);
       },
-      (error) => {
+      error: (error) => {
         this.isLoading = false;
         console.error('Error adding user:', error);
-        alert('Error adding user. Please try again.');
+        
+        // Afficher des détails supplémentaires sur l'erreur
+        if (error.error) {
+          console.error('Error details:', error.error);
+          
+          // Si l'erreur contient un message spécifique du backend
+          if (typeof error.error === 'string') {
+            console.error('Backend error message:', error.error);
+          } else if (error.error.message) {
+            console.error('Backend error message:', error.error.message);
+          }
+        }
+        
+        // Vérifier si le statut est 400 (Bad Request)
+        if (error.status === 400) {
+          console.error('Bad Request Error. Check if the role format is correct and all required fields are provided.');
+          
+          // Afficher les données qui ont été envoyées pour le débogage
+          console.log('Data that was sent:', {
+            name: this.user.name,
+            email: this.user.email,
+            password: this.user.password ? '***' : undefined, // Masquer le mot de passe réel
+            role: this.user.role,
+            userType: this.user.userType,
+            agenceId: this.user.agence ? parseInt(this.user.agence, 10) : undefined
+          });
+        }
+        
+        // Message d'erreur plus détaillé
+        let errorMessage = 'Error adding user. ';
+        if (error.error && typeof error.error === 'string') {
+          errorMessage += error.error;
+        } else if (error.error?.message) {
+          errorMessage += error.error.message;
+        } else if (error.message) {
+          errorMessage += error.message;
+        } else {
+          errorMessage += 'Please check console for details and try again.';
+        }
+        
+        alert(errorMessage);
       }
-    );
+    });
   }
 
   navigateBack(): void {

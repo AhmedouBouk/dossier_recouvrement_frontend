@@ -82,7 +82,7 @@ hasImportChequePermission(): boolean {
 }
 
 hasReadChequePermission(): boolean {
-  return this.authService.hasPermission('READ_CHEQUE');
+  return this.authService.hasPermission('READ_CHHEQUE');
 }
 
 hasUpdateChequePermission(): boolean {

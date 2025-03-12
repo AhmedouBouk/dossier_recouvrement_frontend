@@ -19,6 +19,11 @@
         (click)="navigateToAgences()">
         <i class="material-icons">business</i> Agences
       </button>
+      <button 
+        [class.active]="activeSection === 'history'"
+        (click)="navigateToHistory()">
+        <i class="material-icons">history</i> Historique
+      </button>
     </div>
     <div class="user-controls">
       <div class="user-profile">
