@@ -64,7 +64,10 @@ export class DossierRecouvrementService {
 getComments(dossierId: number): Observable<any[]> {
   return this.http.get<any[]>(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`);
 }
-
+// mise en demeur 
+generatePdf(dossierId: number) {
+  return this.http.get(${this.apiUrl}/${dossierId}/generate-pdf, { responseType: 'blob' });
+}
 // Add a comment to a dossier
 addComment(dossierId: number, content: string): Observable<any> {
   return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, { content });
