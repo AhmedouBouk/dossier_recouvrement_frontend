@@ -20,7 +20,6 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
 import { AgenceListComponent } from './admin/agence/agence-list/agence-list.component';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
 import { HistoryComponent } from './admin/history/history.component';
-
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'auth/login', component: LoginComponent },
