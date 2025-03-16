@@ -194,88 +194,6 @@ selectedPdfUrl: string | null = null;
     };
     return iconMap[type];
   }
-<<<<<<< HEAD
-  isAgent(): boolean {
-    return this.userType === 'AGENCE';
-  }
-  
-  
-  viewChequeFile(fileUrl: string): void {
-    this.selectedPdfUrl = fileUrl; // Affiche le PDF dans le composant intégré
-    window.open(fileUrl, '_blank'); // Optionnel : Ouvre le fichier dans un nouvel onglet
-  }
-  // Télécharger le fichier de chèque
-  
-
-  // Sélectionner un dossier pour l'upload
-  onChequeFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      this.error = null; // Réinitialiser les erreurs
-    } else {
-      this.selectedFile = null;
-      this.error = 'Aucun fichier sélectionné.';
-    }
-  }
-
-  // Uploader le fichier PDF
-  uploadChequeFile(dossierId: number): void {
-    if (this.selectedFile) {
-      this.isLoading = true;
-      this.error = null;
-
-      this.dossierService.uploadChequeFile(dossierId, this.selectedFile).subscribe({
-        next: (response) => {
-          console.log('Fichier uploadé avec succès', response);
-          alert('Fichier uploadé avec succès !');
-          this.isLoading = false;
-          this.selectedFile = null; // Réinitialiser le fichier sélectionné
-          this.loadDossiers(); // Recharger la liste des dossiers
-        },
-        error: (err) => {
-          console.error('Erreur lors de l\'upload du fichier', err);
-          this.error = 'Erreur lors de l\'upload du fichier';
-          this.isLoading = false;
-        },
-      });
-    } else {
-      alert('Veuillez sélectionner un fichier PDF.');
-    }
-  }
-
-  // Supprimer le fichier de chèque
-  
-  deleteChequeFile(dossierId: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier de chèque ?')) {
-      this.dossierService.deleteChequeFile(dossierId).subscribe({
-        next: () => {
-          alert('Fichier de chèque supprimé avec succès !');
-          this.loadDossiers(); // Recharger la liste des dossiers
-        },
-        error: (err) => {
-          console.error('Erreur lors de la suppression du fichier', err);
-          this.error = 'Erreur lors de la suppression du fichier';
-        },
-      });
-    }
-  }
-  testUrl(url: string): void {
-    this.http.head(url).subscribe({
-      next: () => {
-        console.log('URL valide');
-        window.open(url, '_blank'); // Ouvre le fichier dans un nouvel onglet
-      },
-      error: (err) => {
-        console.error('URL invalide ou fichier inaccessible', err);
-        alert('Le fichier PDF est introuvable ou inaccessible.');
-      },
-    });
-  
-  // Visualiser le fichier de chèque
-  
-}
-=======
 
   exportPdf(dossierId: number) {
     this.dossierService.generatePdf(dossierId).subscribe(response => {
@@ -291,5 +209,4 @@ selectedPdfUrl: string | null = null;
       console.error('Erreur lors de la génération du PDF', error);
     });
   }
->>>>>>> 9c329b3c4dcffe8ef09adf210b00525e5ab509b9
 }
