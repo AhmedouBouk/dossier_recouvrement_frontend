@@ -195,18 +195,7 @@ selectedPdfUrl: string | null = null;
     return iconMap[type];
   }
 
-  exportPdf(dossierId: number) {
-    this.dossierService.generatePdf(dossierId).subscribe(response => {
-      const blob = new Blob([response], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'mise_en_demeure.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }, error => {
-      console.error('Erreur lors de la génération du PDF', error);
-    });
+  telechargerMiseEnDemeure(dossier: DossierRecouvrement): void {
+    this.dossierService.genererMiseEnDemeure(dossier);
   }
 }

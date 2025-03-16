@@ -3,7 +3,7 @@ import { HttpClient, HttpEvent } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
 import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
 import { environment } from './../../../environments/environment';
-
+import {jsPDF } from 'jspdf';
 @Injectable({
   providedIn: 'root'
 })
@@ -93,4 +93,39 @@ getComments(dossierId: number): Observable<any[]> {
 addComment(dossierId: number, content: string): Observable<any> {
   return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, { content });
 }
+
+genererMiseEnDemeure(dossier: DossierRecouvrement) {
+  const doc = new jsPDF();
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('Mise en Demeure de Paiement', 20, 20);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
+  doc.text(`ID Dossier: ${dossier.id}`, 20, 40);
+  doc.text(`Nom du Client: ${dossier.compte.nomCompte}`, 20, 50);
+  doc.text(`Montant Dû: ${dossier.montantPrincipal} €`, 20, 60);
+
+  doc.text('Madame, Monsieur,', 20, 80);
+  doc.text(
+    `Nous vous informons que la somme de ${dossier.montantPrincipal} € reste impayée malgré nos relances.`,
+    20,
+    90,
+    { maxWidth: 170 }
+  );
+  doc.text(
+    'Nous vous mettons en demeure de régler cette somme sous 15 jours, sans quoi nous engagerons des actions légales.',
+    20,
+    100,
+    { maxWidth: 170 }
+  );
+
+  doc.text('Cordialement,', 20, 120);
+  doc.text('Votre Société de Recouvrement', 20, 130);
+
+  doc.save(`Mise_en_Demeure_${dossier.id}.pdf`);
+}
+
   }

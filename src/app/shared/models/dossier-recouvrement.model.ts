@@ -16,6 +16,7 @@ export interface Comment {
   content: string;
   createdAt: string; // Format ISO (ex: "2023-10-25T14:30:00.000+00:00")
   dossier?: any;
+
 }
 
 export interface DossierRecouvrement {
@@ -52,6 +53,7 @@ export interface DossierRecouvrement {
     selectedCreditsFile? :File
     selectedCautionsFile?:File
     selectedLcFile?:File
+    comments?: Comment[];
 
   
   }
