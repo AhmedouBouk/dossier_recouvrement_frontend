@@ -71,7 +71,7 @@
                 {{ dossier.etatValidation }}
               </span>
             </td>
-            <>
+            <td>
               <div class="action-buttons">
                 <button class="view-btn" (click)="navigateToDetails(dossier.id)">
                   <i class="material-icons">visibility</i>
@@ -81,15 +81,17 @@
                   <i class="material-icons">edit</i>
                   Modifier
                 </button>
-               
+                <button class="delete-btn" (click)="deleteDossier(dossier.id)">
+                  <i class="material-icons">delete</i>
+                  Supprimer
+                </button>
                 <button class="pdf-btn" (click)="telechargerMiseEnDemeure(dossier)">
                   <i class="material-icons">picture_as_pdf</i>
                   Mise en Demeure
                 </button>
-                
-            </div>
+              </div>
+            </td>
           </tr>
-          
         </tbody>
       </table>
     </div>
