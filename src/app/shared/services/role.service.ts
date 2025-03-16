@@ -82,7 +82,7 @@ hasImportChequePermission(): boolean {
 }
 
 hasReadChequePermission(): boolean {
-  return this.authService.hasPermission('READ_CHHEQUE');
+  return this.authService.hasPermission('READ_CHEQUE');
 }
 
 hasUpdateChequePermission(): boolean {
@@ -95,5 +95,74 @@ hasDeleteChequePermission(): boolean {
 
 hasDownloadChequePermission(): boolean {
   return this.authService.hasPermission('DOWNLOAD_CHEQUE');
+}
+hasCreateCreditPermission(): boolean {
+  return this.authService.hasPermission('CREATE_CREDIT');
+}
+
+hasReadCreditPermission(): boolean {
+  return this.authService.hasPermission('READ_CREDIT');
+}
+
+hasUpdateCreditPermission(): boolean {
+  return this.authService.hasPermission('UPDATE_CREDIT');
+}
+
+hasDeleteCreditPermission(): boolean {
+  return this.authService.hasPermission('DELETE_CREDIT');
+}
+
+hasDownloadCreditFilePermission(): boolean {
+  return this.authService.hasPermission('DOWNLOAD_CREDIT_FILE');
+}
+
+hasUploadCreditFilePermission(): boolean {
+  return this.authService.hasPermission('UPLOAD_CREDIT_FILE');
+}
+hasCreateLcPermission(): boolean {
+  return this.authService.hasPermission('CREATE_LC');
+}
+
+hasReadLcPermission(): boolean {
+  return this.authService.hasPermission('READ_LC');
+}
+
+hasUpdateLcPermission(): boolean {
+  return this.authService.hasPermission('UPDATE_LC');
+}
+
+hasDeleteLcPermission(): boolean {
+  return this.authService.hasPermission('DELETE_LC');
+}
+
+hasDownloadLcFilePermission(): boolean {
+  return this.authService.hasPermission('DOWNLOAD_LC_FILE');
+}
+
+hasUploadLcFilePermission(): boolean {
+  return this.authService.hasPermission('UPLOAD_LC_FILE');
+}
+hasCreateCautionPermission(): boolean {
+  return this.authService.hasPermission('CREATE_CAUTION');
+}
+
+hasReadCautionPermission(): boolean {
+  return this.authService.hasPermission('READ_CAUTION');
+}
+
+hasUpdateCautionPermission(): boolean {
+  return this.authService.hasPermission('UPDATE_CAUTION');
+}
+
+hasDeleteCautionPermission(): boolean {
+  return this.authService.hasPermission('DELETE_CAUTION');
+}
+
+hasDownloadCautionFilePermission(): boolean {
+  return this.authService.hasPermission('DOWNLOAD_CAUTION_FILE');
+}
+
+hasUploadCautionFilePermission(): boolean {
+  return this.authService.hasPermission('UPLOAD_CAUTION_FILE');
 }
 }

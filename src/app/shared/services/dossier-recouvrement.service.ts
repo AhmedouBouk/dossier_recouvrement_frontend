@@ -66,6 +66,7 @@ export class DossierRecouvrementService {
   uploadGarantie(dossierId: number, formData: FormData): Observable<DossierRecouvrement> {
     return this.http.post<DossierRecouvrement>(`${this.apiUrl}/${dossierId}/garantie`, formData);
   }
+<<<<<<< HEAD
  
 
   // Uploader un fichier de chèque
@@ -81,6 +82,11 @@ export class DossierRecouvrementService {
     return this.http.delete<void>(`${this.apiUrl}/${dossierId}/cheque-files`);
   }
 
+=======
+  generatePdf(dossierId: number) {
+    return this.http.get(`${this.apiUrl}/${dossierId}/generate-pdf`, { responseType: 'blob' });
+  }
+>>>>>>> 9c329b3c4dcffe8ef09adf210b00525e5ab509b9
   // Get comments for a dossier
 getComments(dossierId: number): Observable<any[]> {
   return this.http.get<any[]>(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`);
@@ -90,4 +96,4 @@ getComments(dossierId: number): Observable<any[]> {
 addComment(dossierId: number, content: string): Observable<any> {
   return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, { content });
 }
-}
+  }

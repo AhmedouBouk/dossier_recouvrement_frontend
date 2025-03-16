@@ -31,7 +31,7 @@
               <th>N° Compte</th>
               <th>Fichier de Caution</th>
               <th>Date de Création</th>
-              <th>Actions</th>
+              <th *ngIf="roleService.hasCreateCautionPermission() || roleService.hasDeleteCautionPermission()">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -49,7 +49,7 @@
               <td>{{ dossier.dateCreation }}</td>
               <td>
                 <div class="action-buttons">
-                  <input
+                  <input *ngIf="roleService.hasCreateCautionPermission()"
                     type="file"
                     (change)="onCautionsFileSelected($event, dossier)"
                     accept=".pdf"
@@ -64,7 +64,7 @@
                     Sélectionner
                   </label>
   
-                  <button
+                  <button *ngIf="roleService.hasCreateCautionPermission()"
                     class="add-btn"
                     (click)="uploadCautionsFile(dossier)"
                     [disabled]="!dossier.selectedCautionsFile"
@@ -74,17 +74,16 @@
                   </button>
   
                   <!-- Visualiser un fichier -->
-                  <button
+                  <button *ngIf="dossier.cautionsFile"
                     class="view-btn"
                     (click)="viewCautionsFile(dossier)"
-                    [disabled]="!dossier.cautionsFile"
                   >
                     <i class="material-icons">visibility</i>
                     Voir
                   </button>
   
                   <!-- Supprimer un fichier -->
-                  <button
+                  <button *ngIf="roleService.hasDeleteCautionPermission()"
                     class="delete-btn"
                     (click)="deleteCautionsFile(dossier)"
                     [disabled]="!dossier.cautionsFile"

@@ -62,17 +62,17 @@
       garanties
     </a>
 
-    <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
+    <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission">
       <i class="material-icons">description</i>
       Fichiers de chèque
     </a>
-    <a routerLink="/credits-file-management" routerLinkActive="active" class="menu-item">
+    <a routerLink="/credits-file-management" routerLinkActive="active" class="menu-item"*ngIf="roleService.hasReadCreditPermission()">
       <i class="material-icons">credit_card</i>
 Credit    </a>
-    <a routerLink="/    lc-file-management    " routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadClientPermission()">
+    <a routerLink="/lc-file-management" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadLcPermission()">
       <i class="material-icons">assignment</i>
                 Lettres de Crédit    </a>
-    <a routerLink="/cautions-file-management" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadClientPermission()">
+    <a routerLink="/cautions-file-management" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadCautionPermission()">
       <i class="material-icons">attach_money</i>      cautions
     </a>
     
