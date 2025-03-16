@@ -20,6 +20,14 @@ import { RoleListComponent } from './admin/role-list/role-list.component';
 import { AgenceListComponent } from './admin/agence/agence-list/agence-list.component';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
 import { HistoryComponent } from './admin/history/history.component';
+<<<<<<< HEAD
+import { ChequeFileManagementComponent } from './pages/cheque-file-management/cheque-file-management.component';
+import { CreditsFileManagementComponent } from './pages/credits-file-management/credits-file-management.component';
+import { CautionsFileManagementComponent } from './pages/cautions-file-management/cautions-file-management.component';
+import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-management.component';
+
+=======
+>>>>>>> 9c329b3c4dcffe8ef09adf210b00525e5ab509b9
 const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'auth/login', component: LoginComponent },
@@ -28,7 +36,14 @@ const routes: Routes = [
   { path: 'comptes', component: ComptesComponent,canActivate: [AuthGuard]},
   { path: 'dashboard', component: DashboardComponent ,canActivate: [AuthGuard]},
   { path: 'garanties', component: GarantiesComponent }, // Route pour la page Garanties
-
+  {
+    path: 'cautions-file-management', // Chemin de la route
+    component: CautionsFileManagementComponent, // Composant à afficher
+  },
+  {
+    path: 'lc-file-management',
+    component: LcFileManagementComponent,
+  },
   { path: 'clients/details/:nni', component: ClientDetailsComponent,canActivate: [AuthGuard] }
  ,   { path: 'comptes/details/:nomCompte', component: ComptesDetailsComponent,canActivate: [AuthGuard] }
 ,
@@ -46,6 +61,7 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  { path: 'cheque-files', component: ChequeFileManagementComponent },
 
   // Non-admin routes - accessible by all authenticated users
  
@@ -59,6 +75,11 @@ const routes: Routes = [
     component: DossierRecouvrementDetailsComponent
     ,canActivate: [AuthGuard]
   },
+  {
+    path: 'credits-file-management', // URL pour accéder au composant
+    component: CreditsFileManagementComponent, // Composant à afficher
+  },
+
   {
     path: 'dossiers/add',
     component: DossierRecouvrementAddComponent

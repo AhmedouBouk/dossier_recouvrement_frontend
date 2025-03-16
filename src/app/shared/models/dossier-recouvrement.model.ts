@@ -20,6 +20,7 @@ export interface Comment {
 
 export interface DossierRecouvrement {
     id: number;
+    
     compte: {
       nomCompte: string;
     };
@@ -47,6 +48,10 @@ export interface DossierRecouvrement {
     lcFile: string;
     chequeFile: string;
     dateCreation: Date; // Assurez-vous que cette propriété existe
+    selectedFile?: File; // Ajoutez cette propriété
+    selectedCreditsFile? :File
+    selectedCautionsFile?:File
+    selectedLcFile?:File
 
   
   }

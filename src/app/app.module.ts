@@ -37,6 +37,10 @@ import { NavigationHeaderComponent } from './admin/navigation-header/navigation-
 import { SharedModule } from './shared/shared.module';
 import { GarantiesComponent } from './pages/garanties/garanties.component';
 import { HistoryComponent } from './admin/history/history.component';
+import { ChequeFileManagementComponent } from './pages/cheque-file-management/cheque-file-management.component';
+import { CreditsFileManagementComponent } from './pages/credits-file-management/credits-file-management.component';
+import { CautionsFileManagementComponent } from './pages/cautions-file-management/cautions-file-management.component';
+import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-management.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +56,12 @@ import { HistoryComponent } from './admin/history/history.component';
     ComptesDetailsComponent,
     RoleListComponent,
     GarantiesComponent,
-    HistoryComponent
+    ChequeFileManagementComponent,
+    HistoryComponent,
+    CreditsFileManagementComponent,
+    CautionsFileManagementComponent,
+    LcFileManagementComponent,
+    
 
   ],
   imports: [
@@ -78,7 +87,8 @@ import { HistoryComponent } from './admin/history/history.component';
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
     AgenceModule,
-    SharedModule
+    SharedModule,
+    
   ],
   providers: [
     RoleGuard,

@@ -159,16 +159,13 @@ export class AuthService implements OnDestroy {
     const role = this.getUserRole();
     return role !== 'ROLE_ADMIN';
   }
-
-  hasRecouvrementRole(): boolean {
-    return this.getUserRole() === 'ROLE_RECOUVREMENT';
+  getUserType(): string {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = this.decodeToken(token);
+      return decodedToken?.userType || ''; // Retourne le userType ou une chaîne vide si non trouvé
+    }
+    return '';
   }
 
-  hasDGCRRole(): boolean {
-    return this.getUserRole() === 'ROLE_DGCR';
-  }
-
-  hasDORole(): boolean {
-    return this.getUserRole() === 'ROLE_DO';
-  }
 }
