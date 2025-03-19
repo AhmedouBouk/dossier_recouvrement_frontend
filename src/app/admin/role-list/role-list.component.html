@@ -23,7 +23,10 @@
             <label>Permissions:</label>
             <div class="permissions" formArrayName="permissions">
               <label *ngFor="let perm of allPermissions; let i = index">
-                <input type="checkbox" [value]="perm" (change)="onPermissionChange($event, perm)">
+                <input type="checkbox" 
+                       [value]="perm" 
+                       [checked]="isPermissionSelected(perm)"
+                       (change)="onPermissionChange($event, perm)">
                 {{ perm }}
               </label>
             </div>
