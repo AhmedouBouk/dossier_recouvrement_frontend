@@ -81,7 +81,14 @@
                     <i class="material-icons">visibility</i>
                     Voir
                   </button>
-  
+  <!-- Ajouter après le bouton "Voir" -->
+<button *ngIf="dossier.cautionsFile"
+class="download-btn"
+(click)="viewCautionsFile(dossier, true)"
+>
+<i class="material-icons">download</i>
+Télécharger
+</button>
                   <!-- Supprimer un fichier -->
                   <button *ngIf="roleService.hasDeleteCautionPermission()"
                     class="delete-btn"

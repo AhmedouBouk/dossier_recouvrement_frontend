@@ -39,12 +39,15 @@
             <td>{{ dossier.id }}</td>
             <td>{{ dossier.compte.nomCompte }}</td>
             <td>
-              <span *ngIf="dossier.chequeFile; else noFile">
-                {{ dossier.chequeFile }}
-              </span>
-              <ng-template #noFile>
-                <span class="no-file">Aucun fichier</span>
-              </ng-template>
+             
+              
+                <span *ngIf="dossier.chequeFile; else noFile">
+                  {{ getFileNameFromUrl(dossier.chequeFile) }}
+                </span>
+                <ng-template #noFile>
+                  <span class="no-file">Aucun fichier</span>
+                </ng-template>
+              
             </td>
             <td>{{ dossier.dateCreation }}</td>
             <td>
@@ -76,12 +79,23 @@
                 <!-- Visualiser un fichier -->
                 <button *ngIf="roleService.hasReadChequePermission()"
                   class="view-btn"
-                  (click)="viewChequeFile(dossier)"
+                  (click)="viewChequeFile(dossier, false)"
                   [disabled]="!dossier.chequeFile"
                 >
                   <i class="material-icons">visibility</i>
                   Voir
                 </button>
+
+                <!-- Télécharger un fichier -->
+             
+<!-- Téléchargement du fichier -->
+<button *ngIf="roleService.hasReadChequePermission()"
+  class="download-btn"
+  (click)="viewChequeFile(dossier, true)"
+  [disabled]="!dossier.chequeFile">
+  <i class="material-icons">download</i>
+  Télécharger
+</button>
 
                 <!-- Supprimer un fichier -->
                 <button *ngIf="roleService.hasDeleteChequePermission()"

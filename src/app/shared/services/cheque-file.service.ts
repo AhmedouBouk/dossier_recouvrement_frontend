@@ -19,19 +19,28 @@ export class ChequeFileService {
   }
 
   // Uploader un fichier de chèque
-  uploadChequeFile(file: File): Observable<any> {
+  uploadChequeFile(dossierId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/upload`, formData);
+    return this.http.post(`${this.apiUrl}/${dossierId}/upload`, formData);
   }
 
   // Supprimer un fichier de chèque
-  deleteChequeFile(fileId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${fileId}`);
+  deleteChequeFile(dossierId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${dossierId}/delete`);
   }
 
   // Récupérer l'URL d'un fichier de chèque
-  getChequeFileUrl(fileId: number): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/${fileId}/url`);
+  getChequeFileUrl(dossierId: number): Observable<string> {
+    return this.http.get<string>(`${this.apiUrl}/${dossierId}/url`);
+  }
+  
+  // Helper method to construct full URLs
+  getFullFileUrl(relativePath: string): string {
+    // Check if path is already a full URL
+    if (relativePath && !relativePath.startsWith('http')) {
+      return `${environment.apiUrl}${relativePath}`;
+    }
+    return relativePath;
   }
 }

@@ -13,7 +13,6 @@ interface DecodedToken {
   iat: number;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -48,7 +47,6 @@ export class AuthService implements OnDestroy {
         })
       );
   }
-  
 
   logout(): void {
     localStorage.removeItem('token');
@@ -56,15 +54,17 @@ export class AuthService implements OnDestroy {
     this.router.navigate(['/auth/login']);
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
   private setupTokenExpirationCheck(): void {
     if (this.tokenCheckInterval) {
       this.tokenCheckInterval.unsubscribe();
     }
     
-    // Initial check
     this.checkTokenExpiration();
 
-    // Set up periodic checks
     this.tokenCheckInterval = interval(this.CHECK_INTERVAL).subscribe(() => {
       this.checkTokenExpiration();
     });
@@ -77,7 +77,7 @@ export class AuthService implements OnDestroy {
   }
 
   private handleExpiredToken(): void {
-    if (localStorage.getItem('token')) {
+    if (this.getToken()) {
       this.logout();
       alert('Votre session a expiré. Veuillez vous reconnecter.');
     }
@@ -93,19 +93,18 @@ export class AuthService implements OnDestroy {
   }
 
   isAuthenticated(): boolean {
-    const token = localStorage.getItem('token');
+    const token = this.getToken();
     if (!token) return false;
 
     const decodedToken = this.decodeToken(token);
     if (!decodedToken) return false;
 
-    // Check if token is expired
     const currentTime = Date.now() / 1000;
     return decodedToken.exp > currentTime;
   }
 
   getLoggedInUserName(): string {
-    const token = localStorage.getItem('token');
+    const token = this.getToken();
     if (token) {
       const decodedToken = this.decodeToken(token);
       return decodedToken?.sub || 'Utilisateur inconnu';
@@ -123,7 +122,7 @@ export class AuthService implements OnDestroy {
   }
 
   getUserPermissions(): string[] {
-    const token = localStorage.getItem('token');
+    const token = this.getToken();
     if (!token) return [];
     
     const decodedToken = this.decodeToken(token);
@@ -134,12 +133,8 @@ export class AuthService implements OnDestroy {
   
   hasPermission(permission: string): boolean {
     const permissions = this.getUserPermissions();
-    return permissions.includes(permission) ;  // boolean 
+    return permissions.includes(permission);
   }
-
-
-
-  
 
   isAdmin(): boolean {
     return this.getUserRole() === 'ROLE_ADMIN';
@@ -154,18 +149,17 @@ export class AuthService implements OnDestroy {
     return allowedRoles.includes(this.getUserRole());
   }
 
-  // Restored Methods to Prevent Errors in Other Components
   hasRoleNotAdmin(): boolean {
     const role = this.getUserRole();
     return role !== 'ROLE_ADMIN';
   }
+
   getUserType(): string {
-    const token = localStorage.getItem('token');
+    const token = this.getToken();
     if (token) {
       const decodedToken = this.decodeToken(token);
-      return decodedToken?.userType || ''; // Retourne le userType ou une chaîne vide si non trouvé
+      return decodedToken?.userType || '';
     }
     return '';
   }
-
 }

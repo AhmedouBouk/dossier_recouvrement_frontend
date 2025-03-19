@@ -1,9 +1,7 @@
 <div class="main-content">
   <div class="container">
     <!-- Barre de recherche et actions -->
-    <div class="actions-bar">
-    
-    </div>
+    <div class="actions-bar"></div>
 
     <!-- Indicateur de chargement -->
     <div *ngIf="isLoading" class="loading-state">
@@ -18,6 +16,8 @@
           <tr>
             <th>ID Dossier</th>
             <th>N° Compte</th>
+            <th>>Fichier de la Garantie</th>
+
             <th>Titre de la Garantie</th>
             <th>Date de Création</th>
             <th>Actions</th>
@@ -28,19 +28,85 @@
             <td>{{ dossier.id }}</td>
             <td>{{ dossier.compte.nomCompte }}</td>
             <td>
-              <input [(ngModel)]="dossier.garantiesTitre" placeholder="Titre de la garantie" />
+              <span *ngIf="dossier.garantiesFile; else noFile">
+                {{ getFileNameFromUrl(dossier.garantiesFile) }}
+              </span>
+              <ng-template #noFile>
+                <span class="no-file">Aucun fichier</span>
+              </ng-template>
+            </td>
+            <td>
+              <!-- Mode édition -->
+              <ng-container *ngIf="editingGarantie && editingGarantie.id === dossier.id; else viewMode">
+                <input [(ngModel)]="editingGarantie.garantiesTitre" class="edit-input" />
+              
+                <button class="save-btn" (click)="updateGarantie(dossier)">
+                  <i class="material-icons">save</i>
+                  Sauvegarder
+                </button>
+                <button class="cancel-btn" (click)="cancelEdit()">
+                  <i class="material-icons">close</i>
+                  Annuler
+                </button>
+              </ng-container>
+            
+              <!-- Mode affichage -->
+              <ng-template #viewMode>
+                <span (click)="startEdit(dossier)" class="editable-text">
+                  {{ dossier.garantiesTitre || 'Aucun titre' }}
+                </span>
+              </ng-template>
             </td>
             <td>{{ dossier.dateCreation }}</td>
             <td>
               <div class="action-buttons">
-                <input type="file" (change)="onFileUpload($event, dossier)" accept=".pdf" hidden id="file-upload-{{ dossier.id }}" />
+                <!-- Bouton pour sélectionner un fichier -->
+                <input
+                  type="file"
+                  (change)="onFileUpload($event, dossier)"
+                  accept=".pdf"
+                  hidden
+                  id="file-upload-{{ dossier.id }}"
+                />
                 <label for="file-upload-{{ dossier.id }}" class="upload-btn">
                   <i class="material-icons">file_upload</i>
                   Sélectionner
                 </label>
+
+                <!-- Bouton pour uploader un fichier -->
                 <button class="add-btn" (click)="uploadGarantie(dossier)">
                   <i class="material-icons">cloud_upload</i>
                   Upload
+                </button>
+
+                <!-- Bouton pour visualiser un fichier -->
+                <button
+                  class="view-btn"
+                  (click)="viewGarantieFile(dossier, false)"
+                  [disabled]="!dossier.garantiesFile"
+                >
+                  <i class="material-icons">visibility</i>
+                  Voir
+                </button>
+
+                <!-- Bouton pour télécharger un fichier -->
+                <button
+                  class="download-btn"
+                  (click)="viewGarantieFile(dossier, true)"
+                  [disabled]="!dossier.garantiesFile"
+                >
+                  <i class="material-icons">download</i>
+                  Télécharger
+                </button>
+
+                <!-- Bouton pour supprimer un fichier -->
+                <button
+                  class="delete-btn"
+                  (click)="deleteGarantieFile(dossier)"
+                  [disabled]="!dossier.garantiesFile"
+                >
+                  <i class="material-icons">delete</i>
+                  Supprimer
                 </button>
               </div>
             </td>

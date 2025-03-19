@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -44,7 +44,9 @@ import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-ma
 
 @NgModule({
   declarations: [
+
     AppComponent,
+    
     LoginComponent,
     UserListComponent,
     UserEditComponent,
@@ -98,6 +100,7 @@ import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-ma
       multi: true
     }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+
 })
 export class AppModule { }

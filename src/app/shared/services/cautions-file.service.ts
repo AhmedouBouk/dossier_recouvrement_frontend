@@ -43,4 +43,14 @@ export class CautionsFileService {
       'Une erreur s’est produite lors de la gestion des fichiers de caution.'
     );
   }
+  // Ajouter cette méthode au service CautionsFileService
+getFullFileUrl(relativePath: string): string {
+  // Si le chemin est déjà une URL complète, la retourner
+  if (relativePath.startsWith('http')) {
+    return relativePath;
+  }
+  // Sinon, construire l'URL complète
+  const baseUrl = 'http://localhost:8080';
+  return baseUrl + relativePath;
+}
 }
