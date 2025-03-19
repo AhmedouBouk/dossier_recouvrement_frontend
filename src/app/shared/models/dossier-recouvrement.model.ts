@@ -53,6 +53,7 @@ export interface DossierRecouvrement {
     selectedCreditsFile? :File
     selectedCautionsFile?:File
     selectedLcFile?:File
+    
     comments?: Comment[];
 
   

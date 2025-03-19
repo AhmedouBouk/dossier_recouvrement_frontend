@@ -4,6 +4,8 @@ import { DossierRecouvrementService } from 'src/app/shared/services/dossier-reco
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { ChequeFileService } from 'src/app/shared/services/cheque-file.service'; // Importez le ChequeFileService
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-cheque-file-management',
@@ -16,8 +18,14 @@ export class ChequeFileManagementComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  pdfSrc: string | null = null;
 
-  constructor(private dossierService: DossierRecouvrementService,    public roleService: RoleService
+
+  constructor(
+    private dossierService: DossierRecouvrementService,
+    private chequeFileService: ChequeFileService, // Injectez le ChequeFileService
+    public roleService: RoleService,
+    public authService:AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -39,7 +47,14 @@ export class ChequeFileManagementComponent implements OnInit {
       }
     });
   }
-
+  getFileNameFromUrl(url: string | null): string {
+    if (!url) {
+      return 'Aucun fichier';
+    }
+    // Extraire le nom du fichier à partir de l'URL
+    const fileName = url.split('/').pop() || 'Aucun fichier';
+    return fileName;
+  }
   // Gérer la sélection d'un fichier
   onFileSelected(event: any, dossier: DossierRecouvrement): void {
     const file = event.target.files[0];
@@ -48,14 +63,15 @@ export class ChequeFileManagementComponent implements OnInit {
     }
   }
 
-  // Uploader un fichier de chèque
+  // Uploader un fichier de chèque en utilisant ChequeFileService
   uploadChequeFile(dossier: DossierRecouvrement): void {
     if (dossier.selectedFile) {
       this.isLoading = true;
       this.errorMessage = null;
       this.successMessage = null;
-  
-      this.dossierService.uploadChequeFile(dossier.id, dossier.selectedFile).subscribe({
+
+      // Utilisez le ChequeFileService pour l'upload
+      this.chequeFileService.uploadChequeFile(dossier.id, dossier.selectedFile).subscribe({
         next: (response) => {
           console.log('Fichier de chèque uploadé avec succès', response);
           this.successMessage = 'Fichier de chèque uploadé avec succès';
@@ -73,15 +89,50 @@ export class ChequeFileManagementComponent implements OnInit {
   }
 
   // Visualiser un fichier de chèque
-  viewChequeFile(dossier: DossierRecouvrement): void {
-    if (dossier.chequeFile) {
-      const encodedUrl = encodeURI(dossier.chequeFile);
-window.open(encodedUrl, '_blank');
-    } else {
-      console.error('Aucun fichier trouvé pour ce dossier.');
+  viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.chequeFile) {
       alert('Aucun fichier trouvé pour ce dossier.');
+      return;
     }
+  
+    const fileUrl = this.chequeFileService.getFullFileUrl(dossier.chequeFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+  
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+  
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.chequeFile; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
   }
+  
+  
   // Supprimer un fichier de chèque
   deleteChequeFile(dossier: DossierRecouvrement): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier de chèque ?')) {
@@ -89,7 +140,8 @@ window.open(encodedUrl, '_blank');
       this.errorMessage = null;
       this.successMessage = null;
 
-      this.dossierService.deleteChequeFile(dossier.id).subscribe({
+      // Utilisez le ChequeFileService pour la suppression
+      this.chequeFileService.deleteChequeFile(dossier.id).subscribe({
         next: () => {
           this.successMessage = 'Fichier supprimé avec succès';
           this.loadDossiers(); // Recharger la liste des dossiers

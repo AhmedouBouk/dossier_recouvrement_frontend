@@ -5,6 +5,7 @@ import { DossierRecouvrementService } from 'src/app/shared/services/dossier-reco
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-credits-file-management',
@@ -21,7 +22,9 @@ export class CreditsFileManagementComponent implements OnInit {
   constructor(
     private dossierService: DossierRecouvrementService,
     private creditsFileService: CreditsFileService,
-    public roleService: RoleService
+    public roleService: RoleService,
+        public authService:AuthService,
+    
   ) {}
 
   ngOnInit(): void {
@@ -77,14 +80,47 @@ export class CreditsFileManagementComponent implements OnInit {
   }
 
   // Visualiser un fichier de crédit
-  viewCreditsFile(dossier: DossierRecouvrement): void {
-    if (dossier.creditsFile) {
-      const encodedUrl = encodeURI(dossier.creditsFile);
-      window.open(encodedUrl, '_blank');
-    } else {
-      console.error('Aucun fichier trouvé pour ce dossier.');
+  viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.creditsFile) {
       alert('Aucun fichier trouvé pour ce dossier.');
+      return;
     }
+  
+    const fileUrl = this.creditsFileService.getFullFileUrl(dossier.creditsFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+  
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+  
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.creditsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
   }
 
   // Supprimer un fichier de crédit

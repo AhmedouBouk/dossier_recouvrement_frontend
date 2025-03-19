@@ -25,7 +25,12 @@ export class CreditsFileService {
   }
 
   // Récupérer l'URL du fichier de crédit
-  getCreditsFileUrl(dossierId: number): Observable<string> {
-    return this.http.get(`${this.apiUrl}/${dossierId}/url`, { responseType: 'text' });
+  
+  getFullFileUrl(relativePath: string): string {
+    // Vérifie si le chemin est déjà une URL complète
+    if (relativePath && !relativePath.startsWith('http')) {
+      return `${environment.apiUrl}${relativePath}`;
+    }
+    return relativePath;
   }
 }

@@ -82,7 +82,15 @@
                     <i class="material-icons">visibility</i>
                     Voir
                   </button>
-  
+  <!-- Bouton de téléchargement -->
+<button
+class="download-btn"
+(click)="viewCreditsFile(dossier, true)"
+[disabled]="!dossier.creditsFile"
+>
+<i class="material-icons">download</i>
+Télécharger
+</button>
                   <!-- Supprimer un fichier -->
                   <button
                     class="delete-btn"

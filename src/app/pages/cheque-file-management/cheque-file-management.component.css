@@ -320,6 +320,27 @@ tbody tr:hover {
     min-width: 600px; /* Réduire la largeur minimale pour les petits écrans */
   }
 }
+/* Download Button */
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 24px;
+  background-color: #10b981; /* Green color similar to add button */
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
 
 /* Print Styles */
 @media print {
