@@ -38,19 +38,20 @@ export class CautionsFileService {
 
   // Gestion des erreurs
   private handleError(error: HttpErrorResponse) {
-    console.error('Une erreur s’est produite:', error);
+    console.error('Une erreur s\'est produite:', error);
     return throwError(
-      'Une erreur s’est produite lors de la gestion des fichiers de caution.'
+      'Une erreur s\'est produite lors de la gestion des fichiers de caution.'
     );
   }
+
   // Ajouter cette méthode au service CautionsFileService
-getFullFileUrl(relativePath: string): string {
-  // Si le chemin est déjà une URL complète, la retourner
-  if (relativePath.startsWith('http')) {
-    return relativePath;
+  getFullFileUrl(relativePath: string): string {
+    // Si le chemin est déjà une URL complète, la retourner
+    if (relativePath.startsWith('http')) {
+      return relativePath;
+    }
+    // Sinon, construire l'URL complète
+    const baseUrl = environment.apiUrl;
+    return baseUrl + relativePath;
   }
-  // Sinon, construire l'URL complète
-  const baseUrl = 'http://localhost:8080';
-  return baseUrl + relativePath;
-}
 }
