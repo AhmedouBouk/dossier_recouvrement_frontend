@@ -38,9 +38,19 @@ export class LcFileService {
 
   // Gestion des erreurs
   private handleError(error: HttpErrorResponse) {
-    console.error('Une erreur s’est produite:', error);
+    console.error('Une erreur s\'est produite:', error);
     return throwError(
-      'Une erreur s’est produite lors de la gestion des fichiers LC.'
+      'Une erreur s\'est produite lors de la gestion des fichiers LC.'
     );
+  }
+  
+  // Ajouter cette méthode pour être cohérent avec les autres services
+  getFullFileUrl(relativePath: string): string {
+    // Si le chemin est déjà une URL complète, la retourner
+    if (relativePath && relativePath.startsWith('http')) {
+      return relativePath;
+    }
+    // Sinon, construire l'URL complète
+    return `${environment.apiUrl}${relativePath}`;
   }
 }

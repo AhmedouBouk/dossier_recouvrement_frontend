@@ -5,6 +5,7 @@ import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.
 import { HttpErrorResponse } from '@angular/common/http';
 import { LcFileService } from 'src/app/shared/services/lc-file.service';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-lc-file-management',
@@ -21,7 +22,8 @@ export class LcFileManagementComponent implements OnInit {
   constructor(
     private dossierService: DossierRecouvrementService,
     private lcFileService: LcFileService,
-    public roleService: RoleService
+    public roleService: RoleService,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +70,7 @@ export class LcFileManagementComponent implements OnInit {
         error: (err) => {
           console.error('Erreur lors de l\'upload du fichier LC', err);
           this.errorMessage = 'Erreur lors de l\'upload du fichier LC';
+          this.isLoading = false;
         },
         complete: () => {
           this.isLoading = false;
@@ -76,15 +79,48 @@ export class LcFileManagementComponent implements OnInit {
     }
   }
 
-  // Visualiser un fichier LC
-  viewLcFile(dossier: DossierRecouvrement): void {
-    if (dossier.lcFile) {
-      const encodedUrl = encodeURI(dossier.lcFile);
-      window.open(encodedUrl, '_blank');
-    } else {
-      console.error('Aucun fichier trouvé pour ce dossier.');
+  // Visualiser un fichier LC avec option de téléchargement
+  viewLcFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.lcFile) {
       alert('Aucun fichier trouvé pour ce dossier.');
+      return;
     }
+
+    const fileUrl = this.lcFileService.getFullFileUrl(dossier.lcFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.lcFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
   }
 
   // Supprimer un fichier LC
