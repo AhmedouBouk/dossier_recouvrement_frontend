@@ -23,8 +23,7 @@ export class CautionsFileManagementComponent implements OnInit {
     private dossierService: DossierRecouvrementService,
     private cautionsFileService: CautionsFileService,
     public roleService: RoleService,
-        public authService:AuthService,
-    
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +70,7 @@ export class CautionsFileManagementComponent implements OnInit {
         error: (err) => {
           console.error('Erreur lors de l\'upload du fichier de caution', err);
           this.errorMessage = 'Erreur lors de l\'upload du fichier de caution';
+          this.isLoading = false;
         },
         complete: () => {
           this.isLoading = false;
@@ -80,49 +80,48 @@ export class CautionsFileManagementComponent implements OnInit {
   }
 
   // Visualiser un fichier de caution
-// Remplacer la méthode viewCautionsFile actuelle par celle-ci
-viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
-  if (!dossier.cautionsFile) {
-    alert('Aucun fichier trouvé pour ce dossier.');
-    return;
+  viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.cautionsFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+
+    const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
   }
-
-  const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
-  const token = this.authService.getToken(); // Récupérer le token JWT
-
-  fetch(fileUrl, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Erreur lors du chargement du fichier');
-    }
-    return response.blob(); // Convertir la réponse en Blob
-  })
-  .then(blob => {
-    const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-
-    if (download) {
-      // Télécharger le fichier
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else {
-      // Ouvrir dans un nouvel onglet
-      window.open(blobUrl, '_blank');
-    }
-  })
-  .catch(error => {
-    console.error('Erreur:', error);
-    alert('Impossible de charger le fichier.');
-  });
-}
 
   // Supprimer un fichier de caution
   deleteCautionsFile(dossier: DossierRecouvrement): void {

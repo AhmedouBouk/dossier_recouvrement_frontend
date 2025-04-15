@@ -48,12 +48,25 @@ export class RoleListComponent implements OnInit {
 
   openForm(role?: any) {
     this.showForm = true;
+    
+    // Réinitialiser d'abord le formulaire
+    this.roleForm.reset();
+    
     if (role) {
       this.isEditing = true;
       this.editingRoleId = role.id;
+      
+      // Extraire les noms des permissions du rôle
+      const permissionNames = role.permissions.map((p: any) => 
+        typeof p === 'object' ? p.name : p
+      );
+      
+      console.log('Permissions à cocher:', permissionNames);
+      
+      // Mettre à jour le formulaire
       this.roleForm.patchValue({
         roleName: role.name,
-        permissions: role.permissions.map((p: any) => p.name)
+        permissions: permissionNames
       });
     } else {
       this.isEditing = false;
@@ -90,21 +103,41 @@ export class RoleListComponent implements OnInit {
   
     console.log('Envoi des données:', roleData);
   
-    this.adminService.createRole(roleData).subscribe({
-      next: (response) => {
-        console.log('Rôle créé avec succès:', response);
-        this.loadRoles();
-        this.closeForm();
-      },
-      error: (err) => {
-        console.error('🚨 Error Creating Role:', err);
-        if (err.error && typeof err.error === 'string') {
-          alert('Erreur: ' + err.error);
-        } else {
-          alert('Une erreur est survenue lors de la création du rôle');
+    if (this.isEditing && this.editingRoleId) {
+      // Update existing role
+      this.adminService.updateRole(this.editingRoleId, roleData).subscribe({
+        next: (response) => {
+          console.log('Rôle mis à jour avec succès:', response);
+          this.loadRoles();
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('🚨 Error Updating Role:', err);
+          if (err.error && typeof err.error === 'string') {
+            alert('Erreur: ' + err.error);
+          } else {
+            alert('Une erreur est survenue lors de la mise à jour du rôle');
+          }
         }
-      }
-    });
+      });
+    } else {
+      // Create new role
+      this.adminService.createRole(roleData).subscribe({
+        next: (response) => {
+          console.log('Rôle créé avec succès:', response);
+          this.loadRoles();
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('🚨 Error Creating Role:', err);
+          if (err.error && typeof err.error === 'string') {
+            alert('Erreur: ' + err.error);
+          } else {
+            alert('Une erreur est survenue lors de la création du rôle');
+          }
+        }
+      });
+    }
   }
   
   deleteRole(roleId: number) {
@@ -180,5 +213,10 @@ export class RoleListComponent implements OnInit {
     
     // Si c'est un nombre ou une chaîne
     return String(permission);
+  }
+
+  isPermissionSelected(permissionName: string): boolean {
+    const permissions = this.roleForm.value.permissions || [];
+    return permissions.includes(permissionName);
   }
 }
