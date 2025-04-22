@@ -90,13 +90,17 @@ getComments(dossierId: number): Observable<any[]> {
 }
 
 // Add a comment to a dossier
-addComment(dossierId: number, content: string): Observable<any> {
-  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, { content });
+addComment(dossierId: number, content: string, reminderDateTime?: string | null): Observable<any> {
+  const payload: any = { content };
+  if (reminderDateTime) payload.reminderDateTime = reminderDateTime;
+  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, payload);
 }
 
 // Update status and add a comment to a dossier
-updateStatusWithComment(dossierId: number, status: string, content: string): Observable<any> {
-  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/status-with-comment`, { status, content });
+updateStatusWithComment(dossierId: number, status: string, content: string, reminderDateTime?: string | null): Observable<any> {
+  const payload: any = { status, content };
+  if (reminderDateTime) payload.reminderDateTime = reminderDateTime;
+  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/status-with-comment`, payload);
 }
 
 genererMiseEnDemeure(dossier: DossierRecouvrement) {

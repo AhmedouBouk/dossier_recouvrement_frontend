@@ -115,24 +115,29 @@
 .status-toggle-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 5px 10px;
+  gap: 6px;
+  background: linear-gradient(90deg, #4caf50 0%, #43a047 100%);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.12);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
-.status-toggle-btn:hover {
-  background-color: #e0e0e0;
-}
-
+.status-toggle-btn:hover,
 .status-toggle-btn.active {
-  background-color: #4caf50;
-  color: white;
-  border-color: #4caf50;
+  background: linear-gradient(90deg, #388e3c 0%, #43a047 100%);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.18);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.status-toggle-btn i {
+  font-size: 18px;
+  margin-right: 4px;
 }
 
 .status-selection {

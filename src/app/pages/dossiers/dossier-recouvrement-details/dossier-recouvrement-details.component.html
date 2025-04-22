@@ -108,6 +108,12 @@
               placeholder="{{ showStatusSelection ? 'Ajouter un commentaire avec le changement de statut...' : 'Ajouter un commentaire...' }}"
               [disabled]="isLoading">
           </div>
+          <div class="reminder-datetime-fields">
+            <label for="reminder-date">Jour du rappel :</label>
+            <input id="reminder-date" type="date" [(ngModel)]="reminderDate" [disabled]="isLoading">
+            <label for="reminder-time">Heure du rappel :</label>
+            <input id="reminder-time" type="time" [(ngModel)]="reminderTime" [disabled]="isLoading">
+          </div>
           <button 
             class="add-comment-btn" 
             (click)="addComment()"

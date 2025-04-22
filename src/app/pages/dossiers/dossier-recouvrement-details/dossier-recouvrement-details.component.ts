@@ -20,6 +20,8 @@ interface Comment {
   imports: [CommonModule, FormsModule]
 })
 export class DossierRecouvrementDetailsComponent implements OnInit {
+  reminderDate: string = '';
+  reminderTime: string = '';
   dossierDetails: DossierRecouvrement | null = null;
   comments: Comment[] = [];
   newComment: string = '';
@@ -83,12 +85,20 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
 
     this.isLoading = true;
 
+    // Construction du champ reminderDateTime si les deux champs sont remplis
+    let reminderDateTime: string | null = null;
+    if (this.reminderDate && this.reminderTime) {
+      // Format attendu par le backend : yyyy-MM-dd'T'HH:mm:ss
+      reminderDateTime = this.reminderDate + 'T' + this.reminderTime + ':00';
+    }
+
     // Si un statut est sélectionné, mettre à jour le statut avec le commentaire
     if (this.showStatusSelection && this.selectedStatus) {
       this.dossierService.updateStatusWithComment(
         this.dossierDetails.id, 
         this.selectedStatus, 
-        this.newComment
+        this.newComment,
+        reminderDateTime
       ).subscribe({
         next: (comment) => {
           // Ajouter directement le nouveau commentaire à la liste
@@ -96,6 +106,8 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
           this.newComment = '';
           this.selectedStatus = '';
           this.showStatusSelection = false;
+          this.reminderDate = '';
+          this.reminderTime = '';
           this.isLoading = false;
 
           // Recharger les détails du dossier pour afficher le nouveau statut
@@ -109,11 +121,13 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       });
     } else {
       // Sinon, ajouter simplement un commentaire
-      this.dossierService.addComment(this.dossierDetails.id, this.newComment).subscribe({
+      this.dossierService.addComment(this.dossierDetails.id, this.newComment, reminderDateTime).subscribe({
         next: (comment) => {
           // Ajouter directement le nouveau commentaire à la liste
           this.comments.unshift(comment);
           this.newComment = '';
+          this.reminderDate = '';
+          this.reminderTime = '';
           this.isLoading = false;
         },
         error: (err) => {
