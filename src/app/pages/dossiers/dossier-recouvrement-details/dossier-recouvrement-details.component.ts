@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
-import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
+import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossier-recouvrement.model';
+import { RoleService } from 'src/app/shared/services/role.service';
 
 interface Comment {
   id?: number;
@@ -24,12 +25,15 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   comments: Comment[] = [];
   newComment: string = '';
   isLoading = false;
+  isValidating = false;
   errorMessage = '';
+  successMessage = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dossierService: DossierRecouvrementService
+    private dossierService: DossierRecouvrementService,
+    public roleService: RoleService
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +52,55 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       error: (err) => {
         console.error('Erreur de récupération des détails', err);
         this.router.navigate(['/dossiers']);
+      }
+    });
+  }
+
+  validateDossier(status: 'VALIDE' | 'NON_VALIDE') {
+    if (!this.dossierDetails) return;
+    
+    this.isValidating = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    
+    // Mettre à jour l'état de validation avec l'enum approprié
+    const updatedDossier = {
+      ...this.dossierDetails,
+      etatValidation: status === 'VALIDE' ? EtatValidation.VALIDE : EtatValidation.NON_VALIDE
+    };
+    
+    this.dossierService.updateDossier(this.dossierDetails.id, updatedDossier).subscribe({
+      next: (response) => {
+        // Mettre à jour le dossier local
+        this.dossierDetails = response;
+        this.isValidating = false;
+        this.successMessage = status === 'VALIDE' 
+          ? 'Le dossier a été accepté avec succès' 
+          : 'Le dossier a été refusé';
+          
+        // Ajouter un commentaire automatique
+        const commentText = status === 'VALIDE' 
+          ? 'Dossier validé' 
+          : 'Dossier refusé';
+        this.addSystemComment(commentText);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la validation du dossier', err);
+        this.errorMessage = 'Une erreur est survenue lors de la validation du dossier';
+        this.isValidating = false;
+      }
+    });
+  }
+  
+  addSystemComment(content: string) {
+    if (!this.dossierDetails) return;
+    
+    this.dossierService.addComment(this.dossierDetails.id, content).subscribe({
+      next: (comment) => {
+        this.comments.unshift(comment);
+      },
+      error: (err) => {
+        console.error('Erreur lors de l\'ajout du commentaire système', err);
       }
     });
   }

@@ -72,6 +72,43 @@
         </div>
       </div>
 
+      <!-- Success Message -->
+      <div class="alert success" *ngIf="successMessage">
+        <i class="material-icons">check_circle</i>
+        {{ successMessage }}
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert error" *ngIf="errorMessage">
+        <i class="material-icons">error</i>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Validation Section -->
+      <div class="validation-section" *ngIf="dossierDetails.etatValidation === 'INITIALE'">
+        <h3 class="section-title">Validation du dossier</h3>
+        <div class="validation-actions">
+          <button class="validation-btn accept-btn" (click)="validateDossier('VALIDE')" [disabled]="isValidating">
+            <i class="material-icons">check_circle</i>
+            {{ isValidating ? 'Traitement...' : 'Accepter le dossier' }}
+          </button>
+          <button class="validation-btn reject-btn" (click)="validateDossier('NON_VALIDE')" [disabled]="isValidating">
+            <i class="material-icons">cancel</i>
+            {{ isValidating ? 'Traitement...' : 'Refuser le dossier' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Validation Status -->
+      <div class="validation-status" *ngIf="dossierDetails.etatValidation !== 'INITIALE'">
+        <h3 class="section-title">Statut de validation</h3>
+        <div class="status-display" [ngClass]="{'status-validated': dossierDetails.etatValidation === 'VALIDE', 'status-rejected': dossierDetails.etatValidation === 'NON_VALIDE'}">
+          <i class="material-icons" *ngIf="dossierDetails.etatValidation === 'VALIDE'">check_circle</i>
+          <i class="material-icons" *ngIf="dossierDetails.etatValidation === 'NON_VALIDE'">cancel</i>
+          <span>Ce dossier a été {{ dossierDetails.etatValidation === 'VALIDE' ? 'accepté' : 'refusé' }}</span>
+        </div>
+      </div>
+
       <!-- Comments Section -->
       <div class="comments-section">
         <h3 class="section-title">Commentaires</h3>
