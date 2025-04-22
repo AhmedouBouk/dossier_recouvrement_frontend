@@ -369,3 +369,104 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+/* Styles pour les actions sur les commentaires */
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.edit-btn, .delete-btn, .save-btn, .cancel-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.edit-btn {
+  color: #3b82f6;
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+
+.save-btn {
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cancel-btn {
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.edit-btn:hover, .save-btn:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.delete-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.cancel-btn:hover {
+  background-color: rgba(107, 114, 128, 0.1);
+}
+
+/* Formulaire d'édition */
+.edit-form {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  animation: fadeInEdit 0.2s;
+}
+
+@keyframes fadeInEdit {
+  from { opacity: 0; transform: scale(0.98);}
+  to   { opacity: 1; transform: scale(1);}
+}
+
+.edit-form input,
+.edit-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #3b82f6;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-bottom: 8px;
+  background: #fff;
+  transition: border 0.2s;
+}
+
+.edit-form input:focus,
+.edit-form textarea:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.comment-item.editing {
+  border: 2px solid #3b82f6;
+  background-color: #e0e7ff;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}

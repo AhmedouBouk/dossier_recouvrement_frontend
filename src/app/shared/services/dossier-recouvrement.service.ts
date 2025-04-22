@@ -103,6 +103,18 @@ updateStatusWithComment(dossierId: number, status: string, content: string, remi
   return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/status-with-comment`, payload);
 }
 
+// Update an existing comment
+updateComment(commentId: number, content: string, reminderDateTime?: string | null): Observable<any> {
+  const payload: any = { content };
+  if (reminderDateTime) payload.reminderDateTime = reminderDateTime;
+  return this.http.put(`${environment.apiUrl}/api/dossiers/comments/${commentId}`, payload);
+}
+
+// Delete a comment
+deleteComment(commentId: number): Observable<void> {
+  return this.http.delete<void>(`${environment.apiUrl}/api/dossiers/comments/${commentId}`);
+}
+
 genererMiseEnDemeure(dossier: DossierRecouvrement) {
   const doc = new jsPDF();
 

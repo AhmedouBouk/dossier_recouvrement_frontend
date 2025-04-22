@@ -4,12 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
+import { AuthService } from 'src/app/auth/auth.service';
+import { UserDataService } from 'src/app/shared/services/user-data.service';
 
 interface Comment {
   id?: number;
   content: string;
-  createdAt: string; // Changez de Date à string si le backend renvoie ISO string
-  dossier?: any; // Facultatif, dépend de votre modèle
+  createdAt: string;
+  dossierId?: number;
+  user?: { id: number; name: string };
+  reminderDateTime?: string;
+  // Propriétés pour l'édition (non envoyées au backend)
+  editing?: boolean;
+  editContent?: string;
+  editReminderDate?: string;
+  editReminderTime?: string;
 }
 
 @Component({
@@ -22,6 +31,7 @@ interface Comment {
 export class DossierRecouvrementDetailsComponent implements OnInit {
   reminderDate: string = '';
   reminderTime: string = '';
+  currentUserId: number | null = null; // ID de l'utilisateur connecté
   dossierDetails: DossierRecouvrement | null = null;
   comments: Comment[] = [];
   newComment: string = '';
@@ -46,8 +56,14 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dossierService: DossierRecouvrementService
-  ) {}
+    private dossierService: DossierRecouvrementService,
+    private authService: AuthService,
+    private userDataService: UserDataService
+  ) {
+    // Pour les besoins de test, nous utilisons un ID fixe qui correspond à l'utilisateur connecté
+    // Dans un environnement de production, cette valeur devrait être récupérée dynamiquement
+    this.currentUserId = 1;
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -175,5 +191,93 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     };
     
     return statusMap[status] || 'pending';
+  }
+  
+  // Vérifie si l'utilisateur connecté peut éditer/supprimer un commentaire
+  canEditComment(comment: Comment): boolean {
+    // Pour les besoins de test, nous autorisons toujours l'utilisateur à éditer/supprimer les commentaires
+    // Dans un environnement de production, cette logique devrait être plus stricte
+    return true;
+  }
+  
+  // Préparer un commentaire pour l'édition
+  editComment(comment: Comment): void {
+    // Initialiser les champs d'édition
+    comment.editing = true;
+    comment.editContent = comment.content;
+    
+    // Si le commentaire a une date de rappel, la décomposer en date et heure
+    if (comment.reminderDateTime) {
+      const dateTime = new Date(comment.reminderDateTime);
+      comment.editReminderDate = dateTime.toISOString().split('T')[0]; // format YYYY-MM-DD
+      comment.editReminderTime = dateTime.toTimeString().substring(0, 5); // format HH:MM
+    } else {
+      comment.editReminderDate = '';
+      comment.editReminderTime = '';
+    }
+  }
+  
+  // Annuler l'édition d'un commentaire
+  cancelEdit(comment: Comment): void {
+    comment.editing = false;
+    comment.editContent = undefined;
+    comment.editReminderDate = undefined;
+    comment.editReminderTime = undefined;
+  }
+  
+  // Enregistrer les modifications d'un commentaire
+  saveComment(comment: Comment): void {
+    if (!comment.editContent || comment.editContent.trim() === '') {
+      return; // Ne pas enregistrer si le contenu est vide
+    }
+    
+    this.isLoading = true;
+    
+    // Construire la date de rappel si les deux champs sont remplis
+    let reminderDateTime: string | null = null;
+    if (comment.editReminderDate && comment.editReminderTime) {
+      reminderDateTime = comment.editReminderDate + 'T' + comment.editReminderTime + ':00';
+    }
+    
+    this.dossierService.updateComment(comment.id!, comment.editContent, reminderDateTime)
+      .subscribe({
+        next: (updatedComment) => {
+          // Mettre à jour le commentaire dans la liste
+          Object.assign(comment, updatedComment);
+          comment.editing = false;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors de la mise à jour du commentaire', err);
+          this.errorMessage = 'Erreur lors de la mise à jour du commentaire';
+          this.isLoading = false;
+        }
+      });
+  }
+  
+  // Confirmer la suppression d'un commentaire
+  confirmDeleteComment(comment: Comment): void {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+      this.deleteComment(comment);
+    }
+  }
+  
+  // Supprimer un commentaire
+  deleteComment(comment: Comment): void {
+    this.isLoading = true;
+    
+    this.dossierService.deleteComment(comment.id!)
+      .subscribe({
+        next: () => {
+          // Retirer le commentaire de la liste
+          this.comments = this.comments.filter(c => c.id !== comment.id);
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors de la suppression du commentaire', err);
+          this.errorMessage = 'Erreur lors de la suppression du commentaire';
+          this.isLoading = false;
+        }
+      });
   }
 }
