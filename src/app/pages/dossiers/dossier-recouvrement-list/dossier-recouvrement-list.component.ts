@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,7 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoleService } from '../../../shared/services/role.service';
 import { DossierRecouvrementService } from '../../../shared/services/dossier-recouvrement.service';
-import { DossierRecouvrement } from '../../../shared/models/dossier-recouvrement.model';
+import { DossierRecouvrement, EtatValidation } from '../../../shared/models/dossier-recouvrement.model';
 
 @Component({
   selector: 'app-dossier-recouvrement-list',
@@ -22,6 +22,10 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   isLoading = false;
   error: string | null = null;
+  isValidating = false;
+  validationInProgress: number | null = null;
+  successMessage: string | null = null;
+  openValidationDropdown: number | null = null;
 
   constructor(
     private dossierService: DossierRecouvrementService,
@@ -179,5 +183,99 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
       'error': 'error'
     };
     return iconMap[type];
+  }
+
+  validateDossier(dossierId: number, status: 'VALIDE' | 'NON_VALIDE') {
+    if (this.isValidating) return;
+    
+    this.isValidating = true;
+    this.validationInProgress = dossierId;
+    this.error = null;
+    this.successMessage = null;
+    
+    this.dossierService.getDossierById(dossierId).subscribe({
+      next: (dossier) => {
+        const updatedDossier = {
+          ...dossier,
+          etatValidation: status === 'VALIDE' ? EtatValidation.VALIDE : EtatValidation.NON_VALIDE
+        };
+        
+        this.dossierService.updateDossier(dossierId, updatedDossier).subscribe({
+          next: (response) => {
+            const commentText = status === 'VALIDE' 
+              ? 'Dossier validé'
+              : 'Dossier refusé';
+              
+            this.addSystemComment(dossierId, commentText);
+            
+            this.loadDossiers();
+            
+            this.successMessage = status === 'VALIDE'
+              ? `Le dossier #${dossierId} a été accepté avec succès`
+              : `Le dossier #${dossierId} a été refusé`;
+              
+            this.isValidating = false;
+            this.validationInProgress = null;
+          },
+          error: (err) => {
+            console.error('Erreur lors de la validation du dossier', err);
+            this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la validation du dossier';
+            this.isValidating = false;
+            this.validationInProgress = null;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération du dossier', err);
+        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la récupération du dossier';
+        this.isValidating = false;
+        this.validationInProgress = null;
+      }
+    });
+  }
+  
+  addSystemComment(dossierId: number, content: string) {
+    this.dossierService.addComment(dossierId, content).subscribe({
+      next: () => {
+        console.log('Commentaire système ajouté avec succès');
+      },
+      error: (err) => {
+        console.error('Erreur lors de l\'ajout du commentaire système', err);
+      }
+    });
+  }
+
+  toggleValidationOptions(dossierId: number, event?: MouseEvent) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (this.openValidationDropdown === dossierId) {
+      this.openValidationDropdown = null;
+    } else {
+      this.openValidationDropdown = dossierId;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeDropdown(event: MouseEvent) {
+    if (this.openValidationDropdown !== null) {
+      const target = event.target as HTMLElement;
+      
+      if (target.classList.contains('validation-popup')) {
+        this.openValidationDropdown = null;
+      }
+      else if (!target.closest('.validation-dropdown') && 
+               !target.closest('.validation-popup-content')) {
+        this.openValidationDropdown = null;
+      }
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  closeOnEscape() {
+    if (this.openValidationDropdown !== null) {
+      this.openValidationDropdown = null;
+    }
   }
 }

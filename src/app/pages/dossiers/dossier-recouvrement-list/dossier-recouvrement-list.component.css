@@ -204,8 +204,40 @@ tbody tr:hover {
 }
 
 .delete-btn {
+  background-color: #f87171;
+}
+
+.validate-btn, .reject-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  margin-top: 5px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.validate-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.validate-btn:hover {
+  background-color: #059669;
+}
+
+.reject-btn {
   background-color: #ef4444;
   color: white;
+}
+
+.reject-btn:hover {
+  background-color: #dc2626;
 }
 
 .view-btn:hover,
@@ -219,13 +251,28 @@ tbody tr:hover {
 .error-message {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 16px;
-  background-color: #fee2e2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  border-radius: 12px;
+  padding: 15px;
   margin-bottom: 20px;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.error-message i, .success-message i {
+  margin-right: 10px;
+  font-size: 24px;
 }
 
 /* Loading State */
@@ -334,4 +381,210 @@ tbody tr:hover {
   tbody tr:hover {
     transform: none;
   }
+}
+
+.status-display i {
+  font-size: 24px;
+}
+
+/* Styles pour le dropdown de validation */
+.validation-dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 100; /* Assurer que le dropdown est au-dessus des autres éléments */
+}
+
+.status-initial {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-initial:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-icon {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.open .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.validation-options {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  z-index: 1000;
+  min-width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  margin-top: 5px;
+}
+
+.validate-option, .reject-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  gap: 10px;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.validate-option {
+  color: #10b981;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.validate-option:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.reject-option {
+  color: #ef4444;
+}
+
+.reject-option:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.validate-option i, .reject-option i {
+  font-size: 20px;
+}
+
+.validate-option:disabled,
+.reject-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Nouveau style pour le popup de validation */
+.validation-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.validation-popup-content {
+  background-color: white;
+  border-radius: 6px;
+  width: 150px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: popup-appear 0.2s ease-out;
+}
+
+@keyframes popup-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.validation-popup-header {
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.close-popup-btn {
+  position: absolute;
+  right: 3px;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px;
+}
+
+.close-popup-btn i {
+  font-size: 14px;
+}
+
+.validation-buttons-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px;
+  gap: 8px;
+}
+
+.validation-popup .validate-option,
+.validation-popup .reject-option {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.validation-popup .validate-option {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.validation-popup .validate-option:hover {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.validation-popup .reject-option {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.validation-popup .reject-option:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.validation-popup .validate-option i,
+.validation-popup .reject-option i {
+  font-size: 20px;
+}
+
+.validation-popup .validate-option:disabled,
+.validation-popup .reject-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

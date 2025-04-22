@@ -31,6 +31,12 @@
       {{ error }}
     </div>
 
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="material-icons">check_circle</i>
+      {{ successMessage }}
+    </div>
+
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-state">
       <i class="material-icons rotating">sync</i>
@@ -63,9 +69,47 @@
               </span>
             </td>
             <td>
-              <span class="status-chip" [ngClass]="{'status-initial': dossier.etatValidation === 'INITIALE', 'status-valid': dossier.etatValidation === 'VALIDE', 'status-invalid': dossier.etatValidation === 'NON_VALIDE'}">
+              <span *ngIf="dossier.etatValidation !== 'INITIALE'" class="status-chip" 
+                    [ngClass]="{'status-valid': dossier.etatValidation === 'VALIDE', 'status-invalid': dossier.etatValidation === 'NON_VALIDE'}">
                 {{ dossier.etatValidation }}
               </span>
+              
+              <div *ngIf="dossier.etatValidation === 'INITIALE'" class="validation-dropdown">
+                <button class="status-chip status-initial" 
+                        (click)="toggleValidationOptions(dossier.id, $event)"
+                        [class.open]="openValidationDropdown === dossier.id">
+                  {{ dossier.etatValidation }}
+                  <i class="material-icons dropdown-icon">arrow_drop_down</i>
+                </button>
+                
+                <!-- Menu contextuel de validation qui apparaît au-dessus des autres éléments -->
+                <div class="validation-popup" *ngIf="openValidationDropdown === dossier.id">
+                  <div class="validation-popup-content">
+                    <div class="validation-popup-header">
+                      <span>Validation</span>
+                      <button class="close-popup-btn" (click)="toggleValidationOptions(dossier.id, $event)">
+                        <i class="material-icons">close</i>
+                      </button>
+                    </div>
+                    <div class="validation-buttons-row">
+                      <button class="validate-option" 
+                              (click)="validateDossier(dossier.id, 'VALIDE')" 
+                              [disabled]="isValidating && validationInProgress === dossier.id">
+                        <i class="material-icons">
+                          {{ isValidating && validationInProgress === dossier.id ? 'hourglass_top' : 'check_circle' }}
+                        </i>
+                      </button>
+                      <button class="reject-option" 
+                              (click)="validateDossier(dossier.id, 'NON_VALIDE')" 
+                              [disabled]="isValidating && validationInProgress === dossier.id">
+                        <i class="material-icons">
+                          {{ isValidating && validationInProgress === dossier.id ? 'hourglass_top' : 'cancel' }}
+                        </i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </td>
             <td>
               <div class="action-buttons">
