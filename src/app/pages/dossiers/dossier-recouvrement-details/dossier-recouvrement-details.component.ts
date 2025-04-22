@@ -317,22 +317,14 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       reminderDateTime = comment.editReminderDate + 'T' + comment.editReminderTime + ':00';
     }
     
-    // Sauvegarder la date de rappel avant l'appel API car le backend ne la renvoie pas
-    const savedReminderDateTime = reminderDateTime;
-    
     this.dossierService.updateComment(comment.id!, comment.editContent, reminderDateTime)
       .subscribe({
         next: (updatedComment) => {
-          // Mettre à jour le commentaire dans la liste
+          // Mettre à jour le commentaire dans la liste avec la réponse du backend
           Object.assign(comment, updatedComment);
-          
-          // Restaurer la date de rappel car elle n'est pas renvoyée par le backend
-          comment.reminderDateTime = savedReminderDateTime as string | undefined;
-          
           // Désactiver le mode édition
           comment.editing = false;
           this.isLoading = false;
-          
           console.log('Commentaire mis à jour avec date de rappel:', comment.reminderDateTime);
         },
         error: (err) => {

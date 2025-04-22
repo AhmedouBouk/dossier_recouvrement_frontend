@@ -1,21 +1,66 @@
 /* Navbar Styles */
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: white;
-  margin: 16px 16px 0 286px; /* Added margin from top and sides */
-  padding: 0 24px;
-  height: 60px;
   position: fixed;
   top: 0;
-  right: 0;
-  left: 0;
+  left: 270px;
+  width: calc(100vw - 270px - 16px);
+  height: 60px;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  border-radius: 15px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-right: 16px;
+  border-radius: 12px 0 0 0;
 }
+
+@media screen and (max-width: 1024px) {
+  .navbar {
+    left: 250px;
+    width: calc(100vw - 250px);
+    padding: 0 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    left: 0;
+    width: 100vw;
+    padding: 0 10px;
+  }
+}
+
+body, .main-content, app-root {
+  margin-top: 60px !important;
+}
+
+
+body, .main-content, app-root {
+  margin-top: 60px !important;
+}
+
+/* Remove top space from parent containers if any */
+:host {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Optional: Adjust button and title spacing for tight fit */
+.section-title {
+  margin: 0 auto;
+  padding: 0;
+}
+
+.btn-back {
+  margin-left: 0;
+}
+
+.user-actions {
+  margin-right: 0;
+}
+
 .btn-back {
   display: flex;
   align-items: center;
