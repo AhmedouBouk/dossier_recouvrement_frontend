@@ -78,18 +78,40 @@
         
         <!-- Add Comment Form -->
         <div class="comment-form">
+          <div class="form-header">
+            <button 
+              class="status-toggle-btn" 
+              (click)="toggleStatusSelection()"
+              [class.active]="showStatusSelection">
+              <i class="material-icons">{{ showStatusSelection ? 'close' : 'edit' }}</i>
+              {{ showStatusSelection ? 'Annuler' : 'Modifier le statut' }}
+            </button>
+          </div>
+          
+          <!-- Status Selection -->
+          <div class="status-selection" *ngIf="showStatusSelection">
+            <label for="status-select">Choisir un nouveau statut :</label>
+            <select 
+              id="status-select"
+              [(ngModel)]="selectedStatus"
+              class="status-dropdown">
+              <option value="">-- Sélectionner un statut --</option>
+              <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+            </select>
+          </div>
+          
           <div class="input-with-icon">
             <i class="material-icons">comment</i>
             <input 
               type="text" 
               [(ngModel)]="newComment" 
-              placeholder="Ajouter un commentaire..."
+              placeholder="{{ showStatusSelection ? 'Ajouter un commentaire avec le changement de statut...' : 'Ajouter un commentaire...' }}"
               [disabled]="isLoading">
           </div>
           <button 
             class="add-comment-btn" 
             (click)="addComment()"
-            [disabled]="!newComment.trim() || isLoading">
+            [disabled]="(!newComment.trim() || (showStatusSelection && !selectedStatus)) || isLoading">
             <i class="material-icons">send</i>
             {{ isLoading ? 'Envoi...' : 'Ajouter' }}
           </button>

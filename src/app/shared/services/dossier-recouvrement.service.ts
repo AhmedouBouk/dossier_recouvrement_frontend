@@ -94,6 +94,11 @@ addComment(dossierId: number, content: string): Observable<any> {
   return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, { content });
 }
 
+// Update status and add a comment to a dossier
+updateStatusWithComment(dossierId: number, status: string, content: string): Observable<any> {
+  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/status-with-comment`, { status, content });
+}
+
 genererMiseEnDemeure(dossier: DossierRecouvrement) {
   const doc = new jsPDF();
 

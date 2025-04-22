@@ -25,6 +25,21 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   newComment: string = '';
   isLoading = false;
   errorMessage = '';
+  showStatusSelection = false;
+  selectedStatus: string = '';
+
+  // Liste des statuts disponibles
+  statusOptions = [
+    'En cours de traitement',
+    'Relancé',
+    'Mis en demeure',
+    'Protocole d\'accord signé',
+    'Recouvrement amiable',
+    'Non respect du protocole',
+    'En justice',
+    'Adjudication des garanties',
+    'Clôturé'
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -65,26 +80,62 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
 
   addComment() {
     if (!this.newComment.trim() || !this.dossierDetails) return;
-  
+
     this.isLoading = true;
-    this.dossierService.addComment(this.dossierDetails.id, this.newComment).subscribe({
-      next: (comment) => {
-        // Ajouter directement le nouveau commentaire à la liste
-        this.comments.unshift(comment);
-        this.newComment = '';
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Erreur lors de l\'ajout du commentaire', err);
-        this.errorMessage = 'Erreur lors de l\'ajout du commentaire';
-        this.isLoading = false;
-      }
-    });
+
+    // Si un statut est sélectionné, mettre à jour le statut avec le commentaire
+    if (this.showStatusSelection && this.selectedStatus) {
+      this.dossierService.updateStatusWithComment(
+        this.dossierDetails.id, 
+        this.selectedStatus, 
+        this.newComment
+      ).subscribe({
+        next: (comment) => {
+          // Ajouter directement le nouveau commentaire à la liste
+          this.comments.unshift(comment);
+          this.newComment = '';
+          this.selectedStatus = '';
+          this.showStatusSelection = false;
+          this.isLoading = false;
+
+          // Recharger les détails du dossier pour afficher le nouveau statut
+          this.loadDossierDetails(this.dossierDetails!.id);
+        },
+        error: (err) => {
+          console.error('Erreur lors de la mise à jour du statut et de l\'ajout du commentaire', err);
+          this.errorMessage = 'Erreur lors de la mise à jour du statut et de l\'ajout du commentaire';
+          this.isLoading = false;
+        }
+      });
+    } else {
+      // Sinon, ajouter simplement un commentaire
+      this.dossierService.addComment(this.dossierDetails.id, this.newComment).subscribe({
+        next: (comment) => {
+          // Ajouter directement le nouveau commentaire à la liste
+          this.comments.unshift(comment);
+          this.newComment = '';
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors de l\'ajout du commentaire', err);
+          this.errorMessage = 'Erreur lors de l\'ajout du commentaire';
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  // Méthode pour basculer l'affichage de la sélection de statut
+  toggleStatusSelection() {
+    this.showStatusSelection = !this.showStatusSelection;
+    if (!this.showStatusSelection) {
+      this.selectedStatus = '';
+    }
   }
 
   formatDate(dateString: string): string {
     if (!dateString) return 'Date inconnue';
-    
+
     // Valider la chaîne ISO
     const timestamp = Date.parse(dateString);
     if (isNaN(timestamp)) return 'Date invalide';
