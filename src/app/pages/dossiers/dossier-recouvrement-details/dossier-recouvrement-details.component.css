@@ -470,3 +470,11 @@
   margin-top: 12px;
   justify-content: flex-end;
 }
+
+.reminder-date, .info-previous-reminder {
+  display: block;
+  color: #2563eb;
+  font-size: 13px;
+  margin-top: 4px;
+  font-style: italic;
+}

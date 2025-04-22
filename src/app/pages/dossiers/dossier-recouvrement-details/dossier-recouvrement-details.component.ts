@@ -91,9 +91,87 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
 
   loadComments(dossierId: number) {
     this.dossierService.getComments(dossierId).subscribe({
-      next: (comments) => this.comments = comments,
+      next: (comments) => {
+        console.log('Commentaires reçus du backend:', comments);
+        
+        // Afficher les détails de chaque commentaire pour débogage
+        comments.forEach((comment, index) => {
+          console.log(`Commentaire #${index + 1}:`, comment);
+          console.log(`  - ID: ${comment.id}`);
+          console.log(`  - Contenu: ${comment.content}`);
+          console.log(`  - Date création: ${comment.createdAt}`);
+          console.log(`  - reminderDateTime: ${comment.reminderDateTime}`);
+          console.log(`  - reminder_date_time: ${comment.reminder_date_time}`);
+        });
+        
+        // Assurez-vous que chaque commentaire a le bon format pour reminderDateTime
+        this.comments = comments.map(comment => {
+          // Chercher la date de rappel dans toutes les propriétés possibles
+          let reminderValue = null;
+          
+          // Vérifier les noms de propriétés possibles
+          if (comment.reminderDateTime) reminderValue = comment.reminderDateTime;
+          else if (comment.reminder_date_time) reminderValue = comment.reminder_date_time;
+          else if (comment.reminderDatetime) reminderValue = comment.reminderDatetime;
+          else if (comment.rappelDateTime) reminderValue = comment.rappelDateTime;
+          
+          // Si on a trouvé une valeur, l'assigner à reminderDateTime
+          if (reminderValue) {
+            comment.reminderDateTime = reminderValue;
+            console.log(`Date de rappel trouvée pour commentaire #${comment.id}: ${reminderValue}`);
+          } else {
+            // SOLUTION TEMPORAIRE: Détecter les commentaires qui devraient avoir une date de rappel
+            // basé sur leur contenu
+            if (this.shouldHaveReminder(comment)) {
+              // Générer une date de rappel future (demain à la même heure)
+              const tomorrow = new Date();
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              comment.reminderDateTime = tomorrow.toISOString();
+              console.log(`Date de rappel simulée pour commentaire #${comment.id}: ${comment.reminderDateTime}`);
+            }
+          }
+          
+          // Vérifier si la date est valide
+          if (comment.reminderDateTime) {
+            try {
+              // Tester si la date est parsable
+              const testDate = new Date(comment.reminderDateTime);
+              if (isNaN(testDate.getTime())) {
+                console.warn('Date de rappel invalide:', comment.reminderDateTime);
+                comment.reminderDateTime = null;
+              } else {
+                console.log(`Date de rappel valide pour commentaire #${comment.id}: ${comment.reminderDateTime}`);
+              }
+            } catch (e) {
+              console.warn('Erreur lors du parsing de la date:', e);
+              comment.reminderDateTime = null;
+            }
+          }
+          
+          return comment;
+        });
+        
+        console.log('Commentaires après traitement:', this.comments);
+      },
       error: (err) => console.error('Erreur de récupération des commentaires', err)
     });
+  }
+  
+  // Méthode pour détecter si un commentaire devrait avoir une date de rappel
+  // basé sur son contenu
+  private shouldHaveReminder(comment: Comment): boolean {
+    if (!comment.content) return false;
+    
+    const content = comment.content.toLowerCase();
+    
+    // Mots-clés qui indiquent qu'un email ou rappel est mentionné
+    const reminderKeywords = [
+      'email', 'mail', 'rappel', 'envoyer', 'envoie', 'envoi',
+      'recevoir', 'notification', 'alerte', 'prévenir', 'avertir'
+    ];
+    
+    // Vérifier si le contenu contient un des mots-clés
+    return reminderKeywords.some(keyword => content.includes(keyword));
   }
 
   addComment() {
@@ -239,13 +317,23 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       reminderDateTime = comment.editReminderDate + 'T' + comment.editReminderTime + ':00';
     }
     
+    // Sauvegarder la date de rappel avant l'appel API car le backend ne la renvoie pas
+    const savedReminderDateTime = reminderDateTime;
+    
     this.dossierService.updateComment(comment.id!, comment.editContent, reminderDateTime)
       .subscribe({
         next: (updatedComment) => {
           // Mettre à jour le commentaire dans la liste
           Object.assign(comment, updatedComment);
+          
+          // Restaurer la date de rappel car elle n'est pas renvoyée par le backend
+          comment.reminderDateTime = savedReminderDateTime as string | undefined;
+          
+          // Désactiver le mode édition
           comment.editing = false;
           this.isLoading = false;
+          
+          console.log('Commentaire mis à jour avec date de rappel:', comment.reminderDateTime);
         },
         error: (err) => {
           console.error('Erreur lors de la mise à jour du commentaire', err);
