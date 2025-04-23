@@ -62,7 +62,7 @@
       garanties
     </a>
 
-    <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission">
+    <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
       <i class="material-icons">description</i>
       Fichiers de chèque
     </a>
