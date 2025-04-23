@@ -70,13 +70,13 @@
                 />
                 <label for="file-upload-{{ dossier.id }}" class="upload-btn">
                   <i class="material-icons">file_upload</i>
-                  Sélectionner
+                  
                 </label>
 
                 <!-- Bouton pour uploader un fichier -->
                 <button class="add-btn" (click)="uploadGarantie(dossier)">
                   <i class="material-icons">cloud_upload</i>
-                  Upload
+                  
                 </button>
 
                 <!-- Bouton pour visualiser un fichier -->
@@ -86,7 +86,7 @@
                   [disabled]="!dossier.garantiesFile"
                 >
                   <i class="material-icons">visibility</i>
-                  Voir
+                  
                 </button>
 
                 <!-- Bouton pour télécharger un fichier -->
@@ -96,7 +96,7 @@
                   [disabled]="!dossier.garantiesFile"
                 >
                   <i class="material-icons">download</i>
-                  Télécharger
+                  
                 </button>
 
                 <!-- Bouton pour supprimer un fichier -->
@@ -106,7 +106,7 @@
                   [disabled]="!dossier.garantiesFile"
                 >
                   <i class="material-icons">delete</i>
-                  Supprimer
+                  
                 </button>
               </div>
             </td>

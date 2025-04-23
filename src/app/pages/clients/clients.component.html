@@ -155,7 +155,7 @@
                     (click)="startEdit(client)"
                     [disabled]="isLoading">
                     <i class="material-icons">edit</i>
-                    Modifier
+                    
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteClientPermission()"
@@ -163,7 +163,7 @@
                     (click)="deleteClient(client.nni)"
                     [disabled]="isLoading">
                     <i class="material-icons">delete</i>
-                    Supprimer
+                    
                   </button>
                 </div>
               </td>

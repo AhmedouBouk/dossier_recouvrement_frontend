@@ -122,14 +122,14 @@
                     class="edit-btn" 
                     (click)="startEdit(compte)">
                     <i class="material-icons">edit</i>
-                    Modifier
+                    
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteComptePermission()"
                     class="delete-btn" 
                     (click)="deleteCompte(compte.nomCompte)">
                     <i class="material-icons">delete</i>
-                    Supprimer
+                    
                   </button>
                 </div>
               </td>

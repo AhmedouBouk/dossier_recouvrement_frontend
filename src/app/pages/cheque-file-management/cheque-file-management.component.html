@@ -64,7 +64,7 @@
                   class="upload-btn"
                 >
                   <i class="material-icons">file_upload</i>
-                  Sélectionner
+                  
                 </label>
 
                 <button *ngIf="roleService.hasImportChequePermission()"
@@ -73,7 +73,7 @@
                   [disabled]="!dossier.selectedFile"
                 >
                   <i class="material-icons">cloud_upload</i>
-                  Upload
+                  
                 </button>
 
                 <!-- Visualiser un fichier -->
@@ -83,19 +83,19 @@
                   [disabled]="!dossier.chequeFile"
                 >
                   <i class="material-icons">visibility</i>
-                  Voir
+                  
                 </button>
 
                 <!-- Télécharger un fichier -->
              
-<!-- Téléchargement du fichier -->
-<button *ngIf="roleService.hasReadChequePermission()"
-  class="download-btn"
-  (click)="viewChequeFile(dossier, true)"
-  [disabled]="!dossier.chequeFile">
-  <i class="material-icons">download</i>
-  Télécharger
-</button>
+              <!-- Téléchargement du fichier -->
+              <button *ngIf="roleService.hasReadChequePermission()"
+                class="download-btn"
+                (click)="viewChequeFile(dossier, true)"
+                [disabled]="!dossier.chequeFile">
+                <i class="material-icons">download</i>
+                
+              </button>
 
                 <!-- Supprimer un fichier -->
                 <button *ngIf="roleService.hasDeleteChequePermission()"
@@ -104,7 +104,7 @@
                   [disabled]="!dossier.chequeFile"
                 >
                   <i class="material-icons">delete</i>
-                  Supprimer
+                  
                 </button>
               </div>
             </td>
