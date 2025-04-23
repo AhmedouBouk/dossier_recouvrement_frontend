@@ -165,4 +165,31 @@ hasDownloadCautionFilePermission(): boolean {
 hasUploadCautionFilePermission(): boolean {
   return this.authService.hasPermission('UPLOAD_CAUTION_FILE');
 }
+
+
+
+
+
+
+
+hasDeleteDossierRecouvrementPermission(): boolean {
+  return this.authService.hasPermission('DELETE_DOSSIERRECOUVREMENT');
+}
+
+hasUpdateDossierRecouvrementPermission(): boolean {
+  return this.authService.hasPermission('UPDATE_DOSSIERRECOUVREMENT');
+}
+
+hasDownloadMiseEnDemeurePermission(): boolean {
+  return this.authService.hasPermission('DOWNLOAD_MISE_EN_DEMEURE');
+}
+
+hasCommentairePermission(): boolean {
+  return this.authService.hasPermission('COMMENTAIRE_DOSSIER');
+}
+
+hasValidationPermission(): boolean {
+  return this.authService.hasPermission('VALIDATION_DOSSIER');
+}
+
 }
