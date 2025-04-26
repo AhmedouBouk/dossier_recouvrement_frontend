@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { RoleService } from '../../shared/services/role.service';
 
 interface RouteMap {
   [key: string]: string;
@@ -24,7 +25,7 @@ export class SidebarComponent {
 
   currentRoute: string = '';
 
-  constructor(private router: Router) {
+  constructor(private router: Router, public roleService: RoleService) {
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event) => {
