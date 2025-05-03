@@ -60,8 +60,8 @@ export class NavbarComponent implements OnInit {
     window.location.reload();
     sessionStorage.clear();
   
-  // Rediriger vers la page de connexion
-    this.router.navigate(['/auth/login']);
+  
+    this.router.navigate(['/']);
   }
   goBack(): void {
     this.location.back(); // Navigates to the previous page in the browser's history

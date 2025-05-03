@@ -1,0 +1,13 @@
+.admin-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+.admin-content {
+    padding-top: 64px; /* Height of the navbar */
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    box-sizing: border-box;
+}
