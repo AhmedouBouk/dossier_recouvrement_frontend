@@ -95,6 +95,7 @@
           <i class="material-icons">person_outline</i>
           <select id="userType" name="userType" [(ngModel)]="user.userType" (change)="onUserTypeChange()" required class="form-control" autocomplete="off">
             <option value="" disabled selected>Sélectionner un type</option>
+            <option value="Admin">Admin</option>
             <option value="Agence">Agence</option>
             <option value="Recouvrement">Recouvrement</option>
             <option value="Risque">Risque</option>

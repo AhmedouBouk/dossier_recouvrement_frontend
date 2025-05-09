@@ -50,7 +50,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let role of roles">
+            <tr *ngFor="let role of roles" [ngClass]="{'role-inactive': !role.active}">
               <td>{{ role.name }}</td>
               <td>
                 <div class="permission-chips">
@@ -64,7 +64,9 @@
               <td>
                 <div class="action-buttons">
                   <button class="edit-btn" (click)="openForm(role)">Modifier</button>
-                  <button class="delete-btn" (click)="deleteRole(role.id)">Supprimer</button>
+                  <button [ngClass]="role.active ? 'deactivate-btn' : 'activate-btn'" (click)="toggleRoleStatus(role.id)">
+                    {{ role.active ? 'Désactiver' : 'Activer' }}
+                  </button>
                 </div>
               </td>
             </tr>

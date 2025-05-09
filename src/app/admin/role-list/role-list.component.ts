@@ -140,12 +140,19 @@ export class RoleListComponent implements OnInit {
     }
   }
   
-  deleteRole(roleId: number) {
-    if (confirm('Are you sure you want to delete this role?')) {
-      this.adminService.deleteRole(roleId).subscribe(() => {
-        this.loadRoles();
-      });
-    }
+  toggleRoleStatus(roleId: number) {
+    // Suppression de la confirmation pour le moment
+    // if (confirm('Are you sure you want to toggle the status of this role?')) { 
+    this.adminService.toggleRoleStatus(roleId).subscribe({
+      next: () => {
+        this.loadRoles(); // Recharger les rôles pour refléter le changement de statut
+      },
+      error: (err) => {
+        console.error('Error toggling role status:', err);
+        alert('An error occurred while toggling the role status.');
+      }
+    });
+    // }
   }
 
   getPermissionNames(role: any): string {

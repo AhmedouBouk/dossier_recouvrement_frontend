@@ -44,9 +44,9 @@ export class AddUserComponent implements OnInit {
 
   loadRoles(): void {
     this.adminService.getAllRoles().subscribe(
-      (data) => {
-        this.roles = data;
-        console.log('Loaded roles:', this.roles);
+      (data: any[]) => { // Spécifier le type de data comme un tableau d'objets
+        this.roles = data.filter(role => role.active === true); // Filtrer les rôles actifs
+        console.log('Loaded active roles:', this.roles);
       },
       (error) => {
         console.error('Error loading roles:', error);
