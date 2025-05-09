@@ -37,7 +37,7 @@ export class AdminService {
       'Accept': 'application/json'
     });
     
-    return this.http.post<User>(`${this.apiUrl}/admin/add`, user, { headers })
+    return this.http.post<User>(`${this.apiUrl}/users`, user, { headers })
       .pipe(
         tap(response => console.log('Raw response from server:', response)),
         catchError(error => {
