@@ -1,5 +1,11 @@
 <main class="main-content">
   <div class="container">
+    <!-- Notification Message -->
+    <div *ngIf="successMessage" class="success-notification">
+      <i class="material-icons success-icon">check_circle</i>
+      {{ successMessage }}
+    </div>
+
     <!-- Search and Action Bar -->
     <div class="actions-bar">
       <div class="search-container">
@@ -47,7 +53,7 @@
             <th>Engagement Total</th>
             <th>Montant Principal</th>
             <th>Status</th>
-            <th>État de Validation</th>
+            <th ngif>État de Validation</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -61,36 +67,68 @@
               <span class="status-chip" [ngClass]="{'status-active': dossier.status === 'EN_COURS', 'status-closed': dossier.status === 'TERMINE', 'status-pending': dossier.status === 'SUSPENDU', 'status-cancelled': dossier.status === 'ANNULE'}">
                 {{ dossier.status }}
               </span>
-            
-              
-              
-        
             </td>
             <td>
-              <span class="status-chip" [ngClass]="{'status-initial': dossier.etatValidation === 'INITIALE', 'status-valid': dossier.etatValidation === 'VALIDE', 'status-invalid': dossier.etatValidation === 'NON_VALIDE'}">
-                {{ dossier.etatValidation }}
-              </span>
+              <div class="status-container">
+                <span 
+                  class="status-chip" 
+                  [ngClass]="{
+                    'status-initial': dossier.etatValidation === 'INITIALE', 
+                    'status-valid': dossier.etatValidation === 'VALIDE', 
+                    'status-invalid': dossier.etatValidation === 'NON_VALIDE',
+                    'clickable': dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()
+                  }"
+                  (click)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && openValidationMenu(dossier, $event)">
+                  
+                  {{ dossier.etatValidation }}
+                  
+                  <i *ngIf="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()" class="material-icons tiny-icon">
+                    arrow_drop_down
+                  </i>
+                </span>
+              
+                <!-- Menu de validation (visible uniquement si permission) -->
+                <div *ngIf="selectedDossierForValidation?.id === dossier.id && roleService.hasValidationPermission()" class="validation-menu horizontal-menu">
+                  <button class="validation-option accept" title="Accepter" (click)="validateDossier(dossier, 'VALIDE')">
+                    <i class="material-icons">check_circle</i>
+                  </button>
+                  <button class="validation-option reject" title="Refuser" (click)="validateDossier(dossier, 'NON_VALIDE')">
+                    <i class="material-icons">cancel</i>
+                  </button>
+                </div>
+              </div>
+              
             </td>
             <td>
               <div class="action-buttons">
+                <!-- Toujours visible -->
                 <button class="view-btn" (click)="navigateToDetails(dossier.id)">
                   <i class="material-icons">visibility</i>
-                  
                 </button>
-                <button class="edit-btn" (click)="navigateToEdit(dossier.id)">
+              
+                <!-- Modifier (besoin de UPDATE_DOSSIERRECOUVREMENT) -->
+                <button class="edit-btn" 
+                        *ngIf="roleService.hasUpdateDossierRecouvrementPermission()" 
+                        (click)="navigateToEdit(dossier.id)">
                   <i class="material-icons">edit</i>
-                  
                 </button>
-               
-                <button class="pdf-btn" (click)="telechargerMiseEnDemeure(dossier)">
+              
+                <!-- Télécharger mise en demeure (besoin de DOWNLOAD_MISE_EN_DEMEURE) -->
+                <button class="pdf-btn" 
+                        *ngIf="roleService.hasDownloadMiseEnDemeurePermission()" 
+                        (click)="telechargerMiseEnDemeure(dossier)">
                   <i class="material-icons">picture_as_pdf</i>
-                  
                 </button>
-                <button class="delete-btn" (click)="deleteDossier(dossier.id)">
+              
+                <!-- Supprimer (besoin de DELETE_DOSSIERRECOUVREMENT) -->
+                <button class="delete-btn" 
+                        *ngIf="roleService.hasDeleteDossierRecouvrementPermission()" 
+                        (click)="deleteDossier(dossier.id)">
                   <i class="material-icons">delete</i>
-                  
                 </button>
               </div>
+              
+              
             </td>
           </tr>
         </tbody>
