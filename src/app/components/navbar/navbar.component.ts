@@ -55,13 +55,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    window.location.reload();
-    sessionStorage.clear();
-  
-  // Rediriger vers la page de connexion
-    this.router.navigate(['/auth/login']);
+    this.authService.logout(); // Appeler la méthode logout du service
   }
   goBack(): void {
     this.location.back(); // Navigates to the previous page in the browser's history

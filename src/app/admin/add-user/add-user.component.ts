@@ -25,8 +25,10 @@ export class AddUserComponent implements OnInit {
   agences: Agence[] = [];
   isLoading = false;
   successMessage: string = '';  // Variable to hold the success message
+  errorMessage: string = ''; // Variable to hold the error message
   userDataService: any;
   showAgenceField: boolean = false;
+  readonly passwordPattern = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]{8,}$/;
 
   constructor(
     private adminService: AdminService,
@@ -42,9 +44,9 @@ export class AddUserComponent implements OnInit {
 
   loadRoles(): void {
     this.adminService.getAllRoles().subscribe(
-      (data) => {
-        this.roles = data;
-        console.log('Loaded roles:', this.roles);
+      (data: any[]) => { // Spécifier le type de data comme un tableau d'objets
+        this.roles = data.filter(role => role.active === true); // Filtrer les rôles actifs
+        console.log('Loaded active roles:', this.roles);
       },
       (error) => {
         console.error('Error loading roles:', error);
@@ -77,6 +79,8 @@ export class AddUserComponent implements OnInit {
 
   onSubmit(): void {
     this.isLoading = true;
+    this.successMessage = ''; // Reset success message
+    this.errorMessage = '';   // Reset error message
     
     // Créer l'objet utilisateur à envoyer
     const userData: any = {
@@ -115,36 +119,58 @@ export class AddUserComponent implements OnInit {
 
     console.log('Sending user data:', userData);
 
+    // Vérification front-end avant l'envoi
+    if (!this.user.name || !this.user.email || !this.user.password) {
+        this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
+        this.isLoading = false;
+        return;
+    }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.user.email)) {
+        this.errorMessage = "Veuillez saisir une adresse email valide.";
+        this.isLoading = false;
+        return;
+    }
+    if (!this.passwordPattern.test(this.user.password)) {
+        this.errorMessage = "Le mot de passe doit contenir au moins 8 caractères, un chiffre et un caractère spécial.";
+        this.isLoading = false;
+        return;
+    }
+
     this.adminService.addUser(userData).subscribe({
       next: (response) => {
         this.isLoading = false;
         console.log('User created successfully:', response);
-        this.successMessage = 'User added successfully!';
+        this.successMessage = 'Utilisateur ajouté avec succès!'; // Updated message in French
+        this.errorMessage = ''; // Clear any previous error message
         setTimeout(() => {
           this.router.navigate(['/admin/user-list']);  // Navigate back to the user list after 2 seconds
         }, 2000);
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Error adding user:', error);
-        
-        // Afficher des détails supplémentaires sur l'erreur
-        if (error.error) {
-          console.error('Error details:', error.error);
-          
-          // Si l'erreur contient un message spécifique du backend
-          if (typeof error.error === 'string') {
-            console.error('Backend error message:', error.error);
-          } else if (error.error.message) {
-            console.error('Backend error message:', error.error.message);
-          }
+        this.successMessage = ''; // Clear any previous success message
+
+        if (error.error && error.error.error) {
+          this.errorMessage = error.error.error; // Message d'erreur du backend
+          console.error('Backend error message:', this.errorMessage);
+        } else if (error.status === 0) { // Erreur de connexion / CORS / Serveur injoignable
+          this.errorMessage = "Impossible de contacter le serveur. Vérifiez votre connexion internet ou contactez l'administrateur.";
+          console.error('Network or CORS error:', error);
+        } else if (error.message) { // Autre erreur HTTP, e.g., HTML response instead of JSON
+          this.errorMessage = `Une erreur inattendue est survenue (status: ${error.status}). Veuillez réessayer ou contacter le support.`;
+          console.error('Unexpected error:', error.message);
+        } else {
+          this.errorMessage = 'Une erreur est survenue lors de l\'ajout de l\'utilisateur. Veuillez vérifier la console pour plus de détails.';
         }
         
-        // Vérifier si le statut est 400 (Bad Request)
+        // Afficher des détails supplémentaires sur l'erreur dans la console
+        if (error.error) {
+          console.error('Error details:', error.error);
+        }
+        
+        // Vérifier si le statut est 400 (Bad Request) pour le débogage
         if (error.status === 400) {
           console.error('Bad Request Error. Check if the role format is correct and all required fields are provided.');
-          
-          // Afficher les données qui ont été envoyées pour le débogage
           console.log('Data that was sent:', {
             name: this.user.name,
             email: this.user.email,
@@ -154,20 +180,6 @@ export class AddUserComponent implements OnInit {
             agenceId: this.user.agence ? parseInt(this.user.agence, 10) : undefined
           });
         }
-        
-        // Message d'erreur plus détaillé
-        let errorMessage = 'Error adding user. ';
-        if (error.error && typeof error.error === 'string') {
-          errorMessage += error.error;
-        } else if (error.error?.message) {
-          errorMessage += error.error.message;
-        } else if (error.message) {
-          errorMessage += error.message;
-        } else {
-          errorMessage += 'Please check console for details and try again.';
-        }
-        
-        alert(errorMessage);
       }
     });
   }

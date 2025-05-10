@@ -230,6 +230,35 @@ select.form-control {
   background-color: #15803d;
 }
 
+/* Error Validation Styles */
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper .material-icons {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+}
+
+.input-wrapper input.form-control {
+  padding-left: 40px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   header {

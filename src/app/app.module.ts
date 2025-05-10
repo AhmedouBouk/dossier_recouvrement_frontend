@@ -41,6 +41,9 @@ import { ChequeFileManagementComponent } from './pages/cheque-file-management/ch
 import { CreditsFileManagementComponent } from './pages/credits-file-management/credits-file-management.component';
 import { CautionsFileManagementComponent } from './pages/cautions-file-management/cautions-file-management.component';
 import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-management.component';
+import { AuthInterceptor } from './interceptors/AuthInterceptor';
+import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
 @NgModule({
   declarations: [
@@ -63,6 +66,8 @@ import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-ma
     CreditsFileManagementComponent,
     CautionsFileManagementComponent,
     LcFileManagementComponent,
+    AuthLayoutComponent,
+    MainLayoutComponent,
     
 
   ],
@@ -97,6 +102,11 @@ import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-ma
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptorService,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
       multi: true
     }
   ],

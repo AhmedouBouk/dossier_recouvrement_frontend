@@ -287,6 +287,66 @@ tbody tr:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles pour les rôles inactifs */
+tr.role-inactive td {
+  opacity: 0.6; /* Réduire l'opacité pour indiquer l'inactivité */
+  background-color: #f9f9f9; /* Un fond légèrement différent */
+}
+
+tr.role-inactive td:not(:last-child) { /* Ne pas barrer les boutons d'action */
+  text-decoration: line-through; /* Barrer le texte */
+}
+
+/* Styles pour les boutons d'activation/désactivation */
+.action-buttons .activate-btn,
+.action-buttons .deactivate-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-width: 90px; /* Pour que la largeur soit cohérente */
+  text-align: center;
+  margin-left: 5px; /* Ajouter un peu d'espace si les boutons sont proches */
+}
+
+.action-buttons .activate-btn {
+  background-color: #28a745; /* Vert pour activer */
+  color: white;
+}
+
+.action-buttons .activate-btn:hover {
+  background-color: #218838;
+}
+
+.action-buttons .deactivate-btn {
+  background-color: #dc3545; /* Rouge pour désactiver */
+  color: white;
+}
+
+.action-buttons .deactivate-btn:hover {
+  background-color: #c82333;
+}
+
+/* Ajustement pour le bouton edit-btn pour uniformité */
+.action-buttons .edit-btn {
+  background-color: #ffc107; /* Jaune pour éditer */
+  color: #212529;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-width: 90px;
+  text-align: center;
+}
+
+.action-buttons .edit-btn:hover {
+  background-color: #e0a800;
+}
+
 /* Role Chips */
 .role-chip {
   display: inline-block;
