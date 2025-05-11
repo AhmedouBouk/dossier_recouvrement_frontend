@@ -1,7 +1,17 @@
 <div class="main-content">
   <div class="container">
-    <!-- Barre de recherche et actions -->
-    <div class="actions-bar"></div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="material-icons">error</i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Message de succès -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="material-icons">check_circle</i>
+      {{ successMessage }}
+    </div>
 
     <!-- Indicateur de chargement -->
     <div *ngIf="isLoading" class="loading-state">
@@ -16,8 +26,7 @@
           <tr>
             <th>ID Dossier</th>
             <th>N° Compte</th>
-            <th>>Fichier de la Garantie</th>
-
+            <th>Fichier de la Garantie</th>
             <th>Titre de la Garantie</th>
             <th>Date de Création</th>
             <th>Actions</th>
@@ -27,6 +36,8 @@
           <tr *ngFor="let dossier of dossiers">
             <td>{{ dossier.id }}</td>
             <td>{{ dossier.compte.nomCompte }}</td>
+
+            <!-- Fichier de la garantie -->
             <td>
               <span *ngIf="dossier.garantiesFile; else noFile">
                 {{ getFileNameFromUrl(dossier.garantiesFile) }}
@@ -35,78 +46,84 @@
                 <span class="no-file">Aucun fichier</span>
               </ng-template>
             </td>
+
+            <!-- Titre de la garantie -->
             <td>
-              <!-- Mode édition -->
-              <ng-container *ngIf="editingGarantie && editingGarantie.id === dossier.id; else viewMode">
-                <input [(ngModel)]="editingGarantie.garantiesTitre" class="edit-input" />
-              
+              <ng-container *ngIf="editingGarantie && editingGarantie.id === dossier.id && dossier.status !== 'Clôturé'; else viewMode">
+                <input
+                  [(ngModel)]="editingGarantie.garantiesTitre"
+                  class="edit-input"
+                  placeholder="Titre de la garantie"
+                />
                 <button class="save-btn" (click)="updateGarantie(dossier)">
-                  <i class="material-icons">save</i>
-                  Sauvegarder
+                  <i class="material-icons">save</i> Sauvegarder
                 </button>
                 <button class="cancel-btn" (click)="cancelEdit()">
-                  <i class="material-icons">close</i>
-                  Annuler
+                  <i class="material-icons">close</i> Annuler
                 </button>
               </ng-container>
-            
-              <!-- Mode affichage -->
+
               <ng-template #viewMode>
-                <span (click)="startEdit(dossier)" class="editable-text">
+                <span
+                  class="editable-text"
+                  (click)="dossier.status !== 'Clôturé' && startEdit(dossier)">
                   {{ dossier.garantiesTitre || 'Aucun titre' }}
                 </span>
               </ng-template>
             </td>
+
+            <!-- Date -->
             <td>{{ dossier.dateCreation }}</td>
+
+            <!-- Actions -->
             <td>
               <div class="action-buttons">
-                <!-- Bouton pour sélectionner un fichier -->
-                <input
-                  type="file"
-                  (change)="onFileUpload($event, dossier)"
-                  accept=".pdf"
-                  hidden
-                  id="file-upload-{{ dossier.id }}"
-                />
-                <label for="file-upload-{{ dossier.id }}" class="upload-btn">
-                  <i class="material-icons">file_upload</i>
-                  
-                </label>
+                <!-- Input de sélection de fichier (invisible) -->
+                <!-- Input fichier invisible -->
+<input
+  type="file"
+  (change)="onFileUpload($event, dossier)"
+accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+  hidden
+  id="file-upload-{{ dossier.id }}"
+/>
 
-                <!-- Bouton pour uploader un fichier -->
-                <button class="add-btn" (click)="uploadGarantie(dossier)">
-                  <i class="material-icons">cloud_upload</i>
-                  
-                </button>
+<!-- Bouton CHOISIR ET UPLOADER automatiquement -->
+<label
+  *ngIf="dossier.status !== 'Clôturé'"
+  for="file-upload-{{ dossier.id }}"
+  class="upload-btn"
+>
+  <i class="material-icons">file_upload</i>
+</label>
 
-                <!-- Bouton pour visualiser un fichier -->
+
+                <!-- Visualiser fichier -->
                 <button
                   class="view-btn"
                   (click)="viewGarantieFile(dossier, false)"
                   [disabled]="!dossier.garantiesFile"
                 >
                   <i class="material-icons">visibility</i>
-                  
                 </button>
 
-                <!-- Bouton pour télécharger un fichier -->
+                <!-- Télécharger fichier -->
                 <button
                   class="download-btn"
                   (click)="viewGarantieFile(dossier, true)"
                   [disabled]="!dossier.garantiesFile"
                 >
                   <i class="material-icons">download</i>
-                  
                 </button>
 
-                <!-- Bouton pour supprimer un fichier -->
+                <!-- Supprimer fichier -->
                 <button
+                  *ngIf="dossier.status !== 'Clôturé'"
                   class="delete-btn"
                   (click)="deleteGarantieFile(dossier)"
                   [disabled]="!dossier.garantiesFile"
                 >
                   <i class="material-icons">delete</i>
-                  
                 </button>
               </div>
             </td>
@@ -115,18 +132,7 @@
       </table>
     </div>
 
-    <!-- Messages d'erreur ou de succès -->
-    <div *ngIf="errorMessage" class="error-message">
-      <i class="material-icons">error</i>
-      {{ errorMessage }}
-    </div>
-
-    <div *ngIf="successMessage" class="no-dossiers-message">
-      <i class="material-icons">check_circle</i>
-      <p>{{ successMessage }}</p>
-    </div>
-
-    <!-- Message si aucun dossier n'est trouvé -->
+    <!-- Aucun dossier trouvé -->
     <div *ngIf="!isLoading && dossiers.length === 0" class="no-dossiers-message">
       <i class="material-icons">folder_off</i>
       <p>Aucun dossier trouvé</p>

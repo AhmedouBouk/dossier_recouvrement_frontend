@@ -108,10 +108,11 @@
               
                 <!-- Modifier (besoin de UPDATE_DOSSIERRECOUVREMENT) -->
                 <button class="edit-btn" 
-                        *ngIf="roleService.hasUpdateDossierRecouvrementPermission()" 
-                        (click)="navigateToEdit(dossier.id)">
-                  <i class="material-icons">edit</i>
-                </button>
+        *ngIf="roleService.hasUpdateDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
+        (click)="navigateToEdit(dossier.id)">
+  <i class="material-icons">edit</i>
+</button>
+
               
                 <!-- Télécharger mise en demeure (besoin de DOWNLOAD_MISE_EN_DEMEURE) -->
                 <button class="pdf-btn" 
@@ -122,7 +123,7 @@
               
                 <!-- Supprimer (besoin de DELETE_DOSSIERRECOUVREMENT) -->
                 <button class="delete-btn" 
-                        *ngIf="roleService.hasDeleteDossierRecouvrementPermission()" 
+                        *ngIf="roleService.hasDeleteDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
                         (click)="deleteDossier(dossier.id)">
                   <i class="material-icons">delete</i>
                 </button>

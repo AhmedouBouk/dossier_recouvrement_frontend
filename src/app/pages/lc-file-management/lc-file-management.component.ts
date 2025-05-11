@@ -46,13 +46,14 @@ export class LcFileManagementComponent implements OnInit {
     });
   }
 
-  // Gérer la sélection d'un fichier LC
-  onLcFileSelected(event: any, dossier: DossierRecouvrement): void {
-    const file = event.target.files[0];
-    if (file) {
-      dossier.selectedLcFile = file; // Stocker le fichier sélectionné
-    }
-  }
+  
+onLcFileSelectedAndUpload(event: any, dossier: any): void {
+  const file: File = event.target.files[0];
+  if (!file) return;
+
+  dossier.selectedLcFile = file; // stocker temporairement
+  this.uploadLcFile(dossier);   // lancer immédiatement l'upload
+}
 
   // Uploader un fichier LC
   uploadLcFile(dossier: DossierRecouvrement): void {

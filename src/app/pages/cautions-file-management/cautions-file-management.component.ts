@@ -46,13 +46,14 @@ export class CautionsFileManagementComponent implements OnInit {
     });
   }
 
-  // Gérer la sélection d'un fichier de caution
-  onCautionsFileSelected(event: any, dossier: DossierRecouvrement): void {
-    const file = event.target.files[0];
-    if (file) {
-      dossier.selectedCautionsFile = file; // Stocker le fichier sélectionné
-    }
-  }
+  onCautionsFileSelectedAndUpload(event: any, dossier: any): void {
+  const file: File = event.target.files[0];
+  if (!file) return;
+
+  dossier.selectedCautionsFile = file;
+  this.uploadCautionsFile(dossier); // Appel auto après sélection
+}
+
 
   // Uploader un fichier de caution
   uploadCautionsFile(dossier: DossierRecouvrement): void {

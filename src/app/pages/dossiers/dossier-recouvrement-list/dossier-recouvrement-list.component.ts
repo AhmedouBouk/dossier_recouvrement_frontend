@@ -24,6 +24,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   selectedDossierForValidation: DossierRecouvrement | null = null;
   successMessage: string | null = null;
 
+
   dossiers: DossierRecouvrement[] = [];
   searchTerm: string = '';
   private searchSubject = new Subject<string>();
@@ -39,6 +40,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
     public roleService: RoleService,
     private router: Router,
     private authService: AuthService
+    
   ) {
     this.searchSubject.pipe(
       takeUntil(this.destroy$),
