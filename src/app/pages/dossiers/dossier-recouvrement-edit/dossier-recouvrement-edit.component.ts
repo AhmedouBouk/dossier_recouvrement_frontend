@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { RoleService } from 'src/app/shared/services/role.service';
-import { DossierRecouvrement, DossierStatus, EtatValidation } from 'src/app/shared/models/dossier-recouvrement.model';
+import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossier-recouvrement.model';
 
 @Component({
   selector: 'app-dossier-recouvrement-edit',
@@ -32,7 +32,7 @@ export class DossierRecouvrementEditComponent implements OnInit {
       referencesLC: '',
       provision: 0,
       garantiesValeur: 0,
-      status: DossierStatus.EN_COURS,
+      status: '',
       etatValidation: EtatValidation.INITIALE,
       interetsReserves: 0,
       garantiesTitre: '',

@@ -47,59 +47,52 @@
                 </ng-template>
               </td>
               <td>{{ dossier.dateCreation }}</td>
-              <td>
-                <div class="action-buttons">
-                  <input *ngIf="roleService.hasCreateCautionPermission()"
-                    type="file"
-                    (change)="onCautionsFileSelected($event, dossier)"
-                    accept=".pdf"
-                    hidden
-                    id="cautions-file-upload-{{ dossier.id }}"
-                  />
-                  <label
-                    for="cautions-file-upload-{{ dossier.id }}"
-                    class="upload-btn"
-                  >
-                    <i class="material-icons">file_upload</i>
-                    
-                  </label>
-  
-                  <button *ngIf="roleService.hasCreateCautionPermission()"
-                    class="add-btn"
-                    (click)="uploadCautionsFile(dossier)"
-                    [disabled]="!dossier.selectedCautionsFile"
-                  >
-                    <i class="material-icons">cloud_upload</i>
-                    
-                  </button>
-  
-                  <!-- Visualiser un fichier -->
-                  <button *ngIf="dossier.cautionsFile"
-                    class="view-btn"
-                    (click)="viewCautionsFile(dossier)"
-                  >
-                    <i class="material-icons">visibility</i>
-                    
-                  </button>
-  <!-- Ajouter après le bouton "Voir" -->
-<button *ngIf="dossier.cautionsFile"
-class="download-btn"
-(click)="viewCautionsFile(dossier, true)"
->
-<i class="material-icons">download</i>
+             <td>
+  <div class="action-buttons">
+    <!-- Input fichier (sélection + upload auto) -->
+    <input *ngIf="roleService.hasCreateCautionPermission() && dossier.status !== 'Clôturé'"
+      type="file"
+      (change)="onCautionsFileSelectedAndUpload($event, dossier)"
+      accept=".pdf"
+      hidden
+      id="cautions-file-upload-{{ dossier.id }}"
+    />
 
-</button>
-                  <!-- Supprimer un fichier -->
-                  <button *ngIf="roleService.hasDeleteCautionPermission()"
-                    class="delete-btn"
-                    (click)="deleteCautionsFile(dossier)"
-                    [disabled]="!dossier.cautionsFile"
-                  >
-                    <i class="material-icons">delete</i>
-                    
-                  </button>
-                </div>
-              </td>
+    <!-- Bouton unique : choisir + uploader -->
+    <label *ngIf="roleService.hasCreateCautionPermission() && dossier.status !== 'Clôturé'"
+      for="cautions-file-upload-{{ dossier.id }}"
+      class="upload-btn"
+    >
+      <i class="material-icons">file_upload</i>
+    </label>
+
+    <!-- Visualiser -->
+    <button *ngIf="dossier.cautionsFile"
+      class="view-btn"
+      (click)="viewCautionsFile(dossier)"
+    >
+      <i class="material-icons">visibility</i>
+    </button>
+
+    <!-- Télécharger -->
+    <button *ngIf="dossier.cautionsFile"
+      class="download-btn"
+      (click)="viewCautionsFile(dossier, true)"
+    >
+      <i class="material-icons">download</i>
+    </button>
+
+    <!-- Supprimer -->
+    <button *ngIf="roleService.hasDeleteCautionPermission() && dossier.status !== 'Clôturé'"
+      class="delete-btn"
+      (click)="deleteCautionsFile(dossier)"
+      [disabled]="!dossier.cautionsFile"
+    >
+      <i class="material-icons">delete</i>
+    </button>
+  </div>
+</td>
+
             </tr>
           </tbody>
         </table>

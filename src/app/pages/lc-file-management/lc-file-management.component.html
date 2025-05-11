@@ -47,63 +47,56 @@
               </ng-template>
             </td>
             <td>{{ dossier.dateCreation }}</td>
-            <td>
-              <div class="action-buttons">
-                <input
-                  type="file"
-                  (change)="onLcFileSelected($event, dossier)"
-                  accept=".pdf"
-                  hidden
-                  id="lc-file-upload-{{ dossier.id }}"
-                />
-                <label
-                  for="lc-file-upload-{{ dossier.id }}"
-                  class="upload-btn"
-                >
-                  <i class="material-icons">file_upload</i>
-                  
-                </label>
+           <td>
+  <div class="action-buttons">
+    <!-- Input invisible -->
+    <input 
+      type="file"
+      (change)="onLcFileSelectedAndUpload($event, dossier)" 
+      accept=".pdf"
+      hidden
+      id="lc-file-upload-{{ dossier.id }}"
+    />
 
-                <button
-                  class="add-btn"
-                  (click)="uploadLcFile(dossier)"
-                  [disabled]="!dossier.selectedLcFile"
-                >
-                  <i class="material-icons">cloud_upload</i>
-                 
-                </button>
+    <!-- Bouton CHOISIR & UPLOADER AUTOMATIQUEMENT -->
+    <label 
+      *ngIf="dossier.status !== 'Clôturé'" 
+      for="lc-file-upload-{{ dossier.id }}" 
+      class="upload-btn"
+    >
+      <i class="material-icons">file_upload</i>
+    </label>
 
-                <!-- Visualiser un fichier -->
-                <button
-                  class="view-btn"
-                  (click)="viewLcFile(dossier)"
-                  [disabled]="!dossier.lcFile"
-                >
-                  <i class="material-icons">visibility</i>
-                 
-                </button>
-                
-                <!-- Bouton de téléchargement -->
-                <button
-                  class="download-btn"
-                  (click)="viewLcFile(dossier, true)"
-                  [disabled]="!dossier.lcFile"
-                >
-                  <i class="material-icons">download</i>
-                  
-                </button>
+    <!-- Bouton Visualiser -->
+    <button
+      class="view-btn"
+      (click)="viewLcFile(dossier)"
+      [disabled]="!dossier.lcFile"
+    >
+      <i class="material-icons">visibility</i>
+    </button>
 
-                <!-- Supprimer un fichier -->
-                <button
-                  class="delete-btn"
-                  (click)="deleteLcFile(dossier)"
-                  [disabled]="!dossier.lcFile"
-                >
-                  <i class="material-icons">delete</i>
-                 
-                </button>
-              </div>
-            </td>
+    <!-- Bouton Télécharger -->
+    <button 
+      class="download-btn"
+      (click)="viewLcFile(dossier, true)"
+      [disabled]="!dossier.lcFile"
+    >
+      <i class="material-icons">download</i>
+    </button>
+
+    <!-- Bouton Supprimer -->
+    <button 
+      *ngIf="dossier.status !== 'Clôturé'" 
+      class="delete-btn"
+      (click)="deleteLcFile(dossier)"
+      [disabled]="!dossier.lcFile"
+    >
+      <i class="material-icons">delete</i>
+    </button>
+  </div>
+</td>
+
           </tr>
         </tbody>
       </table>

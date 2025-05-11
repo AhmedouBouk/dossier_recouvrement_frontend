@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RoleService } from '../../../shared/services/role.service';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
-import { DossierRecouvrement, DossierStatus, EtatValidation } from 'src/app/shared/models/dossier-recouvrement.model';
+import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossier-recouvrement.model';
 
 @Component({
   selector: 'app-dossier-recouvrement-add',
@@ -39,9 +39,9 @@ export class DossierRecouvrementAddComponent implements OnInit {
     lcFile: '',
     chequeFile: '',
     
-    status: DossierStatus.EN_COURS,
+    status: '',
     etatValidation: EtatValidation.INITIALE,
-    dateCreation: new Date() // Initialisé avec la date actuelle
+    dateCreation: new Date() 
 
   };
 

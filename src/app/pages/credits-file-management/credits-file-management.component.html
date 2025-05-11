@@ -47,62 +47,56 @@
                 </ng-template>
               </td>
               <td>{{ dossier.dateCreation }}</td>
-              <td>
-                <div class="action-buttons">
-                  <input
-                    type="file"
-                    (change)="onFileSelected($event, dossier)"
-                    accept=".pdf"
-                    hidden
-                    id="file-upload-{{ dossier.id }}"
-                  />
-                  <label
-                    for="file-upload-{{ dossier.id }}"
-                    class="upload-btn"
-                  >
-                    <i class="material-icons">file_upload</i>
-                    
-                  </label>
-  
-                  <button
-                    class="add-btn"
-                    (click)="uploadCreditsFile(dossier)"
-                    [disabled]="!dossier.selectedCreditsFile"
-                  >
-                    <i class="material-icons">cloud_upload</i>
-                    
-                  </button>
-  
-                  <!-- Visualiser un fichier -->
-                  <button
-                    class="view-btn"
-                    (click)="viewCreditsFile(dossier)"
-                    [disabled]="!dossier.creditsFile"
-                  >
-                    <i class="material-icons">visibility</i>
-                    
-                  </button>
-  <!-- Bouton de téléchargement -->
-<button
-class="download-btn"
-(click)="viewCreditsFile(dossier, true)"
-[disabled]="!dossier.creditsFile"
->
-<i class="material-icons">download</i>
+           <td>
+  <div class="action-buttons">
 
-</button>
-                  <!-- Supprimer un fichier -->
-                  <button
-                    class="delete-btn"
-                    (click)="deleteCreditsFile(dossier)"
-                    [disabled]="!dossier.creditsFile"
-                    
-                  >
-                    <i class="material-icons">delete</i>
-                    
-                  </button>
-                </div>
-              </td>
+    <!-- Input invisible -->
+    <input
+      type="file"
+      (change)="onFileSelectedAndUpload($event, dossier)"
+      accept=".pdf"
+      hidden
+      id="file-upload-{{ dossier.id }}"
+    />
+
+    <!-- Bouton CHOISIR & UPLOADER automatiquement -->
+    <label *ngIf="dossier.status !== 'Clôturé'" 
+      for="file-upload-{{ dossier.id }}"
+      class="upload-btn"
+    >
+      <i class="material-icons">file_upload</i>
+    </label>
+
+    <!-- Visualiser un fichier -->
+    <button
+      class="view-btn"
+      (click)="viewCreditsFile(dossier)"
+      [disabled]="!dossier.creditsFile"
+    >
+      <i class="material-icons">visibility</i>
+    </button>
+
+    <!-- Télécharger -->
+    <button
+      class="download-btn"
+      (click)="viewCreditsFile(dossier, true)"
+      [disabled]="!dossier.creditsFile"
+    >
+      <i class="material-icons">download</i>
+    </button>
+
+    <!-- Supprimer -->
+    <button *ngIf="dossier.status !== 'Clôturé'" 
+      class="delete-btn"
+      (click)="deleteCreditsFile(dossier)"
+      [disabled]="!dossier.creditsFile"
+    >
+      <i class="material-icons">delete</i>
+    </button>
+
+  </div>
+</td>
+
             </tr>
           </tbody>
         </table>
