@@ -162,13 +162,18 @@
 .search-section {
   padding: 24px;
   border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .search-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+  flex: 1;
 }
 
 .input-with-icon {
@@ -364,6 +369,25 @@ tbody tr:hover {
   color: #dc2626;
 }
 
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+  font-size: 16px;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  margin: 30px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alert .material-icons {
+  margin-right: 15px;
+  font-size: 24px;
+  color: #e6a210;
+}
+
 /* Edit Mode Styles */
 .edit-field {
   display: flex;
@@ -400,6 +424,31 @@ tbody tr:hover {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Alert Message Styles */
+.alert-message {
+  vertical-align: middle;
+  flex-grow: 1;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.alert-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Responsive Design */
@@ -483,4 +532,35 @@ tbody tr:hover {
     transition: none !important;
     animation: none !important;
   }
+}
+
+.wide-field {
+  width: 100%;
+}
+
+.action-buttons-container {
+  display: flex;
+  gap: 12px;
+  margin-left: 16px;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
