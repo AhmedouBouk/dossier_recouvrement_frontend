@@ -73,59 +73,58 @@
   <div class="card-container">
     <div class="search-section">
       <div class="search-grid">
-        <div class="search-field">
+        <div class="search-field wide-field">
           <div class="input-with-icon">
-            <i class="material-icons">person</i>
+            <i class="material-icons">search</i>
             <input 
-              [(ngModel)]="searchNom" 
-              placeholder="Nom"
-              [disabled]="isLoading">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">person_outline</i>
-            <input 
-              [(ngModel)]="searchPrenom" 
-              placeholder="Prénom"
-              [disabled]="isLoading">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">badge</i>
-            <input 
-              [(ngModel)]="searchNNI" 
-              type="number" 
-              placeholder="NNI"
+              [(ngModel)]="globalSearch" 
+              placeholder="Recherche globale (Nom, Prénom, NNI)"
               [disabled]="isLoading">
           </div>
         </div>
       </div>
-      <button 
-        (click)="searchClients()" 
-        class="search-btn"
-        [disabled]="isLoading">
-        <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'search' }}</i>
-        {{ isLoading ? 'Recherche...' : 'Rechercher' }}
+      <div class="action-buttons-container">
+        <button 
+          (click)="searchClients()" 
+          class="search-btn"
+          [disabled]="isLoading">
+          <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'search' }}</i>
+          {{ isLoading ? 'Recherche...' : 'Rechercher' }}
+        </button>
+        <button 
+          (click)="loadClients()" 
+          class="refresh-btn"
+          [disabled]="isLoading">
+          <i class="material-icons">refresh</i>
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
+      <i class="material-icons">info</i>
+      <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
+      <button class="alert-close" (click)="showNoResultsMessage = false">
+        <i class="material-icons">close</i>
       </button>
     </div>
 
-    <!-- Clients Table -->
-    <div class="table-container">
+    <!-- Clients Table - only show when there are results -->
+    <div class="table-container" *ngIf="clients && clients.length > 0">
       <table>
         <thead>
           <tr>
             <th>NNI</th>
             <th>NIF</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Date de Naissance</th>
-            <th>Adresse</th>
-            <th>Secteur d'Activité</th>
-            <th>Genre</th>
-            <th>Salaire</th>
-            <th *ngIf="roleService.hasUpdateClientPermission() || roleService.hasDeleteClientPermission()">Actions</th>
+            <th>NOM</th>
+            <th>PRÉNOM</th>
+            <th>DATE DE NAISSANCE</th>
+            <th>ADRESSE</th>
+            <th>SECTEUR D'ACTIVITÉ</th>
+            <th>GENRE</th>
+            <th>SALAIRE</th>
+            <th *ngIf="roleService.hasUpdateClientPermission() || roleService.hasDeleteClientPermission()">ACTIONS</th>
           </tr>
         </thead>
         <tbody>

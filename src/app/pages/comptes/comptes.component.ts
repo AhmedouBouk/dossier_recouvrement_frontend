@@ -19,8 +19,10 @@ export class ComptesComponent implements OnInit {
   searchNom: string = '';
   searchPrenom: string = '';
   searchNNI: number | null = null;
+  globalSearch: string = '';
+  showNoResultsMessage: boolean = false;
   selectedFile: File | null = null;
-  importMessage: { type: 'success' | 'error', text: string } | null = null;
+  importMessage: { type: 'success' | 'error' | 'warning', text: string } | null = null;
   editingCompte: any = null;
 
   constructor(private compteService: CompteService,
@@ -32,9 +34,18 @@ export class ComptesComponent implements OnInit {
   }
 
   loadComptes() {
+    this.showNoResultsMessage = false;
+    this.globalSearch = '';
+    
     this.compteService.getAllComptes().subscribe({
       next: (data) => {
         this.comptes = data;
+        if (data.length === 0) {
+          this.importMessage = {
+            type: 'warning',
+            text: 'Aucun compte trouvé dans la base de données.'
+          };
+        }
       },
       error: (error) => {
         this.importMessage = {
@@ -44,23 +55,37 @@ export class ComptesComponent implements OnInit {
       }
     });
   }
-  getAlertIcon(type: 'success' | 'error'): string {
-    const iconMap: Record<'success' | 'error', string> = {
+  getAlertIcon(type: 'success' | 'error' | 'warning'): string {
+    const iconMap: Record<'success' | 'error' | 'warning', string> = {
       'success': 'check_circle',
-      'error': 'error'
+      'error': 'error',
+      'warning': 'warning'
     };
     return iconMap[type];
   }
 
   searchComptes() {
+    if (!this.globalSearch) {
+      this.importMessage = {
+        type: 'error',
+        text: 'Veuillez saisir un terme de recherche.'
+      };
+      return;
+    }
+
+    this.showNoResultsMessage = false;
     this.compteService.searchComptes(
-      this.searchNomCompte, 
-      this.searchNom, 
-      this.searchPrenom, 
-      this.searchNNI || undefined
+      '',
+      '',
+      '',
+      undefined,
+      this.globalSearch
     ).subscribe({
       next: (data) => {
         this.comptes = data;
+        if (data.length === 0) {
+          this.showNoResultsMessage = true;
+        }
       },
       error: (error) => {
         this.importMessage = {

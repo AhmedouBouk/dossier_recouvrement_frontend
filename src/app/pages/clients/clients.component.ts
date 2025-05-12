@@ -18,6 +18,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   searchNom: string = '';
   searchPrenom: string = '';
   searchNNI: number | null = null;
+  globalSearch: string = '';
+  showNoResultsMessage: boolean = false;
   importMessage: { type: 'success' | 'error' | 'warning', text: string } | null = null;
   editingClient: any = null;
   isLoading = false;
@@ -173,6 +175,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   loadClients() {
     this.isLoading = true;
     this.startLoadingTimeout();
+    this.showNoResultsMessage = false;
+    this.globalSearch = '';
 
     this.clientService.getAllClients().subscribe({
       next: (data) => {
@@ -192,23 +196,25 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   searchClients() {
-    if (!this.searchNom && !this.searchPrenom && !this.searchNNI) {
-      this.showMessage('warning', 'Veuillez saisir au moins un critère de recherche.');
+    if (!this.globalSearch) {
+      this.showMessage('warning', 'Veuillez saisir un terme de recherche.');
       return;
     }
 
     this.isLoading = true;
     this.startLoadingTimeout();
+    this.showNoResultsMessage = false;
 
     this.clientService.searchClients(
-      this.searchNom, 
-      this.searchPrenom, 
-      this.searchNNI || undefined
+      '', 
+      '', 
+      undefined,
+      this.globalSearch
     ).subscribe({
       next: (data) => {
         this.clients = data;
         if (data.length === 0) {
-          this.showMessage('warning', 'Aucun client ne correspond à vos critères de recherche.');
+          this.showNoResultsMessage = true;
         }
       },
       error: (error) => {

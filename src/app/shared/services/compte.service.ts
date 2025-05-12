@@ -18,12 +18,13 @@ export class CompteService {
     );
   }
 
-  searchComptes(nomCompte?: string, nom?: string, prenom?: string, nni?: number): Observable<any[]> {
+  searchComptes(nomCompte?: string, nom?: string, prenom?: string, nni?: number, globalSearch?: string): Observable<any[]> {
     let params = new HttpParams();
     if (nomCompte) params = params.set('nomCompte', nomCompte);
     if (nom) params = params.set('nom', nom);
     if (prenom) params = params.set('prenom', prenom);
     if (nni) params = params.set('nni', nni.toString());
+    if (globalSearch) params = params.set('globalSearch', globalSearch);
     
     return this.http.get<any[]>(`${this.apiUrl}/recherche`, { params }).pipe(
       catchError(this.handleError)

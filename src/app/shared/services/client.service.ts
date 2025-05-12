@@ -23,11 +23,12 @@ export class ClientService {
     return this.http.get<any[]>(`${this.apiUrl}/Affichage`);
   }
 
-  searchClients(nom?: string, prenom?: string, nni?: number): Observable<any[]> {
+  searchClients(nom?: string, prenom?: string, nni?: number, globalSearch?: string): Observable<any[]> {
     let params = new HttpParams();
     if (nom) params = params.set('nom', nom);
     if (prenom) params = params.set('prenom', prenom);
     if (nni) params = params.set('nni', nni);
+    if (globalSearch) params = params.set('globalSearch', globalSearch);
     return this.http.get<any[]>(`${this.apiUrl}/recherche`, { params });
   }
 

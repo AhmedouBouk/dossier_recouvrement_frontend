@@ -43,51 +43,47 @@
   <div class="card-container">
     <div class="search-section">
       <div class="search-grid">
-        <div class="search-field">
+        <div class="search-field wide-field">
           <div class="input-with-icon">
-            <i class="material-icons">account_balance_wallet</i>
-            <input [(ngModel)]="searchNomCompte" placeholder="Numéro de compte">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">person</i>
-            <input [(ngModel)]="searchNom" placeholder="Nom client">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">person_outline</i>
-            <input [(ngModel)]="searchPrenom" placeholder="Prénom client">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">badge</i>
-            <input [(ngModel)]="searchNNI" type="number" placeholder="NNI client">
+            <i class="material-icons">search</i>
+            <input [(ngModel)]="globalSearch" placeholder="Recherche globale (Numéro compte, Nom client, NNI)">
           </div>
         </div>
       </div>
-      <button (click)="searchComptes()" class="search-btn">
-        <i class="material-icons">search</i>
-        Rechercher
+      <div class="action-buttons-container">
+        <button (click)="searchComptes()" class="search-btn">
+          <i class="material-icons">search</i>
+          Rechercher
+        </button>
+        <button (click)="loadComptes()" class="refresh-btn">
+          <i class="material-icons">refresh</i>
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
+      <i class="material-icons">info</i>
+      <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
+      <button class="alert-close" (click)="showNoResultsMessage = false">
+        <i class="material-icons">close</i>
       </button>
     </div>
 
-    <!-- Accounts Table -->
-    <div class="table-container">
+    <!-- Accounts Table - only show when there are results -->
+    <div class="table-container" *ngIf="comptes && comptes.length > 0">
       <table>
         <thead>
           <tr>
-            <th>N° Compte</th>
-            <th>Client</th>
-            <th>Catégorie</th>
-            <th> libellé Catégorie</th>
-
-            <th>Solde</th>
-            <th>État</th>
-            <th>Date d'ouverture</th>
-            <th *ngIf="roleService.hasUpdateComptePermission() || roleService.hasDeleteComptePermission()">Actions</th>
+            <th>N° COMPTE</th>
+            <th>CLIENT</th>
+            <th>CATÉGORIE</th>
+            <th>LIBELLÉ CATÉGORIE</th>
+            <th>SOLDE</th>
+            <th>ÉTAT</th>
+            <th>DATE D'OUVERTURE</th>
+            <th *ngIf="roleService.hasUpdateComptePermission() || roleService.hasDeleteComptePermission()">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
