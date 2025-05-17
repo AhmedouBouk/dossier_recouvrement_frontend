@@ -1,114 +1,71 @@
 <div class="container">
   <!-- Loading Overlay -->
-  <div class="loading-overlay" *ngIf="isLoading">
-    <div class="loading-content">
-      <div class="spinner"></div>
-      <p class="loading-text">Traitement en cours...</p>
-      <p class="loading-duration" *ngIf="loadingDuration">
-        Temps écoulé: {{ loadingDuration }}
-      </p>
-      <div class="reload-option" *ngIf="showReloadOption">
-        <p>Le chargement semble prendre plus de temps que prévu.</p>
-        <div class="reload-actions">
-          <button class="reload-btn" (click)="reloadPage()">
-            <i class="material-icons">refresh</i>
-            Recharger la page
-          </button>
-          <button class="wait-btn" (click)="showReloadOption = false">
-            <i class="material-icons">timer</i>
-            Continuer d'attendre
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+ 
 
-  <!-- Import Section -->
-  <div *ngIf="roleService.hasImportClientPermission()" class="card-container">
-    <div class="import-section">
-      <div class="section-header">
-        <h3>
-          <i class="material-icons">upload_file</i>
-          Importer des clients
-        </h3>
-        <div class="import-actions">
-          <div class="file-input-wrapper">
-            <input 
-              type="file" 
-              id="file-input"
-              (change)="onFileSelected($event)" 
-              accept=".csv"
-              [disabled]="isLoading"
-              #fileInput>
-            <label for="file-input" class="file-label" [class.has-file]="selectedFile">
-              <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
-              <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
-            </label>
-          </div>
-          <button 
-            [disabled]="!selectedFile || isLoading" 
-            (click)="importClients()" 
-            class="import-btn">
-            <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'cloud_upload' }}</i>
-            {{ isLoading ? 'Importation...' : (selectedFile ? 'Importer' : 'Sélectionner un fichier') }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Alert Message -->
-      <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type" role="alert">
-        <i class="material-icons">
-          {{ importMessage.type === 'success' ? 'check_circle' : 
-              importMessage.type === 'warning' ? 'warning' : 'error' }}
-        </i>
-        <span class="alert-message">{{ importMessage.text }}</span>
-        <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="importMessage = null">
-          <i class="material-icons">close</i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Search Section -->
-  <div class="card-container">
-    <div class="search-section">
-      <div class="search-grid">
-        <div class="search-field wide-field">
-          <div class="input-with-icon">
-            <i class="material-icons">search</i>
-            <input 
-              [(ngModel)]="globalSearch" 
-              placeholder="Recherche globale (Nom, Prénom, NNI)"
-              [disabled]="isLoading">
-          </div>
-        </div>
-      </div>
-      <div class="action-buttons-container">
-        <button 
-          (click)="searchClients()" 
-          class="icon-btn search-btn" data-tooltip="Rechercher"
-          [disabled]="isLoading">
-          <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'search' }}</i>
-        </button>
-        <button 
-          (click)="loadClients()" 
-          class="icon-btn refresh-btn" data-tooltip="Actualiser"
-          [disabled]="isLoading">
-          <i class="material-icons">refresh</i>
-        </button>
-      </div>
+  <!-- Actions Bar (similar to dossier list) -->
+  <div class="actions-bar">
+    <!-- Search Container -->
+    <div class="search-container">
+      <i class="material-icons">search</i>
+      <input
+        [(ngModel)]="globalSearch"
+        placeholder="Rechercher par NNI, NIF, nom ou prénom"
+        [disabled]="isLoading"
+        (input)="onSearchInputChange($event)">
+      <!-- Loading Spinner (optional, if needed for search) -->
+      <!-- <div class="loading-spinner" *ngIf="isSearching">
+        <i class="material-icons rotating">sync</i>
+      </div> -->
     </div>
 
-    <!-- No Results Message -->
-    <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
-      <i class="material-icons">info</i>
-      <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
-      <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="showNoResultsMessage = false">
-        <i class="material-icons">close</i>
+    <!-- Import Actions -->
+    <div *ngIf="roleService.hasImportClientPermission()" class="import-actions">
+      <div class="file-input-wrapper">
+        <input
+          type="file"
+          id="file-input"
+          (change)="onFileSelected($event)"
+          accept=".csv"
+          [disabled]="isLoading"
+          #fileInput>
+        <label for="file-input" class="file-label" [class.has-file]="selectedFile">
+          <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
+          <span>{{ selectedFile?.name || 'Sélectionner un fichier CSV' }}</span>
+        </label>
+      </div>
+      <button
+        [disabled]="!selectedFile || isLoading"
+        (click)="importClients()"
+        class="import-btn">
+        <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'cloud_upload' }}</i>
+        {{ isLoading ? 'Importation...' : (selectedFile ? 'Importer' : 'Sélectionner') }}
       </button>
     </div>
+  </div>
 
-    <!-- Clients Table - only show when there are results -->
+  <!-- Alert Message for Import -->
+  <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type" role="alert">
+    <i class="material-icons">
+      {{ importMessage.type === 'success' ? 'check_circle' :
+          importMessage.type === 'warning' ? 'warning' : 'error' }}
+    </i>
+    <span class="alert-message">{{ importMessage.text }}</span>
+    <button class="alert-close" (click)="importMessage = null">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <!-- No Results Message for Search -->
+  <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
+    <i class="material-icons">info</i>
+    <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
+    <button class="alert-close" (click)="showNoResultsMessage = false">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <!-- Clients Table - only show when there are results -->
+  <div class="card-container">
     <div class="table-container" *ngIf="clients && clients.length > 0">
       <table>
         <thead>
@@ -148,17 +105,19 @@
                 <div class="action-buttons">
                   <button 
                     *ngIf="roleService.hasUpdateClientPermission()"
-                    class="icon-btn edit-btn" data-tooltip="Modifier"
+                    class="edit-btn" 
                     (click)="startEdit(client)"
                     [disabled]="isLoading">
                     <i class="material-icons">edit</i>
+                    
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteClientPermission()"
-                    class="icon-btn delete-btn" data-tooltip="Supprimer"
+                    class="delete-btn" 
                     (click)="deleteClient(client.nni)"
                     [disabled]="isLoading">
                     <i class="material-icons">delete</i>
+                    
                   </button>
                 </div>
               </td>

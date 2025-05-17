@@ -1,75 +1,55 @@
 <div class="container">
 
 
-  <!-- Import Section -->
-  <div *ngIf="roleService.hasCreateComptePermission()" class="card-container">
-    <div class="import-section">
-      <div class="section-header">
-        <h3>
-          <i class="material-icons">upload_file</i>
-          Importer des comptes
-        </h3>
-        <div class="import-actions">
-          <div class="file-input-wrapper">
-            <input 
-              type="file" 
-              id="file-input"
-              (change)="onFileSelected($event)" 
-              accept=".csv"
-              #fileInput>
-            <label for="file-input" class="file-label" [class.has-file]="selectedFile">
-              <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
-              <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
-            </label>
-          </div>
-          <button 
-            [disabled]="!selectedFile" 
-            (click)="uploadFile()" 
-            class="import-btn">
-            <i class="material-icons">cloud_upload</i>
-            {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
-          </button>
-        </div>
-      </div>
+  <!-- Actions Bar (similar to dossier list) -->
+  <div class="actions-bar">
+    <!-- Search Container -->
+    <div class="search-container">
+      <i class="material-icons">search</i>
+      <input [(ngModel)]="globalSearch" placeholder="Recherche globale (Numéro compte, Nom client, NNI)" (input)="onSearchInputChange($event)">
+    </div>
 
-      <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
-        <i class="material-icons">{{ getAlertIcon(importMessage.type) }}</i>
-        {{ importMessage.text }}
+    <!-- Import Actions -->
+    <div *ngIf="roleService.hasCreateComptePermission()" class="import-actions">
+      <div class="file-input-wrapper">
+        <input
+          type="file"
+          id="file-input"
+          (change)="onFileSelected($event)"
+          accept=".csv"
+          #fileInput>
+        <label for="file-input" class="file-label" [class.has-file]="selectedFile">
+          <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
+          <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
+        </label>
       </div>
+      <button
+        [disabled]="!selectedFile"
+        (click)="uploadFile()"
+        class="import-btn">
+        <i class="material-icons">cloud_upload</i>
+        {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
+      </button>
     </div>
   </div>
 
-  <!-- Search Section -->
+  <!-- Import Message -->
+  <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
+    <i class="material-icons">{{ getAlertIcon(importMessage.type) }}</i>
+    {{ importMessage.text }}
+  </div>
+
+  <!-- No Results Message -->
+  <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
+    <i class="material-icons">info</i>
+    <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
+    <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="showNoResultsMessage = false">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <!-- Accounts Table - only show when there are results -->
   <div class="card-container">
-    <div class="search-section">
-      <div class="search-grid">
-        <div class="search-field wide-field">
-          <div class="input-with-icon">
-            <i class="material-icons">search</i>
-            <input [(ngModel)]="globalSearch" placeholder="Recherche globale (Numéro compte, Nom client, NNI)">
-          </div>
-        </div>
-      </div>
-      <div class="action-buttons-container">
-        <button (click)="searchComptes()" class="icon-btn search-btn" data-tooltip="Rechercher">
-          <i class="material-icons">search</i>
-        </button>
-        <button (click)="loadComptes()" class="icon-btn refresh-btn" data-tooltip="Actualiser">
-          <i class="material-icons">refresh</i>
-        </button>
-      </div>
-    </div>
-
-    <!-- No Results Message -->
-    <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
-      <i class="material-icons">info</i>
-      <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
-      <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="showNoResultsMessage = false">
-        <i class="material-icons">close</i>
-      </button>
-    </div>
-
-    <!-- Accounts Table - only show when there are results -->
     <div class="table-container" *ngIf="comptes && comptes.length > 0">
       <table>
         <thead>

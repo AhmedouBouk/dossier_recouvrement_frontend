@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import './app/shared/styles/icon-buttons.css';
+@import './app/shared/styles/layout.css';
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
