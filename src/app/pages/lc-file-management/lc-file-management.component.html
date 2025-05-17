@@ -62,14 +62,16 @@
     <label 
       *ngIf="dossier.status !== 'Clôturé'" 
       for="lc-file-upload-{{ dossier.id }}" 
-      class="upload-btn"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
     >
       <i class="material-icons">file_upload</i>
     </label>
 
     <!-- Bouton Visualiser -->
     <button
-      class="view-btn"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
       (click)="viewLcFile(dossier)"
       [disabled]="!dossier.lcFile"
     >
@@ -78,7 +80,8 @@
 
     <!-- Bouton Télécharger -->
     <button 
-      class="download-btn"
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
       (click)="viewLcFile(dossier, true)"
       [disabled]="!dossier.lcFile"
     >
@@ -88,7 +91,8 @@
     <!-- Bouton Supprimer -->
     <button 
       *ngIf="dossier.status !== 'Clôturé'" 
-      class="delete-btn"
+      class="icon-btn delete-btn"
+      data-tooltip="Supprimer"
       (click)="deleteLcFile(dossier)"
       [disabled]="!dossier.lcFile"
     >

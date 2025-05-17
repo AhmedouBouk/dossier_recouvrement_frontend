@@ -62,7 +62,7 @@
               importMessage.type === 'warning' ? 'warning' : 'error' }}
         </i>
         <span class="alert-message">{{ importMessage.text }}</span>
-        <button class="alert-close" (click)="importMessage = null">
+        <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="importMessage = null">
           <i class="material-icons">close</i>
         </button>
       </div>
@@ -86,17 +86,15 @@
       <div class="action-buttons-container">
         <button 
           (click)="searchClients()" 
-          class="search-btn"
+          class="icon-btn search-btn" data-tooltip="Rechercher"
           [disabled]="isLoading">
           <i class="material-icons">{{ isLoading ? 'hourglass_empty' : 'search' }}</i>
-          {{ isLoading ? 'Recherche...' : 'Rechercher' }}
         </button>
         <button 
           (click)="loadClients()" 
-          class="refresh-btn"
+          class="icon-btn refresh-btn" data-tooltip="Actualiser"
           [disabled]="isLoading">
           <i class="material-icons">refresh</i>
-          Actualiser
         </button>
       </div>
     </div>
@@ -105,7 +103,7 @@
     <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
       <i class="material-icons">info</i>
       <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
-      <button class="alert-close" (click)="showNoResultsMessage = false">
+      <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="showNoResultsMessage = false">
         <i class="material-icons">close</i>
       </button>
     </div>
@@ -150,19 +148,17 @@
                 <div class="action-buttons">
                   <button 
                     *ngIf="roleService.hasUpdateClientPermission()"
-                    class="edit-btn" 
+                    class="icon-btn edit-btn" data-tooltip="Modifier"
                     (click)="startEdit(client)"
                     [disabled]="isLoading">
                     <i class="material-icons">edit</i>
-                    
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteClientPermission()"
-                    class="delete-btn" 
+                    class="icon-btn delete-btn" data-tooltip="Supprimer"
                     (click)="deleteClient(client.nni)"
                     [disabled]="isLoading">
                     <i class="material-icons">delete</i>
-                    
                   </button>
                 </div>
               </td>

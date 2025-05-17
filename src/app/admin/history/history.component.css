@@ -402,3 +402,14 @@
     flex-wrap: wrap;
   }
 }
+
+/* Main Content */
+.main-content {
+  padding: 20px 30px;
+  margin-top: 70px;
+}
+
+.login-action {
+  color: #3182ce;
+  background-color: #ebf8ff;
+}

@@ -51,13 +51,11 @@
         </div>
       </div>
       <div class="action-buttons-container">
-        <button (click)="searchComptes()" class="search-btn">
+        <button (click)="searchComptes()" class="icon-btn search-btn" data-tooltip="Rechercher">
           <i class="material-icons">search</i>
-          Rechercher
         </button>
-        <button (click)="loadComptes()" class="refresh-btn">
+        <button (click)="loadComptes()" class="icon-btn refresh-btn" data-tooltip="Actualiser">
           <i class="material-icons">refresh</i>
-          Actualiser
         </button>
       </div>
     </div>
@@ -66,7 +64,7 @@
     <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
       <i class="material-icons">info</i>
       <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
-      <button class="alert-close" (click)="showNoResultsMessage = false">
+      <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="showNoResultsMessage = false">
         <i class="material-icons">close</i>
       </button>
     </div>
@@ -115,14 +113,16 @@
                 <div class="action-buttons">
                   <button 
                     *ngIf="roleService.hasUpdateComptePermission()"
-                    class="edit-btn" 
+                    class="icon-btn edit-btn" 
+                    data-tooltip="Modifier"
                     (click)="startEdit(compte)">
                     <i class="material-icons">edit</i>
                     
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteComptePermission()"
-                    class="delete-btn" 
+                    class="icon-btn delete-btn" 
+                    data-tooltip="Supprimer"
                     (click)="deleteCompte(compte.nomCompte)">
                     <i class="material-icons">delete</i>
                     
@@ -153,11 +153,11 @@
               <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
               <td class="actions">
                 <div class="action-buttons">
-                  <button class="save-btn" (click)="updateCompte(editingCompte)">
+                  <button class="icon-btn save-btn" data-tooltip="Sauvegarder" (click)="updateCompte(editingCompte)">
                     <i class="material-icons">save</i>
                     Sauvegarder
                   </button>
-                  <button class="cancel-btn" (click)="cancelEdit()">
+                  <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit()">
                     <i class="material-icons">close</i>
                     Annuler
                   </button>
