@@ -59,8 +59,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.id }}</td>
-            <td>{{ dossier.compte.nomCompte }}</td>
+clea            <td>{{ dossier.compte.nomCompte }}</td>
             <td>{{ dossier.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td>{{ dossier.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td>
