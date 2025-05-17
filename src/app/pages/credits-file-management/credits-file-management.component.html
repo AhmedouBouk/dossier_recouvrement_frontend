@@ -62,14 +62,16 @@
     <!-- Bouton CHOISIR & UPLOADER automatiquement -->
     <label *ngIf="dossier.status !== 'Clôturé'" 
       for="file-upload-{{ dossier.id }}"
-      class="upload-btn"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
     >
       <i class="material-icons">file_upload</i>
     </label>
 
     <!-- Visualiser un fichier -->
     <button
-      class="view-btn"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
       (click)="viewCreditsFile(dossier)"
       [disabled]="!dossier.creditsFile"
     >
@@ -78,7 +80,8 @@
 
     <!-- Télécharger -->
     <button
-      class="download-btn"
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
       (click)="viewCreditsFile(dossier, true)"
       [disabled]="!dossier.creditsFile"
     >
@@ -87,7 +90,8 @@
 
     <!-- Supprimer -->
     <button *ngIf="dossier.status !== 'Clôturé'" 
-      class="delete-btn"
+      class="icon-btn delete-btn"
+      data-tooltip="Supprimer"
       (click)="deleteCreditsFile(dossier)"
       [disabled]="!dossier.creditsFile"
     >

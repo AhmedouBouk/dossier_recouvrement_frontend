@@ -136,10 +136,10 @@
               
               <!-- Boutons d'action pour les commentaires -->
               <div class="comment-actions" *ngIf="canEditComment(comment)">
-                <button class="edit-btn" (click)="editComment(comment)" *ngIf="!comment.editing">
+                <button class="icon-btn edit-btn" data-tooltip="Modifier" (click)="editComment(comment)" *ngIf="!comment.editing">
                   <i class="material-icons">edit</i>
                 </button>
-                <button class="delete-btn" (click)="confirmDeleteComment(comment)" *ngIf="!comment.editing">
+                <button class="icon-btn delete-btn" data-tooltip="Supprimer" (click)="confirmDeleteComment(comment)" *ngIf="!comment.editing">
                   <i class="material-icons">delete</i>
                 </button>
               </div>
@@ -164,11 +164,11 @@
               </div>
               
               <div class="edit-actions">
-                <button class="save-btn" (click)="saveComment(comment)">
-                  <i class="material-icons">save</i> Enregistrer
+                <button class="icon-btn save-btn" data-tooltip="Enregistrer" (click)="saveComment(comment)">
+                  <i class="material-icons">save</i>
                 </button>
-                <button class="cancel-btn" (click)="cancelEdit(comment)">
-                  <i class="material-icons">close</i> Annuler
+                <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit(comment)">
+                  <i class="material-icons">close</i>
                 </button>
               </div>
             </div>

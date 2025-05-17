@@ -217,7 +217,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   /**
    * Ouvre le menu de validation pour un dossier spécifique
    */
-  openValidationMenu(dossier: DossierRecouvrement, event: MouseEvent): void {
+  openValidationMenu(dossier: DossierRecouvrement, event: MouseEvent | KeyboardEvent): void {
     // Empêcher la propagation de l'événement pour éviter de fermer le menu immédiatement
     event.stopPropagation();
     

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoleService } from '../../shared/services/role.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subject, debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-clients',
@@ -15,18 +16,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class ClientsComponent implements OnInit, OnDestroy {
   clients: any[] = [];
   selectedFile: File | null = null;
-  searchNom: string = '';
-  searchPrenom: string = '';
-  searchNNI: number | null = null;
   globalSearch: string = '';
   showNoResultsMessage: boolean = false;
   importMessage: { type: 'success' | 'error' | 'warning', text: string } | null = null;
   editingClient: any = null;
   isLoading = false;
-  private loadingTimeout: any;
-  showReloadOption = false;
-  loadingStartTime: number = 0;
-  loadingDuration: string = '';
+  
+  private searchSubject = new Subject<string>();
+  private searchSubscription: Subscription | undefined;
 
   constructor(
     private clientService: ClientService,
@@ -34,41 +31,25 @@ export class ClientsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.loadClients();
+    this.setupSearch();
+    this.searchClients(); // Initial load
   }
 
   ngOnDestroy() {
-    this.clearLoadingTimeout();
+    this.searchSubscription?.unsubscribe();
   }
 
-  private startLoadingTimeout() {
-    this.loadingStartTime = Date.now();
-    this.showReloadOption = false;
-    
-    // Update loading duration every second
-    const updateDuration = setInterval(() => {
-      const seconds = Math.floor((Date.now() - this.loadingStartTime) / 1000);
-      this.loadingDuration = `${seconds} secondes`;
-    }, 1000);
-
-    // Show reload option after 10 seconds
-    this.loadingTimeout = setTimeout(() => {
-      this.showReloadOption = true;
-      clearInterval(updateDuration);
-    }, 4000);
+  setupSearch() {
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300), // Wait for 300ms after the last keystroke
+      distinctUntilChanged() // Only emit if the search term has changed
+    ).subscribe(searchTerm => {
+      this.searchClients(searchTerm);
+    });
   }
 
-  private clearLoadingTimeout() {
-    if (this.loadingTimeout) {
-      clearTimeout(this.loadingTimeout);
-      this.loadingTimeout = null;
-    }
-    this.showReloadOption = false;
-    this.loadingDuration = '';
-  }
-
-  reloadPage() {
-    window.location.reload();
+  onSearchInputChange(event: any) {
+    this.searchSubject.next(event.target.value);
   }
 
   handleError(error: HttpErrorResponse): string {
@@ -133,8 +114,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  
-
   importClients() {
     if (!this.selectedFile) {
       this.showMessage('warning', 'Veuillez sélectionner un fichier CSV.');
@@ -147,14 +126,13 @@ export class ClientsComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.startLoadingTimeout();
     this.importMessage = null;
 
     this.clientService.importClients(this.selectedFile).subscribe({
       next: (response) => {
         if (response.status === 200) {
           this.showMessage('success', 'Import réussi ! Les clients ont été ajoutés.');
-          this.loadClients();
+          this.searchClients();
           this.selectedFile = null;
           const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
           if (fileInput) fileInput.value = '';
@@ -167,64 +145,65 @@ export class ClientsComponent implements OnInit, OnDestroy {
       },
       complete: () => {
         this.isLoading = false;
-        this.clearLoadingTimeout();
       }
     });
   }
 
-  loadClients() {
+  searchClients(searchTerm: string = this.globalSearch) {
+    console.log('searchClients called with searchTerm:', searchTerm);
     this.isLoading = true;
-    this.startLoadingTimeout();
     this.showNoResultsMessage = false;
-    this.globalSearch = '';
 
-    this.clientService.getAllClients().subscribe({
-      next: (data) => {
-        this.clients = data;
-        if (data.length === 0) {
-          this.showMessage('warning', 'Aucun client trouvé dans la base de données.');
+    // If search term is empty, load all clients
+    if (!searchTerm) {
+      this.clientService.getAllClients().subscribe({
+        next: (data) => {
+          console.log('Loaded all clients:', data);
+          this.clients = data;
+          if (data.length === 0) {
+             this.showMessage('warning', 'Aucun client trouvé dans la base de données.');
+          }
+        },
+        error: (error) => {
+          console.error('Error loading all clients:', error);
+          this.showMessage('error', this.handleError(error));
+          this.clients = []; // Clear results on error
+        },
+        complete: () => {
+           console.log('Loading all clients complete.');
+           this.isLoading = false;
         }
-      },
-      error: (error) => {
-        this.showMessage('error', this.handleError(error));
-      },
-      complete: () => {
-        this.isLoading = false;
-        this.clearLoadingTimeout();
-      }
-    });
-  }
-
-  searchClients() {
-    if (!this.globalSearch) {
-      this.showMessage('warning', 'Veuillez saisir un terme de recherche.');
-      return;
+      });
+    } else {
+      // Perform search if search term is not empty
+      this.clientService.searchClients(
+        '', 
+        '', 
+        undefined,
+        searchTerm
+      ).subscribe({
+        next: (data) => {
+          console.log('API response data for search:', data);
+          this.clients = data;
+          if (data.length === 0) {
+            console.log('No results found for search term:', searchTerm);
+            this.showNoResultsMessage = true;
+          } else {
+             this.showNoResultsMessage = false;
+          }
+        },
+        error: (error) => {
+          console.error('Error during search:', error);
+          this.showMessage('error', this.handleError(error));
+          this.clients = []; // Clear results on error
+          this.showNoResultsMessage = true; // Show no results message on error
+        },
+        complete: () => {
+          console.log('Search complete.');
+          this.isLoading = false;
+        }
+      });
     }
-
-    this.isLoading = true;
-    this.startLoadingTimeout();
-    this.showNoResultsMessage = false;
-
-    this.clientService.searchClients(
-      '', 
-      '', 
-      undefined,
-      this.globalSearch
-    ).subscribe({
-      next: (data) => {
-        this.clients = data;
-        if (data.length === 0) {
-          this.showNoResultsMessage = true;
-        }
-      },
-      error: (error) => {
-        this.showMessage('error', this.handleError(error));
-      },
-      complete: () => {
-        this.isLoading = false;
-        this.clearLoadingTimeout();
-      }
-    });
   }
 
   startEdit(client: any) {
@@ -272,12 +251,11 @@ export class ClientsComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.startLoadingTimeout();
 
     this.clientService.updateClient(this.editingClient.nni, this.editingClient).subscribe({
       next: () => {
         this.showMessage('success', 'Client mis à jour avec succès !');
-        this.loadClients();
+        this.searchClients();
         this.editingClient = null;
       },
       error: (error) => {
@@ -285,7 +263,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
       },
       complete: () => {
         this.isLoading = false;
-        this.clearLoadingTimeout();
       }
     });
   }
@@ -301,22 +278,21 @@ export class ClientsComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.startLoadingTimeout();
 
     this.clientService.deleteClient(nni).subscribe({
       next: () => {
         this.showMessage('success', 'Client supprimé avec succès !');
-        this.loadClients();
+        this.searchClients();
       },
       error: (error) => {
         this.showMessage('error', this.handleError(error));
       },
       complete: () => {
         this.isLoading = false;
-        this.clearLoadingTimeout();
       }
     });
   }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
