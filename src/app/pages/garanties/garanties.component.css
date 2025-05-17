@@ -1,14 +1,21 @@
+/* Base Layout */
 .main-content {
-  padding: 32px;
-  max-width: calc(100vw - 290px); /* Account for sidebar */
-  margin-left: 270px; /* Match sidebar width */
-  margin-top: 60px; /* Account for navbar */
-  min-height: calc(100vh - 60px);
+  padding: 0;
+  width: 100%;
+  margin-left: 0;
+  margin-top: 0;
+  min-height: 100vh;
   background-color: #f8fafc;
 }
 
 .container {
-max-width: calc(100vw - 290px);
+  padding: 32px;
+  max-width: calc(100vw - 290px);
+  margin-left: 257px;
+  margin-top: 60px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 60px);
+  position: relative;
 }
 
 /* Actions Bar Styles */
@@ -110,18 +117,17 @@ box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 
 /* Table Styles */
 .table-container {
-background-color: white;
-border-radius: 20px;
-box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-overflow: hidden;
-overflow-x: auto; /* Ajoute une barre de défilement horizontale */
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-top: 20px;
 }
 
 table {
-width: 100%;
-border-collapse: separate;
-border-spacing: 0;
-min-width: 800px; /* Définissez une largeur minimale pour la table */
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
 }
 
 thead tr {
@@ -272,54 +278,58 @@ to {
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-.container {
-  margin-left: 0;
-  max-width: 100%;
-}
-}
-
-@media (max-width: 768px) {
-.main-content {
-  margin-left: 0;
-  padding: 15px;
+@media screen and (max-width: 1200px) {
+  .container {
+    padding: 24px;
+    max-width: calc(100% - 64px);
+    margin-left: 64px;
+  }
 }
 
-.actions-bar {
-  flex-direction: column;
-}
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 16px;
+    margin-left: 0;
+    max-width: 100%;
+  }
 
-.search-container {
-  width: 100%;
-}
+  .actions-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
 
-.add-btn,
-.upload-btn {
-  width: 100%;
-  justify-content: center;
-}
+  .search-container {
+    width: 100%;
+  }
 
-.action-buttons {
-  flex-direction: column;
-  gap: 8px;
-}
+  .add-btn,
+  .upload-btn {
+    width: 100%;
+    justify-content: center;
+  }
 
-.view-btn,
-.edit-btn,
-.delete-btn {
-  width: 100%;
-  justify-content: center;
-}
+  .action-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
 
-th, td {
-  padding: 12px 10px;
-  font-size: 14px;
+  .view-btn,
+  .edit-btn,
+  .delete-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  th, td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
 }
 
 table {
   min-width: 600px; /* Réduire la largeur minimale pour les petits écrans */
 }
-}
+
 .download-btn {
 display: flex;
 align-items: center;
