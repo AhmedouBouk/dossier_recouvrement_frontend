@@ -50,8 +50,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let role of roles">
-              <td>{{ role.name }}</td>
+            <tr *ngFor="let role of roles" [ngClass]="{'role-inactive': !role.active}">
+              <td>
+                <span class="status-badge" [class.status-active]="role.active" [class.status-inactive]="!role.active">
+                  {{ role.active ? 'Active' : 'Inactive' }}
+                </span>
+                {{ role.name }}
+              </td>
               <td>
                 <div class="permission-chips">
                   <span *ngFor="let perm of role.permissions" 
@@ -63,8 +68,16 @@
               </td>
               <td>
                 <div class="action-buttons">
-                  <button class="edit-btn" (click)="openForm(role)">Modifier</button>
-                  <button class="delete-btn" (click)="deleteRole(role.id)">Supprimer</button>
+                  <button class="edit-btn" (click)="openForm(role)">
+                    <i class="material-icons">edit</i>
+                    Modifier
+                  </button>
+                  <button *ngIf="!role.active" class="toggle-btn" (click)="toggleRoleStatus(role.id)">
+                    <i class="material-icons">check_circle</i> Activer
+                  </button>
+                  <button *ngIf="role.active" class="toggle-btn desactivate" (click)="toggleRoleStatus(role.id)">
+                    <i class="material-icons">close</i> Désactiver
+                  </button>
                 </div>
               </td>
             </tr>

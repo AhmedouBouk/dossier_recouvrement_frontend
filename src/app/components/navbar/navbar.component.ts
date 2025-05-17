@@ -23,15 +23,12 @@ export class NavbarComponent implements OnInit {
     '/dashboard': 'Dashboard',
     '/clients': 'Gestion des Clients',
     '/comptes': 'Gestion des Comptes',
-    '/comptes/view': 'Détails du Compte',
-    '/comptes/modify': 'Modifier le Compte',
-    'dossiers': 'Gestion des Dossiers',
-    '/dossiers/view/:id': 'Détails du Dossier',
-    '/dossiers/modify/:id': 'Modifier le Dossier',
-    '/dossiers/add': 'Ajouter un Dossier',
-    '/dossier-recouvrement': 'Dossiers Recouvrement',
-    '/dossier-recouvrement/view': 'Détails du Dossier',
-    '/dossier-recouvrement/modify': 'Modifier le Dossier',
+    '/garanties': 'Gestion des Garanties',
+    '/dossiers': 'Dossiers Recouvrement',
+    '/credits-file-management': 'Gestion des Crédits',
+    '/lc-file-management': 'Lettres de Crédit',
+    '/cautions-file-management': 'Gestion des Cautions',
+    '/cheque-files': 'Fichiers de Chèque'
   };
   userRole: string = '';
   
@@ -55,13 +52,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    window.location.reload();
-    sessionStorage.clear();
-  
-  
-    this.router.navigate(['/']);
+    this.authService.logout(); // Appeler la méthode logout du service
   }
   goBack(): void {
     this.location.back(); // Navigates to the previous page in the browser's history

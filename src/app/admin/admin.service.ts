@@ -37,7 +37,7 @@ export class AdminService {
       'Accept': 'application/json'
     });
     
-    return this.http.post<User>(`${this.apiUrl}/admin/add`, user, { headers })
+    return this.http.post<User>(`${this.apiUrl}/users`, user, { headers })
       .pipe(
         tap(response => console.log('Raw response from server:', response)),
         catchError(error => {
@@ -66,9 +66,9 @@ export class AdminService {
     return this.http.put<any>(`${this.apiUrl}/admin/roles/${roleId}`, roleData);
   }
 
-  // Delete a role
-  deleteRole(roleId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/admin/roles/${roleId}`);
+  // Toggle active status of a role
+  toggleRoleStatus(roleId: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/admin/roles/${roleId}/toggle-status`, {});
   }
 
   // Fetch all available permissions

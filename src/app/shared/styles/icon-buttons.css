@@ -1,0 +1,122 @@
+/* Styles globaux pour les boutons avec icônes */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  padding: 0; /* Assure qu'il n'y a pas de padding qui affecte la taille */
+  box-sizing: border-box; /* S'assure que width et height incluent padding et border */
+}
+
+/* Tooltip style */
+.icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  z-index: 1000;
+}
+
+.icon-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hover effect */
+.icon-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon size */
+.icon-btn i.material-icons {
+  font-size: 20px;
+}
+
+/* Styles spécifiques pour les labels avec la classe icon-btn */
+label.icon-btn {
+  /* Réinitialiser tous les styles spécifiques aux labels qui pourraient affecter la taille */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+/* S'assurer que les styles spécifiques pour upload-btn n'affectent pas la taille */
+label.icon-btn.upload-btn {
+  padding: 0;
+  border-radius: 50%;
+  gap: 0;
+}
+
+/* Button variants */
+.icon-btn.view-btn {
+  background-color: #6366f1;
+}
+
+.icon-btn.edit-btn {
+  background-color: #3b82f6;
+}
+
+.icon-btn.delete-btn {
+  background-color: #ef4444;
+}
+
+.icon-btn.pdf-btn {
+  background-color: #8b5cf6;
+}
+
+.icon-btn.add-btn {
+  background-color: #10b981;
+}
+
+.icon-btn.save-btn {
+  background-color: #10b981;
+}
+
+.icon-btn.cancel-btn {
+  background-color: #64748b;
+}
+
+/* Disabled state */
+.icon-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .icon-btn i.material-icons {
+    font-size: 18px;
+  }
+}

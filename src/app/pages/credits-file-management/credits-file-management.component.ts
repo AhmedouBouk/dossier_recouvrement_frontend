@@ -46,14 +46,14 @@ export class CreditsFileManagementComponent implements OnInit {
       },
     });
   }
+onFileSelectedAndUpload(event: any, dossier: any): void {
+  const file: File = event.target.files[0];
+  if (!file) return;
 
-  // Gérer la sélection d'un fichier
-  onFileSelected(event: any, dossier: DossierRecouvrement): void {
-    const file = event.target.files[0];
-    if (file) {
-      dossier.selectedCreditsFile = file; // Stocker le fichier sélectionné
-    }
-  }
+  dossier.selectedCreditsFile = file;
+  this.uploadCreditsFile(dossier);
+}
+
 
   // Uploader un fichier de crédit
   uploadCreditsFile(dossier: DossierRecouvrement): void {

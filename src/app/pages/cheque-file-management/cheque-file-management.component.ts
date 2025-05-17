@@ -55,13 +55,13 @@ export class ChequeFileManagementComponent implements OnInit {
     const fileName = url.split('/').pop() || 'Aucun fichier';
     return fileName;
   }
-  // Gérer la sélection d'un fichier
-  onFileSelected(event: any, dossier: DossierRecouvrement): void {
-    const file = event.target.files[0];
-    if (file) {
-      dossier.selectedFile = file; // Stocker le fichier sélectionné
-    }
-  }
+onFileSelectedAndUpload(event: any, dossier: any): void {
+  const file: File = event.target.files[0];
+  if (!file) return;
+
+  dossier.selectedFile = file;
+  this.uploadChequeFile(dossier); // upload automatique
+}
 
   // Uploader un fichier de chèque en utilisant ChequeFileService
   uploadChequeFile(dossier: DossierRecouvrement): void {

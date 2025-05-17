@@ -1,9 +1,4 @@
-export enum DossierStatus {
-  EN_COURS = 'EN_COURS',
-  TERMINE = 'TERMINE',
-  SUSPENDU = 'SUSPENDU',
-  ANNULE = 'ANNULE'
-}
+
 
 export enum EtatValidation {
   INITIALE = 'INITIALE',
@@ -39,7 +34,7 @@ export interface DossierRecouvrement {
     referencesLC: string;
     provision: number;
     interetsReserves: number;
-    status: DossierStatus;
+  status: string;  // PAS DossierStatus
     etatValidation: EtatValidation;
     garantiesTitre: string;
     garantiesValeur: number;

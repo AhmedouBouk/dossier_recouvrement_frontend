@@ -38,10 +38,17 @@
             name="email"
             [(ngModel)]="user.email"
             required
+            email
+            #emailField="ngModel"
+            [ngClass]="{ 'is-invalid': addUserForm.submitted && emailField.invalid }"
             class="form-control"
             placeholder="Enter Username"
             autocomplete="off"
           />
+        </div>
+        <div *ngIf="emailField.invalid && (emailField.dirty || emailField.touched || addUserForm.submitted)" class="invalid-feedback d-block">
+          <div *ngIf="emailField.errors?.['required']">L'email est requis.</div>
+          <div *ngIf="emailField.errors?.['email']">Veuillez saisir une adresse email valide.</div>
         </div>
       </div>
 
@@ -55,11 +62,19 @@
             name="password"
             [(ngModel)]="user.password"
             required
-            minlength="6"
+            minlength="8"
+            [pattern]="passwordPattern"
+            #passwordField="ngModel"
+            [ngClass]="{ 'is-invalid': addUserForm.submitted && passwordField.invalid }"
             class="form-control"
             placeholder="Enter password"
             autocomplete="new-password"
           />
+        </div>
+        <div *ngIf="passwordField.invalid && (passwordField.dirty || passwordField.touched || addUserForm.submitted)" class="invalid-feedback d-block">
+          <div *ngIf="passwordField.errors?.['required']">Le mot de passe est requis.</div>
+          <div *ngIf="passwordField.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caractères.</div>
+          <div *ngIf="passwordField.errors?.['pattern']">Le mot de passe doit contenir au moins un caractère spécial et un chiffre.</div>
         </div>
       </div>
 
@@ -80,6 +95,7 @@
           <i class="material-icons">person_outline</i>
           <select id="userType" name="userType" [(ngModel)]="user.userType" (change)="onUserTypeChange()" required class="form-control" autocomplete="off">
             <option value="" disabled selected>Sélectionner un type</option>
+            <option value="Admin">Admin</option>
             <option value="Agence">Agence</option>
             <option value="Recouvrement">Recouvrement</option>
             <option value="Risque">Risque</option>
@@ -104,16 +120,22 @@
           <i class="material-icons">arrow_back</i>
           Back
         </button>
-        <button type="submit" class="btn btn-primary" [disabled]="!addUserForm.form.valid">
+        <button type="submit" class="btn btn-primary" [disabled]="!addUserForm.form.valid || isLoading">
           <i class="material-icons">person_add</i>
-          Add User
+          <span *ngIf="!isLoading">Add User</span>
+          <span *ngIf="isLoading">Adding...</span>
         </button>
       </div>
     </form>
 
-    <div *ngIf="successMessage" class="alert alert-success">
+    <div *ngIf="successMessage && !errorMessage" class="alert alert-success mt-3">
       <i class="material-icons">check_circle</i>
       {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+      <i class="material-icons">error_outline</i>
+      {{ errorMessage }}
     </div>
   </div>
 </div>

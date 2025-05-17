@@ -24,6 +24,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   selectedDossierForValidation: DossierRecouvrement | null = null;
   successMessage: string | null = null;
 
+
   dossiers: DossierRecouvrement[] = [];
   searchTerm: string = '';
   private searchSubject = new Subject<string>();
@@ -39,6 +40,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
     public roleService: RoleService,
     private router: Router,
     private authService: AuthService
+    
   ) {
     this.searchSubject.pipe(
       takeUntil(this.destroy$),
@@ -215,7 +217,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   /**
    * Ouvre le menu de validation pour un dossier spécifique
    */
-  openValidationMenu(dossier: DossierRecouvrement, event: MouseEvent): void {
+  openValidationMenu(dossier: DossierRecouvrement, event: MouseEvent | KeyboardEvent): void {
     // Empêcher la propagation de l'événement pour éviter de fermer le menu immédiatement
     event.stopPropagation();
     

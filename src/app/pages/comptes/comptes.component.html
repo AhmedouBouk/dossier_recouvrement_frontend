@@ -1,93 +1,67 @@
 <div class="container">
 
 
-  <!-- Import Section -->
-  <div *ngIf="roleService.hasCreateComptePermission()" class="card-container">
-    <div class="import-section">
-      <div class="section-header">
-        <h3>
-          <i class="material-icons">upload_file</i>
-          Importer des comptes
-        </h3>
-        <div class="import-actions">
-          <div class="file-input-wrapper">
-            <input 
-              type="file" 
-              id="file-input"
-              (change)="onFileSelected($event)" 
-              accept=".csv"
-              #fileInput>
-            <label for="file-input" class="file-label" [class.has-file]="selectedFile">
-              <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
-              <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
-            </label>
-          </div>
-          <button 
-            [disabled]="!selectedFile" 
-            (click)="uploadFile()" 
-            class="import-btn">
-            <i class="material-icons">cloud_upload</i>
-            {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
-          </button>
-        </div>
-      </div>
+  <!-- Actions Bar (similar to dossier list) -->
+  <div class="actions-bar">
+    <!-- Search Container -->
+    <div class="search-container">
+      <i class="material-icons">search</i>
+      <input [(ngModel)]="globalSearch" placeholder="Recherche globale (Numéro compte, Nom client, NNI)" (input)="onSearchInputChange($event)">
+    </div>
 
-      <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
-        <i class="material-icons">{{ getAlertIcon(importMessage.type) }}</i>
-        {{ importMessage.text }}
+    <!-- Import Actions -->
+    <div *ngIf="roleService.hasCreateComptePermission()" class="import-actions">
+      <div class="file-input-wrapper">
+        <input
+          type="file"
+          id="file-input"
+          (change)="onFileSelected($event)"
+          accept=".csv"
+          #fileInput>
+        <label for="file-input" class="file-label" [class.has-file]="selectedFile">
+          <i class="material-icons">{{ selectedFile ? 'check_circle' : 'file_upload' }}</i>
+          <span>{{ selectedFile?.name || 'Choisir un fichier CSV' }}</span>
+        </label>
       </div>
+      <button
+        [disabled]="!selectedFile"
+        (click)="uploadFile()"
+        class="import-btn">
+        <i class="material-icons">cloud_upload</i>
+        {{ selectedFile ? 'Importer' : 'Sélectionner un fichier' }}
+      </button>
     </div>
   </div>
 
-  <!-- Search Section -->
-  <div class="card-container">
-    <div class="search-section">
-      <div class="search-grid">
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">account_balance_wallet</i>
-            <input [(ngModel)]="searchNomCompte" placeholder="Numéro de compte">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">person</i>
-            <input [(ngModel)]="searchNom" placeholder="Nom client">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">person_outline</i>
-            <input [(ngModel)]="searchPrenom" placeholder="Prénom client">
-          </div>
-        </div>
-        <div class="search-field">
-          <div class="input-with-icon">
-            <i class="material-icons">badge</i>
-            <input [(ngModel)]="searchNNI" type="number" placeholder="NNI client">
-          </div>
-        </div>
-      </div>
-      <button (click)="searchComptes()" class="search-btn">
-        <i class="material-icons">search</i>
-        Rechercher
-      </button>
-    </div>
+  <!-- Import Message -->
+  <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
+    <i class="material-icons">{{ getAlertIcon(importMessage.type) }}</i>
+    {{ importMessage.text }}
+  </div>
 
-    <!-- Accounts Table -->
-    <div class="table-container">
+  <!-- No Results Message -->
+  <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
+    <i class="material-icons">info</i>
+    <span class="alert-message">Aucun résultat trouvé pour votre recherche.</span>
+    <button class="icon-btn alert-close" data-tooltip="Fermer" (click)="showNoResultsMessage = false">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <!-- Accounts Table - only show when there are results -->
+  <div class="card-container">
+    <div class="table-container" *ngIf="comptes && comptes.length > 0">
       <table>
         <thead>
           <tr>
-            <th>N° Compte</th>
-            <th>Client</th>
-            <th>Catégorie</th>
-            <th> libellé Catégorie</th>
-
-            <th>Solde</th>
-            <th>État</th>
-            <th>Date d'ouverture</th>
-            <th *ngIf="roleService.hasUpdateComptePermission() || roleService.hasDeleteComptePermission()">Actions</th>
+            <th>N° COMPTE</th>
+            <th>CLIENT</th>
+            <th>CATÉGORIE</th>
+            <th>LIBELLÉ CATÉGORIE</th>
+            <th>SOLDE</th>
+            <th>ÉTAT</th>
+            <th>DATE D'OUVERTURE</th>
+            <th *ngIf="roleService.hasUpdateComptePermission() || roleService.hasDeleteComptePermission()">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
@@ -119,14 +93,16 @@
                 <div class="action-buttons">
                   <button 
                     *ngIf="roleService.hasUpdateComptePermission()"
-                    class="edit-btn" 
+                    class="icon-btn edit-btn" 
+                    data-tooltip="Modifier"
                     (click)="startEdit(compte)">
                     <i class="material-icons">edit</i>
                     
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteComptePermission()"
-                    class="delete-btn" 
+                    class="icon-btn delete-btn" 
+                    data-tooltip="Supprimer"
                     (click)="deleteCompte(compte.nomCompte)">
                     <i class="material-icons">delete</i>
                     
@@ -157,11 +133,11 @@
               <td>{{compte.dateOuverture | date:'dd/MM/yyyy'}}</td>
               <td class="actions">
                 <div class="action-buttons">
-                  <button class="save-btn" (click)="updateCompte(editingCompte)">
+                  <button class="icon-btn save-btn" data-tooltip="Sauvegarder" (click)="updateCompte(editingCompte)">
                     <i class="material-icons">save</i>
                     Sauvegarder
                   </button>
-                  <button class="cancel-btn" (click)="cancelEdit()">
+                  <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit()">
                     <i class="material-icons">close</i>
                     Annuler
                   </button>

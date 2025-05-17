@@ -3,96 +3,100 @@
   [activeSection]="'history'"
   [pageTitle]="'Historique des actions'">
 </app-navigation-header>
-<div class="history-container">
-  
-
-  <div class="filters">
-    <div class="search-box">
-      <i class="material-icons">search</i>
-      <input 
-        type="text" 
-        placeholder="Rechercher dans l'historique..." 
-        [(ngModel)]="searchTerm"
-        (input)="onSearch(searchTerm)"
-      >
-    </div>
-    <div class="filter-actions">
-      <button 
-        [class.active]="filterType === 'all'" 
-        (click)="onFilterChange('all')">
-        <i class="material-icons">history</i> Tous
-      </button>
-      <button 
-        [class.active]="filterType === 'import'" 
-        (click)="onFilterChange('import')">
-        <i class="material-icons">file_upload</i> Imports
-      </button>
-      <button 
-        [class.active]="filterType === 'delete'" 
-        (click)="onFilterChange('delete')">
-        <i class="material-icons">delete</i> Suppressions
-      </button>
-      <button 
-        [class.active]="filterType === 'create'" 
-        (click)="onFilterChange('create')">
-        <i class="material-icons">add_circle</i> Créations
-      </button>
-      <button 
-        [class.active]="filterType === 'update'" 
-        (click)="onFilterChange('update')">
-        <i class="material-icons">edit</i> Modifications
-      </button>
-    </div>
-  </div>
-
-  <div class="loading-error" *ngIf="loading || error">
-    <div class="spinner" *ngIf="loading">
-      <i class="material-icons rotating">sync</i>
-      <span>Chargement de l'historique...</span>
-    </div>
-    <div class="error-message" *ngIf="error">
-      <i class="material-icons">error_outline</i>
-      <span>{{ error }}</span>
-    </div>
-  </div>
-
-  <div class="history-list" *ngIf="!loading && !error">
-    <div class="empty-state" *ngIf="getFilteredEvents().length === 0">
-      <i class="material-icons">history</i>
-      <p>Aucun événement trouvé</p>
-      <span *ngIf="searchTerm || filterType !== 'all'">Essayez de modifier vos filtres de recherche</span>
-    </div>
-
-    <div class="history-item" *ngFor="let event of getPaginatedEvents()">
-      <div class="event-icon" [ngClass]="getActionClass(event.action)">
-        <i class="material-icons">{{ getActionIcon(event.action) }}</i>
-      </div>
-      <div class="event-content">
-        <div class="event-header">
-          <span class="event-time">{{ formatDate(event.timestamp) }}</span>
-          <span class="event-user">{{ event.username }}</span>
+  <div class="main-content">
+    <div class="history-container">
+      <div class="filters">
+        <div class="search-box">
+          <i class="material-icons">search</i>
+          <input 
+            type="text" 
+            placeholder="Rechercher dans l'historique..." 
+            [(ngModel)]="searchTerm"
+            (input)="onSearch(searchTerm)"
+          >
         </div>
-        <div class="event-description">
-          {{ getFormattedDescription(event) }}
-        </div>
-        <div class="event-details" *ngIf="event.details">
-          <p>{{ event.details }}</p>
+        <div class="filter-actions">
+          <button 
+            [class.active]="filterType === 'all'" 
+            (click)="onFilterChange('all')">
+            <i class="material-icons">history</i> Tous
+          </button>
+          <button 
+            [class.active]="filterType === 'import'" 
+            (click)="onFilterChange('import')">
+            <i class="material-icons">file_upload</i> Imports
+          </button>
+          <button 
+            [class.active]="filterType === 'delete'" 
+            (click)="onFilterChange('delete')">
+            <i class="material-icons">delete</i> Suppressions
+          </button>
+          <button 
+            [class.active]="filterType === 'create'" 
+            (click)="onFilterChange('create')">
+            <i class="material-icons">add_circle</i> Créations
+          </button>
+          <button 
+            [class.active]="filterType === 'update'" 
+            (click)="onFilterChange('update')">
+            <i class="material-icons">edit</i> Modifications
+          </button>
+          <button (click)="onFilterChange('LOGIN')" [class.active]="filterType === 'LOGIN'">
+            <i class="fas fa-sign-in-alt"></i> Logins
+          </button>
         </div>
       </div>
-    </div>
 
-    <div class="pagination" *ngIf="getFilteredEvents().length > itemsPerPage">
-      <button 
-        [disabled]="currentPage === 1"
-        (click)="onPageChange(currentPage - 1)">
-        <i class="material-icons">chevron_left</i>
-      </button>
-      <span>Page {{ currentPage }} sur {{ Math.ceil(getFilteredEvents().length / itemsPerPage) }}</span>
-      <button 
-        [disabled]="currentPage >= Math.ceil(getFilteredEvents().length / itemsPerPage)"
-        (click)="onPageChange(currentPage + 1)">
-        <i class="material-icons">chevron_right</i>
-      </button>
+      <div class="loading-error" *ngIf="loading || error">
+        <div class="spinner" *ngIf="loading">
+          <i class="material-icons rotating">sync</i>
+          <span>Chargement de l'historique...</span>
+        </div>
+        <div class="error-message" *ngIf="error">
+          <i class="material-icons">error_outline</i>
+          <span>{{ error }}</span>
+        </div>
+      </div>
+
+      <div class="history-list" *ngIf="!loading && !error">
+        <div class="empty-state" *ngIf="getFilteredEvents().length === 0">
+          <i class="material-icons">history</i>
+          <p>Aucun événement trouvé</p>
+          <span *ngIf="searchTerm || filterType !== 'all'">Essayez de modifier vos filtres de recherche</span>
+        </div>
+
+        <div class="history-item" *ngFor="let event of getPaginatedEvents()">
+          <div class="event-icon" [ngClass]="getActionClass(event.action)">
+            <i class="material-icons">{{ getActionIcon(event.action) }}</i>
+          </div>
+          <div class="event-content">
+            <div class="event-header">
+              <span class="event-time">{{ formatDate(event.timestamp) }}</span>
+              <span class="event-user">{{ event.username }}</span>
+            </div>
+            <div class="event-description">
+              {{ getFormattedDescription(event) }}
+            </div>
+            <div class="event-details" *ngIf="event.details">
+              <p>{{ event.details }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pagination" *ngIf="getFilteredEvents().length > itemsPerPage">
+          <button 
+            [disabled]="currentPage === 1"
+            (click)="onPageChange(currentPage - 1)">
+            <i class="material-icons">chevron_left</i>
+          </button>
+          <span>Page {{ currentPage }} sur {{ Math.ceil(getFilteredEvents().length / itemsPerPage) }}</span>
+          <button 
+            [disabled]="currentPage >= Math.ceil(getFilteredEvents().length / itemsPerPage)"
+            (click)="onPageChange(currentPage + 1)">
+            <i class="material-icons">chevron_right</i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

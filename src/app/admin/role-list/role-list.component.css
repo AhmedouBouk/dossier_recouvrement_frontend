@@ -154,7 +154,7 @@ header:hover {
 /* Main Content */
 .main-content {
   padding: 20px 30px;
-  margin-top: 20px;
+  margin-top: 70px;
 }
 
 .container {
@@ -257,19 +257,39 @@ tbody tr:hover {
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.edit-btn, .delete-btn {
-  padding: 8px 16px;
+/* Base button style */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
   border: none;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
   gap: 5px;
+}
+
+/* Edit button */
+.edit-btn, .toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  gap: 10px;
 }
 
 .edit-btn {
@@ -277,15 +297,90 @@ tbody tr:hover {
   color: white;
 }
 
-.delete-btn {
+.edit-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.toggle-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn[class*="desactivate"] {
+  background-color: #ef4444;
+}
+
+.toggle-btn[class*="desactivate"]:hover {
+  background-color: #dc2626;
+}
+
+.edit-btn i, .toggle-btn i {
+  font-size: 20px;
+}
+
+/* Activate button */
+.activate-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.activate-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Deactivate button */
+.deactivate-btn {
   background-color: #ef4444;
   color: white;
 }
 
-.edit-btn:hover, .delete-btn:hover {
+.deactivate-btn:hover {
+  background-color: #dc2626;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+
+/* Button icons */
+.action-btn i {
+  font-size: 14px;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-active {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status-inactive {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* Inactive role row styling */
+tr.role-inactive td {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+}
+
 
 /* Role Chips */
 .role-chip {

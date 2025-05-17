@@ -51,63 +51,57 @@
             </td>
             <td>{{ dossier.dateCreation }}</td>
             <td>
-              <div class="action-buttons">
-                <input *ngIf="roleService.hasImportChequePermission()"
-                  type="file"
-                  (change)="onFileSelected($event, dossier)"
-                  accept=".pdf"
-                  hidden
-                  id="file-upload-{{ dossier.id }}"
-                />
-                <label *ngIf="roleService.hasImportChequePermission()"
-                  for="file-upload-{{ dossier.id }}"
-                  class="upload-btn"
-                >
-                  <i class="material-icons">file_upload</i>
-                  
-                </label>
+  <div class="action-buttons">
+    <!-- Input FICHIER (upload automatique après sélection) -->
+    <input *ngIf="roleService.hasImportChequePermission() && dossier.status !== 'Clôturé'"
+      type="file"
+      (change)="onFileSelectedAndUpload($event, dossier)"
+      accept=".pdf"
+      hidden
+      id="file-upload-{{ dossier.id }}"
+    />
 
-                <button *ngIf="roleService.hasImportChequePermission()"
-                  class="add-btn"
-                  (click)="uploadChequeFile(dossier)"
-                  [disabled]="!dossier.selectedFile"
-                >
-                  <i class="material-icons">cloud_upload</i>
-                  
-                </button>
+    <!-- BOUTON unique : choisir + upload auto -->
+    <label *ngIf="roleService.hasImportChequePermission() && dossier.status !== 'Clôturé'"
+      for="file-upload-{{ dossier.id }}"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
+    >
+      <i class="material-icons">file_upload</i>
+    </label>
 
-                <!-- Visualiser un fichier -->
-                <button *ngIf="roleService.hasReadChequePermission()"
-                  class="view-btn"
-                  (click)="viewChequeFile(dossier, false)"
-                  [disabled]="!dossier.chequeFile"
-                >
-                  <i class="material-icons">visibility</i>
-                  
-                </button>
+    <!-- Visualiser -->
+    <button *ngIf="roleService.hasReadChequePermission()"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
+      (click)="viewChequeFile(dossier, false)"
+      [disabled]="!dossier.chequeFile"
+    >
+      <i class="material-icons">visibility</i>
+    </button>
 
-                <!-- Télécharger un fichier -->
-             
-              <!-- Téléchargement du fichier -->
-              <button *ngIf="roleService.hasReadChequePermission()"
-                class="download-btn"
-                (click)="viewChequeFile(dossier, true)"
-                [disabled]="!dossier.chequeFile">
-                <i class="material-icons">download</i>
-                
-              </button>
+    <!-- Télécharger -->
+    <button *ngIf="roleService.hasReadChequePermission()"
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
+      (click)="viewChequeFile(dossier, true)"
+      [disabled]="!dossier.chequeFile"
+    >
+      <i class="material-icons">download</i>
+    </button>
 
-                <!-- Supprimer un fichier -->
-                <button *ngIf="roleService.hasDeleteChequePermission()"
-                  class="delete-btn"
-                  (click)="deleteChequeFile(dossier)"
-                  [disabled]="!dossier.chequeFile"
-                >
-                  <i class="material-icons">delete</i>
-                  
-                </button>
-              </div>
-            </td>
+    <!-- Supprimer -->
+    <button *ngIf="roleService.hasDeleteChequePermission() && dossier.status !== 'Clôturé'"
+      class="icon-btn delete-btn"
+      data-tooltip="Supprimer"
+      (click)="deleteChequeFile(dossier)"
+      [disabled]="!dossier.chequeFile"
+    >
+      <i class="material-icons">delete</i>
+    </button>
+  </div>
+</td>
+
           </tr>
         </tbody>
       </table>
