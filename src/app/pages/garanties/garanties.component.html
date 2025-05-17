@@ -34,7 +34,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.id }}</td>
+<td>
+  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+    {{ dossier.id }}
+  </a>
+</td>
             <td>{{ dossier.compte.nomCompte }}</td>
 
             <!-- Fichier de la garantie -->
@@ -90,7 +94,7 @@ accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
 
 <!-- Bouton CHOISIR ET UPLOADER automatiquement -->
 <label
-  *ngIf="dossier.status !== 'Clôturé'"
+  *ngIf=" roleService.hasImportGrantiePermission()&& dossier.status !== 'Clôturé'"
   for="file-upload-{{ dossier.id }}"
   class="upload-btn"
 >
@@ -108,7 +112,7 @@ accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
                 </button>
 
                 <!-- Télécharger fichier -->
-                <button
+                <button  *ngIf=" roleService.hasDownloadGrantiePermission()"
                   class="download-btn"
                   (click)="viewGarantieFile(dossier, true)"
                   [disabled]="!dossier.garantiesFile"
@@ -118,7 +122,7 @@ accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
 
                 <!-- Supprimer fichier -->
                 <button
-                  *ngIf="dossier.status !== 'Clôturé'"
+                  *ngIf="roleService.hasDeleteGrantiePermission() && dossier.status !== 'Clôturé'"
                   class="delete-btn"
                   (click)="deleteGarantieFile(dossier)"
                   [disabled]="!dossier.garantiesFile"

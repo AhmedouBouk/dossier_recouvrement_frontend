@@ -23,7 +23,7 @@ export class LcFileManagementComponent implements OnInit {
     private dossierService: DossierRecouvrementService,
     private lcFileService: LcFileService,
     public roleService: RoleService,
-    public authService: AuthService
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {

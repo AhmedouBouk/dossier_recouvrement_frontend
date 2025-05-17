@@ -36,7 +36,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.id }}</td>
+<td>
+  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+    {{ dossier.id }}
+  </a>
+</td>
             <td>{{ dossier.compte.nomCompte }}</td>
             <td>
               <span *ngIf="dossier.lcFile; else noFile">
@@ -59,8 +63,8 @@
     />
 
     <!-- Bouton CHOISIR & UPLOADER AUTOMATIQUEMENT -->
-    <label 
-      *ngIf="dossier.status !== 'Clôturé'" 
+    <label   *ngIf="roleService.hasUploadLcFilePermission() && dossier.status !== 'Clôturé'" 
+
       for="lc-file-upload-{{ dossier.id }}" 
       class="upload-btn"
     >
@@ -77,7 +81,7 @@
     </button>
 
     <!-- Bouton Télécharger -->
-    <button 
+    <button *ngIf="roleService.hasDownloadLcFilePermission()"
       class="download-btn"
       (click)="viewLcFile(dossier, true)"
       [disabled]="!dossier.lcFile"
@@ -87,7 +91,7 @@
 
     <!-- Bouton Supprimer -->
     <button 
-      *ngIf="dossier.status !== 'Clôturé'" 
+      *ngIf=" roleService.hasDeleteLcPermission() && dossier.status !== 'Clôturé'" 
       class="delete-btn"
       (click)="deleteLcFile(dossier)"
       [disabled]="!dossier.lcFile"

@@ -36,7 +36,11 @@
           </thead>
           <tbody>
             <tr *ngFor="let dossier of dossiers">
-              <td>{{ dossier.id }}</td>
+<td>
+  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+    {{ dossier.id }}
+  </a>
+</td>
               <td>{{ dossier.compte.nomCompte }}</td>
               <td>
                 <span *ngIf="dossier.cautionsFile; else noFile">
