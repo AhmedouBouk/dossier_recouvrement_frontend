@@ -68,14 +68,16 @@
     <!-- BOUTON unique : choisir + upload auto -->
     <label *ngIf="roleService.hasImportChequePermission() && dossier.status !== 'Clôturé'"
       for="file-upload-{{ dossier.id }}"
-      class="upload-btn"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
     >
       <i class="material-icons">file_upload</i>
     </label>
 
     <!-- Visualiser -->
     <button *ngIf="roleService.hasReadChequePermission()"
-      class="view-btn"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
       (click)="viewChequeFile(dossier, false)"
       [disabled]="!dossier.chequeFile"
     >
@@ -84,7 +86,8 @@
 
     <!-- Télécharger -->
     <button *ngIf="roleService.hasReadChequePermission()"
-      class="download-btn"
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
       (click)="viewChequeFile(dossier, true)"
       [disabled]="!dossier.chequeFile"
     >
@@ -93,7 +96,8 @@
 
     <!-- Supprimer -->
     <button *ngIf="roleService.hasDeleteChequePermission() && dossier.status !== 'Clôturé'"
-      class="delete-btn"
+      class="icon-btn delete-btn"
+      data-tooltip="Supprimer"
       (click)="deleteChequeFile(dossier)"
       [disabled]="!dossier.chequeFile"
     >

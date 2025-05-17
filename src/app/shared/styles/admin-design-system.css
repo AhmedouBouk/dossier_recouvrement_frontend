@@ -1,0 +1,287 @@
+/* Admin Design System - Shared styles for admin components */
+
+/* Base variables */
+:root {
+  /* Colors */
+  --primary: #4caf50;
+  --primary-dark: #2e7d32;
+  --primary-light: #a5d6a7;
+  --primary-rgb: 46, 125, 50;
+  
+  /* Neutral colors */
+  --white: #ffffff;
+  --text-dark: #333333;
+  --text-light: #666666;
+  
+  /* Status colors */
+  --danger: #ef4444;
+  --danger-rgb: 220, 53, 69;
+  --warning: #f59e0b;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-rgb: 59, 130, 246;
+  --success: #10b981;
+  --success-rgb: 16, 185, 129;
+  
+  /* Grays */
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-standard: 0.3s ease;
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+}
+
+/* Common button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--gray-200);
+  color: var(--gray-800);
+}
+
+.btn-secondary:hover {
+  background-color: var(--gray-300);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background-color: rgba(var(--danger-rgb), 0.9);
+}
+
+.btn-info {
+  background-color: var(--info);
+  color: var(--white);
+}
+
+.btn-info:hover {
+  background-color: rgba(var(--info-rgb), 0.9);
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: var(--white);
+}
+
+.btn-success:hover {
+  background-color: rgba(var(--success-rgb), 0.9);
+}
+
+/* Common card styles */
+.card {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--spacing-lg);
+  transition: box-shadow var(--transition-standard);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Table styles */
+.table-container {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead tr {
+  background-color: var(--gray-100);
+}
+
+th {
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: left;
+  color: var(--gray-800);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--gray-200);
+  font-size: 14px;
+  color: var(--gray-700);
+}
+
+tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+tbody tr:hover {
+  background-color: var(--gray-100);
+}
+
+/* Action buttons in tables */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* Layout containers */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.main-content {
+  padding: var(--spacing-lg) 0;
+}
+
+.actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Common form styles */
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  transition: border-color var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+/* Responsive breakpoints */
+/* These are common breakpoints to use across components */
+/* Small devices (phones) */
+@media (max-width: 576px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .actions-bar {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Medium devices (tablets) */
+@media (max-width: 768px) {
+  .card {
+    padding: var(--spacing-md);
+  }
+  
+  th, td {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* Large devices (desktops) */
+@media (max-width: 992px) {
+  .container {
+    max-width: 100%;
+  }
+}

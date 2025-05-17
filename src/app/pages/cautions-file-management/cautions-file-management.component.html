@@ -65,14 +65,16 @@
     <!-- Bouton unique : choisir + uploader -->
     <label *ngIf="roleService.hasCreateCautionPermission() && dossier.status !== 'Clôturé'"
       for="cautions-file-upload-{{ dossier.id }}"
-      class="upload-btn"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
     >
       <i class="material-icons">file_upload</i>
     </label>
 
     <!-- Visualiser -->
     <button *ngIf="dossier.cautionsFile"
-      class="view-btn"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
       (click)="viewCautionsFile(dossier)"
     >
       <i class="material-icons">visibility</i>
@@ -80,7 +82,8 @@
 
     <!-- Télécharger -->
     <button *ngIf="dossier.cautionsFile"
-      class="download-btn"
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
       (click)="viewCautionsFile(dossier, true)"
     >
       <i class="material-icons">download</i>
@@ -88,7 +91,8 @@
 
     <!-- Supprimer -->
     <button *ngIf="roleService.hasDeleteCautionPermission() && dossier.status !== 'Clôturé'"
-      class="delete-btn"
+      class="icon-btn delete-btn"
+      data-tooltip="Supprimer"
       (click)="deleteCautionsFile(dossier)"
       [disabled]="!dossier.cautionsFile"
     >

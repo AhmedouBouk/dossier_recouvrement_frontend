@@ -66,14 +66,16 @@
     <!-- Bouton CHOISIR & UPLOADER automatiquement -->
     <label *ngIf="roleService.hasUploadCreditFilePermission()&& dossier.status !== 'Clôturé'" 
       for="file-upload-{{ dossier.id }}"
-      class="upload-btn"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
     >
       <i class="material-icons">file_upload</i>
     </label>
 
     <!-- Visualiser un fichier -->
     <button
-      class="view-btn"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
       (click)="viewCreditsFile(dossier)"
       [disabled]="!dossier.creditsFile"
     >
@@ -82,7 +84,8 @@
 
     <!-- Télécharger -->
     <button *ngIf="roleService.hasDownloadCreditFilePermission()" 
-      class="download-btn"
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
       (click)="viewCreditsFile(dossier, true)"
       [disabled]="!dossier.creditsFile"
     >
@@ -90,7 +93,7 @@
     </button>
 
     <!-- Supprimer -->
-    <button *ngIf="roleService.hasDeleteCreditPermission() && dossier.status !== 'Clôturé'" 
+    <button *ngIf="dossier.status !== 'Clôturé'" 
       class="delete-btn"
       (click)="deleteCreditsFile(dossier)"
       [disabled]="!dossier.creditsFile"
