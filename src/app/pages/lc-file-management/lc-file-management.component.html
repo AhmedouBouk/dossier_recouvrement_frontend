@@ -71,7 +71,7 @@
     </button>
 
     <!-- Bouton Télécharger -->
-    <button 
+    <button *ngIf="roleService.hasDownloadLcFilePermission()" 
       class="icon-btn download-btn"
       data-tooltip="Télécharger"
       (click)="viewLcFile(dossier, true)"
@@ -82,7 +82,7 @@
 
     <!-- Bouton Supprimer -->
     <button 
-      *ngIf="dossier.status !== 'Clôturé'" 
+      *ngIf=" roleService.hasDeleteLcPermission() && dossier.status !== 'Clôturé'" 
       class="icon-btn delete-btn"
       data-tooltip="Supprimer"
       (click)="deleteLcFile(dossier)"
