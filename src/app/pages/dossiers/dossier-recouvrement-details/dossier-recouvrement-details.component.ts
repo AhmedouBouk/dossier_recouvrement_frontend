@@ -6,6 +6,8 @@ import { DossierRecouvrementService } from 'src/app/shared/services/dossier-reco
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserDataService } from 'src/app/shared/services/user-data.service';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 
 interface Comment {
   id?: number;
@@ -359,5 +361,215 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
           this.isLoading = false;
         }
       });
+  }
+
+  generatePDF() {
+    try {
+      if (!this.dossierDetails) {
+        console.error('Aucun dossier disponible pour la génération du PDF');
+        return;
+      }
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let y = margin; // Commencer au niveau de la marge
+
+      // --- Configuration du Logo ---
+      const logoPath = 'assets/logo.png'; // <-- Chemin vers votre logo
+      const logoFormat = 'PNG'; // <-- Spécifiez le format (ex: 'PNG', 'JPEG')
+      const logoWidth = 25; // Ajustez la largeur
+      const logoHeight = 25; // Ajustez la hauteur (maintenez les proportions)
+      const logoX = margin; // Position X (gauche)
+      const logoY = margin; // Position Y (haut)
+
+       try {
+           // jsPDF va essayer de charger l'image à partir de ce chemin
+           doc.addImage(logoPath, logoFormat, logoX, logoY, logoWidth, logoHeight);
+       } catch (e) {
+           console.error('Erreur lors de l\'ajout du logo. Assurez-vous que le chemin est correct et que l\'image est accessible:', e);
+       }
+      // --------------------------------
+
+      // Titre du document (sans en-tête bleu)
+      doc.setFontSize(24); // Taille plus grande pour un titre principal
+      doc.setTextColor(30, 64, 175); // Couleur bleue/grise foncée pour le titre
+      // Positionner le titre à droite du logo ou centré si pas de logo
+      const titleX = logoPath && logoPath !== 'assets/logo.png' ? margin + logoWidth + 10 : pageWidth / 2;
+      const titleAlign = logoPath && logoPath !== 'assets/logo.png' ? 'left' : 'center';
+      doc.text('Dossier de Recouvrement', titleX, margin + (logoHeight > 0 ? logoHeight / 2 : 10), { align: titleAlign }); // Ajuster Y pour aligner avec logo ou marge
+
+      doc.setTextColor(0, 0, 0); // Rétablir la couleur noire pour le corps du document
+      // Démarrer le contenu sous le titre et/ou le logo
+      y = margin + (logoHeight > 0 ? logoHeight : 20) + 15; // Position Y pour le contenu
+
+      function cleanNumeric(val: any): string {
+        // Si c'est un nombre, on le formate avec espace pour les milliers
+        if (typeof val === 'number') {
+          return val.toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+        }
+        // Si c'est une chaîne, on enlève tout sauf chiffres
+        if (typeof val === 'string') {
+          // On enlève tout sauf chiffres
+          const cleaned = val.replace(/[^0-9]/g, '');
+          if (cleaned.length > 0) {
+            // On parse en nombre puis on re-formate
+            return Number(cleaned).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+          }
+          return '';
+        }
+        return '';
+      }
+
+      // Préparation des données pour la grille 3 colonnes
+      // LOGS DIAGNOSTIC
+      console.log('Montant Principal brut:', this.dossierDetails.montantPrincipal);
+      console.log('Montant Principal nettoyé:', cleanNumeric(this.dossierDetails.montantPrincipal));
+      console.log('Intérêt Contractuel brut:', this.dossierDetails.interetContractuel);
+      console.log('Intérêt Contractuel nettoyé:', cleanNumeric(this.dossierDetails.interetContractuel));
+      console.log('Intérêt de Retard brut:', this.dossierDetails.interetRetard);
+      console.log('Intérêt de Retard nettoyé:', cleanNumeric(this.dossierDetails.interetRetard));
+      console.log('Engagement Total brut:', this.dossierDetails.engagementTotal);
+      console.log('Engagement Total nettoyé:', cleanNumeric(this.dossierDetails.engagementTotal));
+      console.log('Provision brut:', this.dossierDetails.provision);
+      console.log('Provision nettoyé:', cleanNumeric(this.dossierDetails.provision));
+
+      const fields = [
+        { label: `ID Dossier`, value: this.dossierDetails.id },
+        { label: `Numéro de Compte`, value: this.dossierDetails.compte.nomCompte },
+        { label: `Engagement Total`, value: cleanNumeric(this.dossierDetails.engagementTotal) },
+        { label: `Montant Principal`, value: cleanNumeric(this.dossierDetails.montantPrincipal) },
+        { label: `Intérêt Contractuel`, value: cleanNumeric(this.dossierDetails.interetContractuel) },
+        { label: `Intérêt de Retard`, value: cleanNumeric(this.dossierDetails.interetRetard) },
+        { label: `Origines de l'engagement`, value: this.dossierDetails.naturesEngagement },
+        { label: `Agence d'ouverture`, value: this.dossierDetails.agenceOuvertureCompte },
+        { label: `Références Chèques`, value: this.dossierDetails.referencesChecks || 'Non spécifié' },
+        { label: `Références Crédits`, value: this.dossierDetails.referencesCredits || 'Non spécifié' },
+        { label: `Références Cautions`, value: this.dossierDetails.referencesCautions || 'Non spécifié' },
+        { label: `Références LC`, value: this.dossierDetails.referencesLC || 'Non spécifié' },
+        { label: `Provision`, value: cleanNumeric(this.dossierDetails.provision) },
+        { label: `Garanties Valeur`, value: this.dossierDetails.garantiesValeur || 'Non spécifié' },
+      ];
+
+      // Affichage en grille 3 colonnes
+      const colCount = 3;
+      const colWidth = (pageWidth - 2 * margin) / colCount;
+      for (let i = 0; i < fields.length; i += colCount) {
+        for (let col = 0; col < colCount; col++) {
+          const field = fields[i + col];
+          if (!field) continue;
+          const x = margin + col * colWidth;
+          // Label
+          doc.setFontSize(11);
+          doc.setTextColor(120, 130, 140);
+          doc.text(field.label, x, y);
+          // Valeur
+          doc.setFontSize(14);
+          doc.setTextColor(33, 33, 33);
+          doc.setFont('helvetica', 'bold');
+          doc.text(String(field.value), x, y + 7);
+          doc.setFont('helvetica', 'normal');
+        }
+        y += 18;
+      }
+      y += 5;
+
+      // Statut et État de Validation (même style que les autres champs)
+      doc.setFontSize(11);
+      doc.setTextColor(120, 130, 140);
+      doc.text('Status', margin, y);
+      doc.text('État de Validation', margin + colWidth, y);
+      // Valeurs
+      doc.setFontSize(14);
+      doc.setTextColor(33, 33, 33);
+      doc.setFont('helvetica', 'bold');
+      doc.text(this.dossierDetails.status || '', margin, y + 7);
+      doc.text(this.dossierDetails.etatValidation || '', margin + colWidth, y + 7);
+      doc.setFont('helvetica', 'normal');
+      y += 18;
+
+      // Section Commentaires (couleur inspirée du logo)
+      doc.setFontSize(15);
+      doc.setTextColor(50, 50, 50); // Gris foncé/noir inspiré du logo
+      doc.text('Commentaires', margin, y);
+      y += 8;
+      // Tableau des commentaires
+      const tableData = this.comments.map(comment => [
+        this.formatDate(comment.createdAt),
+        comment.content,
+        comment.reminderDateTime ? this.formatDate(comment.reminderDateTime) : 'Non défini',
+        comment.user?.name || 'Utilisateur inconnu'
+      ]);
+      autoTable(doc, {
+        startY: y,
+        head: [['DATE', 'COMMENTAIRE', 'DATE DE RAPPEL', 'UTILISATEUR']],
+        body: tableData,
+        theme: 'plain', // Utilisation du thème plain
+        styles: {
+          fontSize: 11,
+          cellPadding: 5,
+          halign: 'left',
+          valign: 'top', // Aligner en haut pour les commentaires longs
+          textColor: [50, 50, 50], // Texte gris foncé
+          lineColor: [230, 230, 230], // Lignes très claires
+          lineWidth: 0.2, // Lignes fines
+        },
+        headStyles: {
+          textColor: [30, 64, 175], // Conserver la couleur bleue/grise de l'en-tête du tableau
+          fontStyle: 'bold',
+          fontSize: 12,
+          halign: 'left',
+          // Utiliser lineColor et lineWidth standards pour la ligne sous l'en-tête
+          lineColor: [30, 64, 175], 
+          lineWidth: 0.5, 
+        },
+        alternateRowStyles: {
+          fillColor: [248, 248, 248] // Gris très clair pour les lignes alternées
+        },
+        columnStyles: {
+          0: { cellWidth: 35 },
+          1: { cellWidth: 85 }, // Ajusté légèrement pour le commentaire
+          2: { cellWidth: 35 },
+          3: { cellWidth: 30 }
+        },
+        margin: { top: 10 },
+        // Supprimer didDrawCell, plain theme gère les lignes horizontales
+      });
+
+      // Pied de page
+      const pageCount = doc.getNumberOfPages();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const footerY = pageHeight - 10; // Position Y pour le pied de page
+
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(128, 128, 128);
+
+        // Numéro de page (au centre)
+        doc.text(
+          `Page ${i} sur ${pageCount}`,
+          pageWidth / 2,
+          footerY,
+          { align: 'center' }
+        );
+      }
+
+      // Déplacer la date de génération ici, après le tableau
+      const finalY = (doc as any).lastAutoTable.finalY || y; // Obtenir la position Y finale du tableau ou utiliser la dernière position connue
+      const currentDate = new Date().toLocaleDateString('fr-FR'); // Obtenir la date formatée
+      doc.setFontSize(10);
+      doc.setTextColor(128, 128, 128);
+      doc.text(
+        `Généré le ${currentDate}`,
+        pageWidth - margin,
+        finalY + 10, // Ajouter un petit espace sous le tableau
+        { align: 'right' }
+      );
+
+      doc.save(`dossier_recouvrement_${this.dossierDetails.id}.pdf`);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+      alert('Une erreur est survenue lors de la génération du PDF. Veuillez réessayer.');
+    }
   }
 }
