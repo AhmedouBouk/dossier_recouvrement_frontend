@@ -2,19 +2,7 @@
 <div class="main-content">
   <div class="container">
     <!-- Barre de recherche et actions -->
-    <div class="actions-bar">
-      <div class="search-container">
-        <i class="material-icons">search</i>
-        <input
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange($event)"
-          placeholder="Rechercher par ID, compte ou nom du client"
-        />
-        <div *ngIf="isLoading" class="loading-spinner">
-          <i class="material-icons rotating">sync</i>
-        </div>
-      </div>
-    </div>
+    
 
     <!-- Indicateur de chargement -->
     <div *ngIf="isLoading" class="loading-state">
@@ -97,7 +85,7 @@
     <!-- Supprimer -->
     <button *ngIf="roleService.hasDeleteChequePermission() && dossier.status !== 'Clôturé'"
       class="icon-btn delete-btn"
-      data-tooltip="Supprimer"
+      data-tooltip="supprimer le fichier pdf"
       (click)="deleteChequeFile(dossier)"
       [disabled]="!dossier.chequeFile"
     >
