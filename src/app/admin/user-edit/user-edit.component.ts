@@ -51,7 +51,12 @@ export class UserEditComponent implements OnInit {
     const user = this.userDataService.getUser();
 
     if (user) {
-      this.user = { ...user, password: '' };
+      this.user = {
+        ...user,
+        // S'assurer que user.role est le nom du rôle (string) si c'est un objet
+        role: (user.role && typeof user.role === 'object') ? user.role.name : user.role,
+        password: ''
+      };
       this.updateAgenceFieldVisibility();
       this.isLoading = false;
     } else {
@@ -60,7 +65,9 @@ export class UserEditComponent implements OnInit {
         this.adminService.getUserById(+userId).subscribe({
           next: (response) => {
             this.user = { 
-              ...response, 
+              ...response,
+              // Extraire le nom du rôle de l'objet rôle
+              role: response.role ? response.role.name : null,
               password: '',
               agenceId: response.agence?.id
             };
@@ -154,15 +161,21 @@ export class UserEditComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const updateRequest: User = {
+    // Créer un objet de requête qui correspond à ce que le backend attend
+    const updateRequest: any = {
       id: this.user.id,
       name: this.user.name.trim(),
       email: this.user.email.trim(),
-      role: this.user.role,
+      // S'assurer que seul le nom du rôle est envoyé
+      role: typeof this.user.role === 'object' ? this.user.role.name : this.user.role,
       userType: this.user.userType,
-      password: this.user.password, // Only included if changed
+      // Inclure le mot de passe uniquement s'il a été modifié
+      password: this.user.password,
+      // Inclure l'ID de l'agence uniquement si nécessaire
       agenceId: this.showAgenceField ? this.user.agenceId : undefined
     };
+    
+    console.log('Envoi de la requête de mise à jour :', updateRequest);
 
     this.adminService.updateUser(updateRequest).subscribe({
       next: (response: User) => {

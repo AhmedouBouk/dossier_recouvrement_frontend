@@ -2,19 +2,7 @@
 <div class="main-content">
   <div class="container">
     <!-- Barre de recherche et actions -->
-    <div class="actions-bar">
-      <div class="search-container">
-        <i class="material-icons">search</i>
-        <input
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange($event)"
-          placeholder="Rechercher par ID, compte ou nom du client"
-        />
-        <div *ngIf="isLoading" class="loading-spinner">
-          <i class="material-icons rotating">sync</i>
-        </div>
-      </div>
-    </div>
+    
 
     <!-- Indicateur de chargement -->
     <div *ngIf="isLoading" class="loading-state">
@@ -36,7 +24,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.id }}</td>
+<td>
+  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+    {{ dossier.id }}
+  </a>
+</td>
             <td>{{ dossier.compte.nomCompte }}</td>
             <td>
               <span *ngIf="dossier.lcFile; else noFile">
@@ -59,8 +51,8 @@
     />
 
     <!-- Bouton CHOISIR & UPLOADER AUTOMATIQUEMENT -->
-    <label 
-      *ngIf="dossier.status !== 'Clôturé'" 
+    <label   *ngIf="roleService.hasUploadLcFilePermission() && dossier.status !== 'Clôturé'" 
+
       for="lc-file-upload-{{ dossier.id }}" 
       class="icon-btn upload-btn"
       data-tooltip="Téléverser"
@@ -79,7 +71,7 @@
     </button>
 
     <!-- Bouton Télécharger -->
-    <button 
+    <button *ngIf="roleService.hasDownloadLcFilePermission()" 
       class="icon-btn download-btn"
       data-tooltip="Télécharger"
       (click)="viewLcFile(dossier, true)"
@@ -90,7 +82,7 @@
 
     <!-- Bouton Supprimer -->
     <button 
-      *ngIf="dossier.status !== 'Clôturé'" 
+      *ngIf=" roleService.hasDeleteLcPermission() && dossier.status !== 'Clôturé'" 
       class="icon-btn delete-btn"
       data-tooltip="Supprimer"
       (click)="deleteLcFile(dossier)"

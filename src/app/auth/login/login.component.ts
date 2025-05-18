@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -13,11 +14,13 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
   isLoading: boolean = false;
   passwordVisible: boolean = false;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
-    private authService: AuthService,
-    private router: Router,
-    private fb: FormBuilder
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly fb: FormBuilder,
+    private readonly snackBar: MatSnackBar
   ) {
     if (this.authService.isAuthenticated()) {
       this.navigateBasedOnRole(this.authService.getRole());
@@ -81,14 +84,42 @@ export class LoginComponent implements OnInit {
 
   getErrorMessage(controlName: string): string {
     const control = this.loginForm.get(controlName);
-    if (control?.errors) {
-      if (control.errors['required']) {
-        return `Le champ ${controlName === 'email' ? 'nom d\'utilisateur' : 'mot de passe'} est requis`;
-      }
-      if (control.errors['minlength']) {
-        return 'Le mot de passe doit contenir au moins 6 caractères';
-      }
+    if (!control) return '';
+    
+    if (control.hasError('required')) {
+      return 'Ce champ est requis';
     }
-    return '';
+    
+    if (control.hasError('minlength')) {
+      return `Minimum ${control.getError('minlength').requiredLength} caractères`;
+    }
+    
+    return 'Champ invalide';
+  }
+
+  onForgotPassword(): void {
+    this.snackBar.open('Fonctionnalité de réinitialisation du mot de passe à venir', 'Fermer', {
+      duration: 5000,
+      panelClass: ['snackbar-info']
+    });
+  }
+
+  onContactSupport(): void {
+    this.snackBar.open('Veuillez contacter le support à support@bnm.mr', 'Copier', {
+      duration: 10000,
+      panelClass: ['snackbar-info']
+    }).onAction().subscribe(() => {
+      navigator.clipboard.writeText('support@bnm.mr');
+      this.snackBar.open('Adresse email copiée dans le presse-papier', 'OK', {
+        duration: 3000
+      });
+    });
+  }
+
+  onPrivacyPolicy(): void {
+    this.snackBar.open('Politique de confidentialité - En cours de préparation', 'Fermer', {
+      duration: 5000,
+      panelClass: ['snackbar-info']
+    });
   }
 }
