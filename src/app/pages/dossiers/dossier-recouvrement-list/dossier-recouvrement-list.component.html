@@ -59,8 +59,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.id }}</td>
-            <td>{{ dossier.compte.nomCompte }}</td>
+clea            <td>{{ dossier.compte.nomCompte }}</td>
             <td>{{ dossier.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td>{{ dossier.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td>
@@ -78,7 +77,8 @@
                     'status-invalid': dossier.etatValidation === 'NON_VALIDE',
                     'clickable': dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()
                   }"
-                  (click)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && openValidationMenu(dossier, $event)">
+                  (click)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && openValidationMenu(dossier, $event)"
+                  (keydown)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && $event.key === 'Enter' && openValidationMenu(dossier, $event)">
                   
                   {{ dossier.etatValidation }}
                   
@@ -89,10 +89,10 @@
               
                 <!-- Menu de validation (visible uniquement si permission) -->
                 <div *ngIf="selectedDossierForValidation?.id === dossier.id && roleService.hasValidationPermission()" class="validation-menu horizontal-menu">
-                  <button class="validation-option accept" title="Accepter" (click)="validateDossier(dossier, 'VALIDE')">
+                  <button class="icon-btn validation-option accept" data-tooltip="Accepter" (click)="validateDossier(dossier, 'VALIDE')">
                     <i class="material-icons">check_circle</i>
                   </button>
-                  <button class="validation-option reject" title="Refuser" (click)="validateDossier(dossier, 'NON_VALIDE')">
+                  <button class="icon-btn validation-option reject" data-tooltip="Refuser" (click)="validateDossier(dossier, 'NON_VALIDE')">
                     <i class="material-icons">cancel</i>
                   </button>
                 </div>
@@ -102,12 +102,13 @@
             <td>
               <div class="action-buttons">
                 <!-- Toujours visible -->
-                <button class="view-btn" (click)="navigateToDetails(dossier.id)">
+                <button class="icon-btn view-btn" data-tooltip="Voir détails" (click)="navigateToDetails(dossier.id)">
                   <i class="material-icons">visibility</i>
                 </button>
               
                 <!-- Modifier (besoin de UPDATE_DOSSIERRECOUVREMENT) -->
-                <button class="edit-btn" 
+                <button class="icon-btn edit-btn" 
+        data-tooltip="Modifier" 
         *ngIf="roleService.hasUpdateDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
         (click)="navigateToEdit(dossier.id)">
   <i class="material-icons">edit</i>
@@ -115,14 +116,16 @@
 
               
                 <!-- Télécharger mise en demeure (besoin de DOWNLOAD_MISE_EN_DEMEURE) -->
-                <button class="pdf-btn" 
+                <button class="icon-btn pdf-btn" 
+                        data-tooltip="Télécharger PDF" 
                         *ngIf="roleService.hasDownloadMiseEnDemeurePermission()" 
                         (click)="telechargerMiseEnDemeure(dossier)">
                   <i class="material-icons">picture_as_pdf</i>
                 </button>
               
                 <!-- Supprimer (besoin de DELETE_DOSSIERRECOUVREMENT) -->
-                <button class="delete-btn" 
+                <button class="icon-btn delete-btn" 
+                        data-tooltip="Supprimer" 
                         *ngIf="roleService.hasDeleteDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
                         (click)="deleteDossier(dossier.id)">
                   <i class="material-icons">delete</i>

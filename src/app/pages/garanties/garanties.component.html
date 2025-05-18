@@ -34,7 +34,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-            <td>{{ dossier.id }}</td>
+<td>
+  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+    {{ dossier.id }}
+  </a>
+</td>
             <td>{{ dossier.compte.nomCompte }}</td>
 
             <!-- Fichier de la garantie -->
@@ -55,18 +59,19 @@
                   class="edit-input"
                   placeholder="Titre de la garantie"
                 />
-                <button class="save-btn" (click)="updateGarantie(dossier)">
-                  <i class="material-icons">save</i> Sauvegarder
+                <button class="icon-btn save-btn" data-tooltip="Sauvegarder" (click)="updateGarantie(dossier)">
+                  <i class="material-icons">save</i>
                 </button>
-                <button class="cancel-btn" (click)="cancelEdit()">
-                  <i class="material-icons">close</i> Annuler
+                <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit()">
+                  <i class="material-icons">close</i>
                 </button>
               </ng-container>
 
               <ng-template #viewMode>
                 <span
                   class="editable-text"
-                  (click)="dossier.status !== 'Clôturé' && startEdit(dossier)">
+                  (click)="dossier.status !== 'Clôturé' && startEdit(dossier)"
+                  (keydown)="$event.key === 'Enter' && dossier.status !== 'Clôturé' && startEdit(dossier)">
                   {{ dossier.garantiesTitre || 'Aucun titre' }}
                 </span>
               </ng-template>
@@ -90,9 +95,10 @@ accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
 
 <!-- Bouton CHOISIR ET UPLOADER automatiquement -->
 <label
-  *ngIf="dossier.status !== 'Clôturé'"
+  *ngIf=" roleService.hasImportGrantiePermission()&& dossier.status !== 'Clôturé'"
   for="file-upload-{{ dossier.id }}"
-  class="upload-btn"
+  class="icon-btn upload-btn"
+  data-tooltip="Téléverser"
 >
   <i class="material-icons">file_upload</i>
 </label>
@@ -100,7 +106,8 @@ accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
 
                 <!-- Visualiser fichier -->
                 <button
-                  class="view-btn"
+                  class="icon-btn view-btn"
+                  data-tooltip="Visualiser"
                   (click)="viewGarantieFile(dossier, false)"
                   [disabled]="!dossier.garantiesFile"
                 >
@@ -108,8 +115,9 @@ accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
                 </button>
 
                 <!-- Télécharger fichier -->
-                <button
-                  class="download-btn"
+                <button  *ngIf=" roleService.hasDownloadGrantiePermission()"
+                  class="icon-btn download-btn"
+                  data-tooltip="Télécharger"
                   (click)="viewGarantieFile(dossier, true)"
                   [disabled]="!dossier.garantiesFile"
                 >

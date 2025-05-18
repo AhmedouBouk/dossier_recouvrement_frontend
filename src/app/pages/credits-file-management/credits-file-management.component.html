@@ -36,7 +36,11 @@
           </thead>
           <tbody>
             <tr *ngFor="let dossier of dossiers">
-              <td>{{ dossier.id }}</td>
+<td>
+  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+    {{ dossier.id }}
+  </a>
+</td>
               <td>{{ dossier.compte.nomCompte }}</td>
               <td>
                 <span *ngIf="dossier.creditsFile; else noFile">
@@ -60,16 +64,18 @@
     />
 
     <!-- Bouton CHOISIR & UPLOADER automatiquement -->
-    <label *ngIf="dossier.status !== 'Clôturé'" 
+    <label *ngIf="roleService.hasUploadCreditFilePermission()&& dossier.status !== 'Clôturé'" 
       for="file-upload-{{ dossier.id }}"
-      class="upload-btn"
+      class="icon-btn upload-btn"
+      data-tooltip="Téléverser"
     >
       <i class="material-icons">file_upload</i>
     </label>
 
     <!-- Visualiser un fichier -->
     <button
-      class="view-btn"
+      class="icon-btn view-btn"
+      data-tooltip="Visualiser"
       (click)="viewCreditsFile(dossier)"
       [disabled]="!dossier.creditsFile"
     >
@@ -77,8 +83,9 @@
     </button>
 
     <!-- Télécharger -->
-    <button
-      class="download-btn"
+    <button *ngIf="roleService.hasDownloadCreditFilePermission()" 
+      class="icon-btn download-btn"
+      data-tooltip="Télécharger"
       (click)="viewCreditsFile(dossier, true)"
       [disabled]="!dossier.creditsFile"
     >

@@ -70,10 +70,84 @@
             {{ dossierDetails.etatValidation }}
           </span>
         </div>
+        <div class="detail-item">
+  <span class="label">Titre de la garantie</span>
+  <span class="value">{{ dossierDetails.garantiesTitre || 'Non spécifié' }}</span>
+</div>
+
+<div class="detail-item">
+  <span class="label">Valeur de la garantie</span>
+  <span class="value">{{ dossierDetails.garantiesValeur | currency:'EUR':'symbol':'1.0-0' }}</span>
+</div>
+
+<div class="detail-item">
+  <span class="label">Fichier de la garantie</span>
+  <span class="value">
+    <ng-container *ngIf="dossierDetails.garantiesFile; else noGarantieFile">
+      <a  (click)="viewGarantieFile(dossierDetails, false)">📄 Voir le fichier</a>
+    </ng-container>
+    <ng-template #noGarantieFile>
+      📂 Aucun fichier
+    </ng-template>
+  </span>
+</div>
+<!-- Fichier des crédits -->
+<div class="detail-item">
+  <span class="label">Fichier des crédits</span>
+  <span class="value">
+    <ng-container *ngIf="dossierDetails.creditsFile; else noCreditsFile">
+      <a (click)="viewCreditsFile(dossierDetails, false)">📄 Voir le fichier</a>
+    </ng-container>
+    <ng-template #noCreditsFile>
+      📂 Aucun fichier
+    </ng-template>
+  </span>
+</div>
+
+<!-- Fichier des cautions -->
+<div class="detail-item">
+  <span class="label">Fichier des cautions</span>
+  <span class="value">
+    <ng-container *ngIf="dossierDetails.cautionsFile; else noCautionsFile">
+      <a (click)="viewCautionsFile(dossierDetails, false)">📄 Voir le fichier</a>
+    </ng-container>
+    <ng-template #noCautionsFile>
+      📂 Aucun fichier
+    </ng-template>
+  </span>
+</div>
+
+<!-- Fichier des lettres de crédit (LC) -->
+<div class="detail-item">
+  <span class="label">Fichier des lettres de crédit</span>
+  <span class="value">
+    <ng-container *ngIf="dossierDetails.lcFile; else noLCFile">
+      <a (click)="viewLcFile(dossierDetails, false)">📄 Voir le fichier</a>
+    </ng-container>
+    <ng-template #noLCFile>
+      📂 Aucun fichier
+    </ng-template>
+  </span>
+</div>
+
+<!-- Fichier des chèques -->
+<div class="detail-item">
+  <span class="label">Fichier des chèques</span>
+  <span class="value">
+    <ng-container *ngIf="dossierDetails.chequeFile; else noChequeFile">
+      <a (click)="viewChequeFile(dossierDetails, false)">📄 Voir le fichier</a>
+    </ng-container>
+    <ng-template #noChequeFile>
+      📂 Aucun fichier
+    </ng-template>
+  </span>
+</div>
+
       </div>
 
       <!-- Comments Section -->
-      <div class="comments-section">
+<!-- Comments Section -->
+<div class="comments-section" *ngIf="canComment()">
         <h3 class="section-title">Commentaires</h3>
         
         <!-- Add Comment Form -->
@@ -135,11 +209,11 @@
               </span>
               
               <!-- Boutons d'action pour les commentaires -->
-              <div class="comment-actions" *ngIf="canEditComment(comment)">
-                <button class="edit-btn" (click)="editComment(comment)" *ngIf="!comment.editing">
+              <div class="comment-actions">
+                <button class="icon-btn edit-btn" data-tooltip="Modifier" (click)="editComment(comment)" *ngIf="!comment.editing">
                   <i class="material-icons">edit</i>
                 </button>
-                <button class="delete-btn" (click)="confirmDeleteComment(comment)" *ngIf="!comment.editing">
+                <button class="icon-btn delete-btn" data-tooltip="Supprimer" (click)="confirmDeleteComment(comment)" *ngIf="!comment.editing">
                   <i class="material-icons">delete</i>
                 </button>
               </div>
@@ -164,11 +238,11 @@
               </div>
               
               <div class="edit-actions">
-                <button class="save-btn" (click)="saveComment(comment)">
-                  <i class="material-icons">save</i> Enregistrer
+                <button class="icon-btn save-btn" data-tooltip="Enregistrer" (click)="saveComment(comment)">
+                  <i class="material-icons">save</i>
                 </button>
-                <button class="cancel-btn" (click)="cancelEdit(comment)">
-                  <i class="material-icons">close</i> Annuler
+                <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit(comment)">
+                  <i class="material-icons">close</i>
                 </button>
               </div>
             </div>

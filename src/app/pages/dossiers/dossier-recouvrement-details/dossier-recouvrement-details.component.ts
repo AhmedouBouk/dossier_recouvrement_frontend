@@ -8,6 +8,12 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { UserDataService } from 'src/app/shared/services/user-data.service';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
+import { GarantieService } from 'src/app/shared/services/garantie.service';
+import { LcFileService } from 'src/app/shared/services/lc-file.service';
+import { CreditsFileService } from 'src/app/shared/services/credits-file.service';
+import { ChequeFileService } from 'src/app/shared/services/cheque-file.service';
+import { CautionsFileService } from 'src/app/shared/services/cautions-file.service';
+import { RoleService } from 'src/app/shared/services/role.service';
 
 interface Comment {
   id?: number;
@@ -60,7 +66,18 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     private router: Router,
     private dossierService: DossierRecouvrementService,
     private authService: AuthService,
-    private userDataService: UserDataService
+    private userDataService: UserDataService,
+        private garantieService: GarantieService,
+            private lcFileService: LcFileService,
+                private creditsFileService: CreditsFileService,
+                    private chequeFileService: ChequeFileService, // Injectez le ChequeFileService
+                        private cautionsFileService: CautionsFileService,
+                    
+                    public roleService: RoleService,
+                
+            
+        
+    
   ) {
     // Pour les besoins de test, nous utilisons un ID fixe qui correspond à l'utilisateur connecté
     // Dans un environnement de production, cette valeur devrait être récupérée dynamiquement
@@ -89,6 +106,44 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/dossiers']);
+  }
+  
+  viewGarantieFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.garantiesFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+
+    const fileUrl = this.garantieService.getFullFileUrl(dossier.garantiesFile);
+    const token = this.authService.getToken();
+
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Erreur lors du chargement du fichier');
+        return response.blob();
+      })
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        if (download) {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = dossier.garantiesFile.split('/').pop() || 'file.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else {
+          window.open(blobUrl, '_blank');
+        }
+      })
+      .catch((error) => {
+        console.error('Erreur:', error);
+        alert('Impossible de charger le fichier.');
+      });
   }
 
   loadComments(dossierId: number) {
@@ -158,6 +213,91 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       error: (err) => console.error('Erreur de récupération des commentaires', err)
     });
   }
+    viewLcFile(dossier: DossierRecouvrement, download: boolean = false): void {
+      if (!dossier.lcFile) {
+        alert('Aucun fichier trouvé pour ce dossier.');
+        return;
+      }
+  
+      const fileUrl = this.lcFileService.getFullFileUrl(dossier.lcFile);
+      const token = this.authService.getToken(); // Récupérer le token JWT
+  
+      fetch(fileUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement du fichier');
+        }
+        return response.blob(); // Convertir la réponse en Blob
+      })
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+  
+        if (download) {
+          // Télécharger le fichier
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = dossier.lcFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else {
+          // Ouvrir dans un nouvel onglet
+          window.open(blobUrl, '_blank');
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        alert('Impossible de charger le fichier.');
+      });
+    }
+  
+ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.creditsFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+  
+    const fileUrl = this.creditsFileService.getFullFileUrl(dossier.creditsFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+  
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+  
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.creditsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
+  }    
   
   // Méthode pour détecter si un commentaire devrait avoir une date de rappel
   // basé sur son contenu
@@ -234,6 +374,90 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       });
     }
   }
+viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.chequeFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+  
+    const fileUrl = this.chequeFileService.getFullFileUrl(dossier.chequeFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+  
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+  
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.chequeFile; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
+  }
+  viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.cautionsFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+
+    const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
+    const token = this.authService.getToken(); // Récupérer le token JWT
+
+    fetch(fileUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement du fichier');
+      }
+      return response.blob(); // Convertir la réponse en Blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+
+      if (download) {
+        // Télécharger le fichier
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Ouvrir dans un nouvel onglet
+        window.open(blobUrl, '_blank');
+      }
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert('Impossible de charger le fichier.');
+    });
+  }
 
   // Méthode pour basculer l'affichage de la sélection de statut
   toggleStatusSelection() {
@@ -274,11 +498,10 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   }
   
   // Vérifie si l'utilisateur connecté peut éditer/supprimer un commentaire
-  canEditComment(comment: Comment): boolean {
-    // Pour les besoins de test, nous autorisons toujours l'utilisateur à éditer/supprimer les commentaires
-    // Dans un environnement de production, cette logique devrait être plus stricte
-    return true;
-  }
+canComment(): boolean {
+  return this.roleService.hasCommentairePermission();
+}
+
   
   // Préparer un commentaire pour l'édition
   editComment(comment: Comment): void {

@@ -96,6 +96,7 @@ export class HistoryComponent implements OnInit {
       case 'delete': return 'delete';
       case 'create': return 'add_circle';
       case 'update': return 'edit';
+      case 'LOGIN': return 'login';
       default: return 'info';
     }
   }
@@ -106,6 +107,7 @@ export class HistoryComponent implements OnInit {
       case 'delete': return 'delete-action';
       case 'create': return 'create-action';
       case 'update': return 'update-action';
+      case 'LOGIN': return 'login-action';
       default: return '';
     }
   }
@@ -124,6 +126,8 @@ export class HistoryComponent implements OnInit {
         return `L'utilisateur "${event.username}" a créé ${event.entityType} "${event.entityName ?? event.entityId}"`;
       case 'update':
         return `L'utilisateur "${event.username}" a modifié ${event.entityType} "${event.entityName ?? event.entityId}"`;
+      case 'LOGIN':
+        return `L'utilisateur "${event.username}" s'est connecté. ${event.details || ''}`;
       default:
         return `L'utilisateur "${event.username}" a effectué l'action "${event.action}" sur ${event.entityType} "${event.entityName ?? event.entityId}"`;
     }
