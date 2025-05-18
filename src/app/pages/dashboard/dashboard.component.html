@@ -92,7 +92,8 @@
             </div>
             <p>{{ notification.contenu }}</p>
             <div class="notification-actions">
-              <button class="btn-view" (click)="$event.stopPropagation(); navigateToDossier(notification)">
+              <button class="btn-view"    [routerLink]="['/dossiers/view', notification.dossier.id]" class="link-id">
+
                 <i class="material-icons">visibility</i> Voir le dossier
               </button>
               <button *ngIf="!notification.lu" class="btn-mark-read" (click)="$event.stopPropagation(); markAsRead(notification)">
