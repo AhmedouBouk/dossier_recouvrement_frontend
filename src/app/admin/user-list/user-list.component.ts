@@ -75,8 +75,12 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   onDeleteUser(userId: number): void {
     if (confirm(`Are you sure you want to delete this user?`)) {
+      this.isLoading = true;
       this.adminService.deleteUser(userId)
-        .pipe(takeUntil(this.destroy$))
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => this.isLoading = false)
+        )
         .subscribe({
           next: () => {
             this.showNotification('User deleted successfully', 'success-snackbar');
@@ -84,7 +88,17 @@ export class UserListComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error deleting user:', error);
-            this.showNotification('Error deleting user', 'error-snackbar');
+            let errorMessage = 'Error deleting user';
+            
+            if (error.status === 403) {
+              errorMessage = 'You do not have permission to delete this user';
+            } else if (error.status === 404) {
+              errorMessage = 'User not found';
+            } else if (error.status === 409) {
+              errorMessage = 'Cannot delete this user because it is referenced by other records';
+            }
+            
+            this.showNotification(errorMessage, 'error-snackbar');
           }
         });
     }
