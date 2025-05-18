@@ -4,6 +4,7 @@ import { GarantieService } from 'src/app/shared/services/garantie.service';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { AuthService } from 'src/app/auth/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RoleService } from 'src/app/shared/services/role.service';
 
 @Component({
   selector: 'app-garanties',
@@ -20,7 +21,9 @@ export class GarantiesComponent implements OnInit {
   constructor(
     private garantieService: GarantieService,
     private dossierService: DossierRecouvrementService,
-    public authService: AuthService
+    public authService: AuthService,
+        public roleService: RoleService,
+    
   ) {}
 
   ngOnInit(): void {

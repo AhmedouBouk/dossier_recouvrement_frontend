@@ -26,7 +26,9 @@ export class RoleService {
 hasReadClientPermission(): boolean {
   return this.authService.hasPermission('READ_CLIENT');
 }
-
+hasCommantairePermission(): boolean {
+  return this.authService.hasPermission('COMMENTAIRE_DOSSIER');
+}
 hasUpdateClientPermission(): boolean {
   return this.authService.hasPermission('UPDATE_CLIENT');
 }
