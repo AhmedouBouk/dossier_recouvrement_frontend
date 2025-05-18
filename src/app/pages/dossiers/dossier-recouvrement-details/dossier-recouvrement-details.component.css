@@ -478,3 +478,42 @@
   margin-top: 4px;
   font-style: italic;
 }
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.back-btn, .pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.back-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.pdf-btn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.pdf-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
