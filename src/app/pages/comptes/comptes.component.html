@@ -116,6 +116,7 @@
               <td>{{compte.nomCompte}}</td>
               <td>{{compte.client?.nom}} {{compte.client?.prenom}}</td>
               <td>{{compte.categorie}}</td>
+              <td>{{compte.libelecategorie}}</td>
               <td>
                 <div class="edit-field">
                   <input type="number" [(ngModel)]="editingCompte.solde" class="amount-input">
@@ -135,11 +136,11 @@
                 <div class="action-buttons">
                   <button class="icon-btn save-btn" data-tooltip="Sauvegarder" (click)="updateCompte(editingCompte)">
                     <i class="material-icons">save</i>
-                    Sauvegarder
+                    
                   </button>
                   <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit()">
                     <i class="material-icons">close</i>
-                    Annuler
+                    
                   </button>
                 </div>
               </td>
