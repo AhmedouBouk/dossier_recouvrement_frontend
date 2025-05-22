@@ -46,11 +46,11 @@ export class LcFileService {
   
   // Ajouter cette méthode pour être cohérent avec les autres services
   getFullFileUrl(relativePath: string): string {
-    // Si le chemin est déjà une URL complète, la retourner
-    if (relativePath && relativePath.startsWith('http')) {
-      return relativePath;
+    // Vérifie si le chemin est déjà une URL complète
+    if (relativePath && !relativePath.startsWith('http')) {
+      return `${environment.apiUrl}${relativePath}`;
     }
-    // Sinon, construire l'URL complète
-    return `${environment.apiUrl}${relativePath}`;
+    return relativePath;
   }
+  
 }

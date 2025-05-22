@@ -46,4 +46,11 @@ export class GarantieService {
     }
     return relativePath;
   }
+
+downloadPdfByDossier(id: number): Observable<Blob> {
+  return this.http.get(`/api/garanties/pdf/${id}`, {
+    responseType: 'blob'
+  });
+}
+
 }

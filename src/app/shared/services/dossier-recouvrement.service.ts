@@ -4,13 +4,33 @@ import { catchError, Observable, of } from 'rxjs';
 import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
 import { environment } from './../../../environments/environment';
 import {jsPDF } from 'jspdf';
+
+import { tap } from 'rxjs/operators';
+
+import { CautionsFileService } from './cautions-file.service';
+import { CreditsFileService } from './credits-file.service';
+import { GarantieService } from './garantie.service';
+// Mise à jour du composant ListDossier pour fusionner tous les PDFs
+import { Component, OnInit, ViewChild } from '@angular/core';
+
+import { firstValueFrom } from 'rxjs';
+
+
+
 @Injectable({
   providedIn: 'root'
 })
 export class DossierRecouvrementService {
   private apiUrl = `${environment.apiUrl}/dossiers`;  // Updated to match backend endpoint
+ public detailsPdfBlobs: { [id: number]: Blob } = {};
+ 
+  constructor
+  (private http: HttpClient,
+   private garantieService: GarantieService,
+   private creditService:CreditsFileService,
+   private cautionService:CautionsFileService
 
-  constructor(private http: HttpClient) {}
+  ) {}
 
   // Get all dossiers
   getDossiers(): Observable<DossierRecouvrement[]> {
@@ -148,5 +168,52 @@ genererMiseEnDemeure(dossier: DossierRecouvrement) {
 
   doc.save(`Mise_en_Demeure_${dossier.id}.pdf`);
 }
+// Dans votre dossier-recouvrement.service.ts
 
-  }
+/**
+ * Télécharge un PDF fusionné avec tous les documents (y compris chèque et LC)
+ */
+downloadAllFichiersAsPdf(id: number): Observable<Blob> {
+  return this.http.get(`/api/dossier-recouvrement/${id}/pdf`, {
+    responseType: 'blob'
+  });
+}
+
+/**
+ * Fusionne tous les PDFs incluant les fichiers chèque et LC
+ */
+fusionnerToutAvecChequeEtLc(dossierId: number, detailsBlob: Blob, miseBlob: Blob): Observable<Blob> {
+  const formData = new FormData();
+  formData.append('detailsPdf', detailsBlob, 'details.pdf');
+  formData.append('miseEnDemeurePdf', miseBlob, 'mise.pdf');
+
+  return this.http.post(`${this.apiUrl}/${dossierId}/fusionner-complet`, formData, {
+    responseType: 'blob'
+  }).pipe(
+    tap(() => console.log('✅ Fusion complète (avec chèque et LC) réussie')),
+    catchError(error => {
+      console.error('❌ Erreur lors de la fusion complète', error);
+      throw error;
+    })
+  );
+}
+
+/**
+ * Version mise à jour de fusionnerTout (renommage pour clarté)
+ */
+fusionnerTout(dossierId: number, detailsBlob: Blob, miseBlob: Blob): Observable<Blob> {
+  return this.fusionnerToutAvecChequeEtLc(dossierId, detailsBlob, miseBlob);
+}
+
+/**
+ * Vérifie quels fichiers sont disponibles pour un dossier
+ */
+getAvailableFiles(dossierId: number): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${dossierId}/files-status`).pipe(
+    tap((status) => console.log('📋 Statut des fichiers:', status)),
+    catchError(error => {
+      console.error('❌ Erreur lors de la récupération du statut des fichiers', error);
+      throw error;
+    })
+  );
+}}

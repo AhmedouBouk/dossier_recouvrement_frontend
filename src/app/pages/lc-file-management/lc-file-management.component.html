@@ -74,7 +74,7 @@
     <button *ngIf="roleService.hasDownloadLcFilePermission()" 
       class="icon-btn download-btn"
       data-tooltip="Télécharger"
-      (click)="viewLcFile(dossier, true)"
+      (click)=" viewLcFile(dossier, true)"
       [disabled]="!dossier.lcFile"
     >
       <i class="material-icons">download</i>

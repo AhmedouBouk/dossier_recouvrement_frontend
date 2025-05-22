@@ -37,7 +37,7 @@ interface Comment {
   imports: [CommonModule, FormsModule]
 })
 export class DossierRecouvrementDetailsComponent implements OnInit {
-  reminderDate: string = '';
+  reminderDate: string = ''; 
   reminderTime: string = '';
   currentUserId: number | null = null; // ID de l'utilisateur connecté
   dossierDetails: DossierRecouvrement | null = null;
@@ -47,7 +47,7 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   errorMessage = '';
   showStatusSelection = false;
   selectedStatus: string = '';
-
+  commentairesParDossier: { [id: number]: any[] } = {};
   // Liste des statuts disponibles
   statusOptions = [
     'En cours de traitement',
@@ -788,11 +788,160 @@ canComment(): boolean {
         finalY + 10, // Ajouter un petit espace sous le tableau
         { align: 'right' }
       );
-
+const blob = doc.output("blob"); // ou await doc.output("blob") selon ta version
+this.dossierService.detailsPdfBlobs[this.dossierDetails.id] = blob;
       doc.save(`dossier_recouvrement_${this.dossierDetails.id}.pdf`);
     } catch (error) {
       console.error('Erreur lors de la génération du PDF:', error);
       alert('Une erreur est survenue lors de la génération du PDF. Veuillez réessayer.');
     }
   }
+  async generatePdfAsBlob(): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this.dossierDetails) {
+          reject(new Error('Aucun dossier disponible pour la génération du PDF'));
+          return;
+        }
+        
+        // Code de génération du PDF (même que generatePDF mais sans téléchargement)
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 20;
+        let y = margin; // Commencer au niveau de la marge
+
+        // --- Configuration du Logo ---
+        const logoPath = 'assets/logo.png'; // Chemin vers le logo
+        const logoFormat = 'PNG'; 
+        const logoWidth = 25; 
+        const logoHeight = 25; 
+        const logoX = margin; 
+        const logoY = margin; 
+
+        try {
+          doc.addImage(logoPath, logoFormat, logoX, logoY, logoWidth, logoHeight);
+        } catch (e) {
+          console.error('Erreur lors de l\'ajout du logo:', e);
+        }
+
+        // Titre du document
+        doc.setFontSize(24);
+        doc.setTextColor(30, 64, 175);
+        const titleX = logoPath && logoPath !== 'assets/logo.png' ? margin + logoWidth + 10 : pageWidth / 2;
+        const titleAlign = logoPath && logoPath !== 'assets/logo.png' ? 'left' : 'center';
+        doc.text('Dossier de Recouvrement', titleX, margin + (logoHeight > 0 ? logoHeight / 2 : 10), { align: titleAlign });
+
+        doc.setTextColor(0, 0, 0);
+        y = margin + (logoHeight > 0 ? logoHeight : 20) + 15;
+
+        function cleanNumeric(val: any): string {
+          if (typeof val === 'number') {
+            return val.toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+          }
+          if (typeof val === 'string') {
+            const cleaned = val.replace(/[^0-9]/g, '');
+            if (cleaned.length > 0) {
+              return Number(cleaned).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+            }
+            return '';
+          }
+          return '';
+        }
+
+        // ... reste du code pour générer le PDF ...
+        
+        // Au lieu de télécharger le PDF, retourner un Blob
+        const pdfBlob = doc.output('blob');
+        resolve(pdfBlob);
+      } catch (error) {
+        console.error('Erreur lors de la génération du PDF:', error);
+        reject(error);
+      }
+    });
+  }
+
+ 
+
+
+  async generateDetailsPdfAsBlob(dossier: DossierRecouvrement, comments: any[]): Promise<Blob> {
+    return new Promise(async (resolve) => {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let y = margin;
+
+      try {
+        const logo = await this.loadImageBase64('assets/logo.png');
+        doc.addImage(logo, 'PNG', margin, margin, 25, 25);
+      } catch (e) {
+        console.warn("⚠️ Erreur logo :", e);
+      }
+
+      doc.setFontSize(24);
+      doc.setTextColor(30, 64, 175);
+      doc.text('Dossier de Recouvrement', margin + 35, margin + 15);
+
+      y += 50;
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      const fields = [
+        { label: 'ID Dossier', value: dossier.id },
+        { label: 'Client', value: dossier.compte?.nomCompte },
+        { label: 'Montant Principal', value: dossier.montantPrincipal },
+        { label: 'Engagement Total', value: dossier.engagementTotal },
+        { label: 'Provision', value: dossier.provision },
+        { label: 'Status', value: dossier.status },
+        { label: 'État', value: dossier.etatValidation }
+      ];
+      for (const field of fields) {
+        doc.text(`${field.label} : ${field.value}`, margin, y);
+        y += 10;
+      }
+
+      doc.setFontSize(14);
+      doc.text('Commentaires', margin, y + 10);
+      y += 18;
+
+      const tableData = comments.map(c => [
+        new Date(c.createdAt).toLocaleDateString('fr-FR'),
+        c.content,
+        c.reminderDateTime ? new Date(c.reminderDateTime).toLocaleDateString('fr-FR') : 'Non défini',
+        c.user?.name || 'Utilisateur inconnu'
+      ]);
+
+      autoTable(doc, {
+        startY: y,
+        head: [['DATE', 'COMMENTAIRE', 'DATE DE RAPPEL', 'UTILISATEUR']],
+        body: tableData,
+        theme: 'grid',
+        styles: { fontSize: 10 }
+      });
+
+      const finalY = (doc as any).lastAutoTable?.finalY || y;
+      const currentDate = new Date().toLocaleDateString('fr-FR');
+      doc.setFontSize(10);
+      doc.setTextColor(128, 128, 128);
+      doc.text(`Généré le ${currentDate}`, pageWidth - margin, finalY + 10, { align: 'right' });
+
+      resolve(doc.output("blob"));
+    });
+  }
+
+  
+  loadImageBase64(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.onerror = reject;
+      xhr.open('GET', url);
+      xhr.responseType = 'blob';
+      xhr.send();
+    });
+  }
+
 }
