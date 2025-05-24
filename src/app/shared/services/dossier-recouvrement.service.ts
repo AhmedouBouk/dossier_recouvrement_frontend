@@ -4,9 +4,9 @@ import { catchError, Observable, of } from 'rxjs';
 import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
 import { environment } from './../../../environments/environment';
 import {jsPDF } from 'jspdf';
-
+import { map } from 'rxjs/operators';
 import { tap } from 'rxjs/operators';
-
+import { BehaviorSubject } from 'rxjs';
 import { CautionsFileService } from './cautions-file.service';
 import { CreditsFileService } from './credits-file.service';
 import { GarantieService } from './garantie.service';
@@ -216,4 +216,126 @@ getAvailableFiles(dossierId: number): Observable<any> {
       throw error;
     })
   );
-}}
+}
+
+/**
+ * Archive un dossier
+ */
+archiverDossier(dossierId: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/${dossierId}/archiver`, {}).pipe(
+    tap((response) => console.log('✅ Dossier archivé:', response)),
+    catchError(error => {
+      console.error('❌ Erreur lors de l\'archivage', error);
+      // ✅ Ajouter plus de détails sur l'erreur
+      if (error.status === 400) {
+        throw new Error('Le dossier est déjà archivé');
+      } else if (error.status === 404) {
+        throw new Error('Dossier non trouvé');
+      } else if (error.status === 500) {
+        throw new Error('Erreur serveur lors de l\'archivage');
+      }
+      throw error;
+    })
+  );
+}
+
+/**
+ * Désarchive un dossier
+ */
+desarchiverDossier(dossierId: number): Observable<any> {
+  // ✅ CORRECTION : URL correcte pour correspondre au controller
+  return this.http.post(`${this.apiUrl}/${dossierId}/desarchiver`, {}).pipe(
+    tap((response) => console.log('✅ Dossier désarchivé:', response)),
+    catchError(error => {
+      console.error('❌ Erreur lors du désarchivage', error);
+      // ✅ Ajouter plus de détails sur l'erreur
+      if (error.status === 400) {
+        throw new Error('Le dossier n\'est pas archivé');
+      } else if (error.status === 404) {
+        throw new Error('Dossier non trouvé');
+      } else if (error.status === 500) {
+        throw new Error('Erreur serveur lors du désarchivage');
+      }
+      throw error;
+    })
+  );
+}
+
+/**
+ * Compte le nombre de dossiers archivés (pour le badge dans la sidebar)
+ */
+countDossiersArchives(): Observable<number> {
+  return this.http.get<{count: number}>(`${this.apiUrl}/archives/count`).pipe(
+    map(response => response.count),
+    catchError(error => {
+      console.error('❌ Erreur lors du comptage des archives', error);
+      return of(0);
+    })
+  );
+}
+
+/**
+ * Vérifie si un dossier est archivé
+ */
+isDossierArchive(dossierId: number): Observable<boolean> {
+  return this.http.get<{isArchived: boolean}>(`${this.apiUrl}/${dossierId}/is-archived`).pipe(
+    map(response => response.isArchived),
+    catchError(error => {
+      console.error('❌ Erreur lors de la vérification d\'archivage', error);
+      return of(false);
+    })
+  );
+}
+
+ // ✅ BehaviorSubject pour partager le nombre d'archives
+  private archiveCountSubject = new BehaviorSubject<number>(0);
+  
+  /**
+   * ✅ Observable pour écouter les changements du compteur d'archives
+   */
+  archiveCount$: Observable<number> = this.archiveCountSubject.asObservable();
+
+  /**
+   * ✅ Met à jour le compteur d'archives
+   */
+  updateArchiveCount(count: number): void {
+    this.archiveCountSubject.next(count);
+  }
+
+  /**
+   * ✅ Obtient la valeur actuelle du compteur
+   */
+  getCurrentArchiveCount(): number {
+    return this.archiveCountSubject.value;
+  }
+
+  /**
+   * ✅ Incrémente le compteur (quand un dossier est archivé)
+   */
+  incrementArchiveCount(): void {
+    const currentCount = this.archiveCountSubject.value;
+    this.archiveCountSubject.next(currentCount + 1);
+  }
+
+  /**
+   * ✅ Décrémente le compteur (quand un dossier est désarchivé)
+   */
+  decrementArchiveCount(): void {
+    const currentCount = this.archiveCountSubject.value;
+    if (currentCount > 0) {
+      this.archiveCountSubject.next(currentCount - 1);
+    }
+  }
+
+
+
+getDossiersActifs(): Observable<DossierRecouvrement[]> {
+  return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/actifs`);
+}
+
+getDossiersArchives(): Observable<DossierRecouvrement[]> {
+  return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/archives`);
+}
+
+  
+}

@@ -126,6 +126,22 @@ clea            <td>{{ dossier.compte.nomCompte }}</td>
 </button>
 
 
+<!-- Si le dossier n'est PAS archivé -->
+  <button *ngIf="dossier.status !== statusEnum.ARCHIVEE"
+                class="icon-btn archive-btn"
+                data-tooltip="Archiver"
+                (click)="archiverDossierAvecRechargement(dossier.id)">
+          <i class="material-icons">archive</i>
+        </button>
+
+        <!-- Bouton Désarchiver (visible seulement si archivé) -->
+        <button *ngIf="dossier.status === statusEnum.ARCHIVEE"
+                class="icon-btn unarchive-btn"
+                data-tooltip="Désarchiver"
+                (click)="desarchiverDossierAvecRechargement(dossier.id)">
+          <i class="material-icons">unarchive</i>
+        </button>
+
 
 
 

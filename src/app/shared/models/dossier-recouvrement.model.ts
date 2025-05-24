@@ -3,7 +3,14 @@
 export enum EtatValidation {
   INITIALE = 'INITIALE',
   VALIDE = 'VALIDE',
-  NON_VALIDE = 'NON_VALIDE'
+  NON_VALIDE = 'NON_VALIDE',
+  ARCHIVEE = 'ARCHIVEE'
+}
+export enum Status {
+    
+    EN_COURS = 'EN_COURS',
+   
+    ARCHIVEE = 'ARCHIVEE'
 }
 
 export interface Comment {
@@ -51,6 +58,6 @@ export interface DossierRecouvrement {
     
     comments?: Comment[];
 
-  
+   dateArchivage?:Date;
   }
   

@@ -63,6 +63,7 @@ const routes: Routes = [
       { path: 'dossiers/view/:id', component: DossierRecouvrementDetailsComponent },
       { path: 'dossiers/add', component: DossierRecouvrementAddComponent },
       { path: 'dossier-recouvrement/modify/:id', component: DossierRecouvrementEditComponent },
+      { path: 'archives', component: DossierRecouvrementListComponent},
       {
         path: 'admin',
         canActivate: [RoleGuard], // Protège spécifiquement les routes admin

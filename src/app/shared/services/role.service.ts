@@ -193,5 +193,12 @@ hasCommentairePermission(): boolean {
 hasValidationPermission(): boolean {
   return this.authService.hasPermission('VALIDATION_DOSSIER');
 }
+hasReadArchivePermission(): boolean {
+  return this.authService.hasPermission('READ_ARCHIVES'); // ✅ nom correct
+}
+isNotAdmin(): boolean {
+  return this.authService.getUserRole() !== 'ROLE_ADMIN';
+}
+
 
 }

@@ -6,11 +6,11 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoleService } from '../../../shared/services/role.service';
 import { DossierRecouvrementService } from '../../../shared/services/dossier-recouvrement.service';
-import { DossierRecouvrement, EtatValidation } from '../../../shared/models/dossier-recouvrement.model';
+import { DossierRecouvrement} from '../../../shared/models/dossier-recouvrement.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { CreditsFileService } from 'src/app/shared/services/credits-file.service';
 import { GarantieService } from 'src/app/shared/services/garantie.service';
-
+import { Status } from '../../../shared/models/dossier-recouvrement.model';
 import { firstValueFrom } from 'rxjs';
 import jsPDF from 'jspdf';
 import { CautionsFileManagementComponent } from '../../cautions-file-management/cautions-file-management.component';
@@ -32,6 +32,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   selectedDossierForValidation: DossierRecouvrement | null = null;
   successMessage: string | null = null;
 
+ statusEnum = Status; // Remplace etatValidationEnum
 
   dossiers: DossierRecouvrement[] = [];
   searchTerm: string = '';
@@ -44,6 +45,8 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   selectedPdfUrl: string | null = null;
   comments: any[] = [];
 
+
+  dossiersArchives: any[] = [];
 
   constructor(private http: HttpClient,
     private dossierService: DossierRecouvrementService,
@@ -76,6 +79,7 @@ formatDate(date: string | Date): string {
 
   ngOnInit(): void {
     this.loadDossiers();
+    this.loadDossiersArchives();
     // Ajouter un gestionnaire d'événements pour fermer le menu lors d'un clic à l'extérieur
     document.addEventListener('click', this.closeValidationMenu.bind(this));
   }
@@ -86,22 +90,43 @@ formatDate(date: string | Date): string {
     // Nettoyer le gestionnaire d'événements
     document.removeEventListener('click', this.closeValidationMenu.bind(this));
   }
-  
-  loadDossiers() {
-    this.isLoading = true;
-    this.error = null;
-    this.dossierService.getDossiers().subscribe({
-      next: (data) => {
-        this.dossiers = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading dossiers:', err);
-        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors du chargement des dossiers';
-        this.isLoading = false;
-      }
-    });
+  loadDossiersArchives(): void {
+  this.isLoading = true;
+  this.dossierService.getDossiersArchives().subscribe({
+    next: (data) => {
+      this.dossiers = data;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      this.error = 'Erreur lors du chargement des archives';
+      this.isLoading = false;
+    }
+  });
+}
+
+  /**
+   * Désarchive un dossier
+   */
+ 
+  retournerAuxDossiers(): void {
+    this.router.navigate(['/dossiers']);
   }
+loadDossiers(): void {
+  this.isLoading = true;
+  console.log("➡️ Chargement des dossiers ACTIFS...");
+  this.dossierService.getDossiersActifs().subscribe({
+    next: (data) => {
+      console.log("✅ Dossiers actifs reçus :", data);  // 🟡 AJOUT ICI
+      this.dossiers = data;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      this.error = 'Erreur de chargement';
+      this.isLoading = false;
+    }
+  });
+}
+
 
   onSearchChange(event: any) {
     const term = event.target.value;
@@ -275,7 +300,7 @@ formatDate(date: string | Date): string {
       : 'Dossier refusé';
     
     // Mettre à jour l'état du dossier
-    const updatedDossier = { ...dossier, etatValidation: newState as EtatValidation };
+    const updatedDossier = { ...dossier, Status: newState as Status};
     
     // Appeler le service pour mettre à jour le dossier
     this.dossierService.updateDossier(dossier.id, updatedDossier).subscribe({
@@ -907,6 +932,117 @@ private loadImageBase64(url: string): Promise<string> {
     xhr.send();
   });
 }
-}
-  
+// ========== MÉTHODE DE DÉSARCHIVAGE OPTIMISÉE ==========
+  archiverDossier(id: number): void {
+    if (confirm("Voulez-vous vraiment archiver ce dossier ?")) {
+      this.dossierService.archiverDossier(id).subscribe({
+        next: (response) => {
+          alert("✅ Dossier archivé avec succès !");
+          
+          // ✅ SUPPRIMER de la liste des dossiers actifs
+          this.dossiers = this.dossiers.filter(d => d.id !== id);
+          
+          // ✅ Optionnel : Recharger la liste pour être sûr
+          // this.loadDossiers();
+        },
+        error: (error) => {
+          console.error("Erreur lors de l'archivage :", error);
+          alert("❌ Erreur lors de l'archivage.");
+        }
+      });
+    }
+  }
 
+  // ========== MÉTHODE DE DÉSARCHIVAGE CORRIGÉE ==========
+  desarchiverDossier(id: number): void {
+    if (confirm("Voulez-vous vraiment désarchiver ce dossier ?")) {
+      this.dossierService.desarchiverDossier(id).subscribe({
+        next: (dossierDesarchive) => {
+          alert("✅ Dossier désarchivé avec succès !");
+          
+          // ✅ SUPPRIMER de la liste des archives
+          this.dossiersArchives = this.dossiersArchives.filter(d => d.id !== id);
+          
+          // ✅ AJOUTER à la liste des dossiers actifs (si on est sur la page des dossiers)
+          if (this.dossiers && dossierDesarchive) {
+            this.dossiers.push(dossierDesarchive);
+          }
+        },
+        error: (error) => {
+          console.error("Erreur lors du désarchivage :", error);
+          alert("❌ Une erreur est survenue lors du désarchivage.");
+        }
+      });
+    }
+  }
+
+  // ========== VERSION AVEC RECHARGEMENT COMPLET ==========
+  // Plus sûre mais moins performante
+
+
+
+// ========== MÉTHODES DE CHARGEMENT DES DONNÉES ==========
+
+
+
+// ========== VÉRIFICATION AVANT ARCHIVAGE ==========
+verifierAvantArchivage(id: number): void {
+    this.dossierService.isDossierArchive(id).subscribe({
+        next: (isArchived) => {
+            if (isArchived) {
+                alert("❌ Ce dossier est déjà archivé.");
+            } else {
+                this.archiverDossier(id);
+            }
+        },
+        error: () => {
+            // Si la vérification échoue, on essaie quand même l'archivage
+            this.archiverDossier(id);
+        }
+    });
+}
+
+// ========== MÉTHODE POUR ACTUALISER UNE SEULE LISTE ==========
+// Utilisez cette approche si vous voulez être plus précis
+actualiseListe(listeType: 'dossiers' | 'archives'): void {
+    if (listeType === 'dossiers') {
+        this.loadDossiers();
+    } else if (listeType === 'archives') {
+        this.loadDossiersArchives();
+    }
+}
+
+// ========== EXEMPLE D'UTILISATION DANS LE TEMPLATE ==========
+/*
+<!-- Dans votre template HTML -->
+<button (click)="desarchiverDossier(dossier.id)" 
+        class="btn btn-success btn-sm">
+    <i class="fas fa-undo"></i> Désarchiver
+</button>
+
+<button (click)="archiverDossier(dossier.id)" 
+        class="btn btn-warning btn-sm">
+    <i class="fas fa-archive"></i> Archiver
+</button>
+*/
+
+archiverDossierAvecRechargement(id: number): void {
+  this.dossierService.archiverDossier(id).subscribe({
+    next: () => {
+      console.log("✅ Archivage OK, rechargement de la liste");
+      this.loadDossiers();  // recharge la liste des ACTIFS
+    }
+  });
+}
+
+
+desarchiverDossierAvecRechargement(id: number): void {
+  this.dossierService.desarchiverDossier(id).subscribe(() => {
+    this.loadDossiers(); // ou loadDossiersArchives() si tu es dans le composant Archives
+  });
+}
+trackByDossierId(index: number, dossier: any): number {
+  return dossier.id;
+}
+
+}

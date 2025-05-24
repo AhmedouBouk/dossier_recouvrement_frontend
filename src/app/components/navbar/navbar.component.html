@@ -78,7 +78,11 @@ Credit    </a>
     
  
    
-   
+   <a routerLink="/archives" routerLinkActive="active" class="menu-item"
+   *ngIf="roleService.isNotAdmin()">
+  <i class="material-icons">archive</i>
+  Archives
+</a>
   
       
    
