@@ -46,7 +46,10 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   comments: any[] = [];
 
 
-  dossiersArchives: any[] = [];
+ dossier: DossierRecouvrement[] = [];        // Dossiers ACTIFS
+  dossiersArchives: DossierRecouvrement[] = []; // Dossiers ARCHIVÉS
+  currentView: 'actifs' | 'archives' = 'actifs'; // Pour savoir quelle vue est active
+
 
   constructor(private http: HttpClient,
     private dossierService: DossierRecouvrementService,
@@ -78,8 +81,16 @@ formatDate(date: string | Date): string {
 }
 
   ngOnInit(): void {
+
+    if (this.currentView === 'actifs') {
+      this.loadDossiers();
+    } else {
+      this.loadDossiersArchives();
+    }
     this.loadDossiers();
     this.loadDossiersArchives();
+
+    
     // Ajouter un gestionnaire d'événements pour fermer le menu lors d'un clic à l'extérieur
     document.addEventListener('click', this.closeValidationMenu.bind(this));
   }
@@ -90,19 +101,7 @@ formatDate(date: string | Date): string {
     // Nettoyer le gestionnaire d'événements
     document.removeEventListener('click', this.closeValidationMenu.bind(this));
   }
-  loadDossiersArchives(): void {
-  this.isLoading = true;
-  this.dossierService.getDossiersArchives().subscribe({
-    next: (data) => {
-      this.dossiers = data;
-      this.isLoading = false;
-    },
-    error: (err) => {
-      this.error = 'Erreur lors du chargement des archives';
-      this.isLoading = false;
-    }
-  });
-}
+ 
 
   /**
    * Désarchive un dossier
@@ -111,23 +110,41 @@ formatDate(date: string | Date): string {
   retournerAuxDossiers(): void {
     this.router.navigate(['/dossiers']);
   }
-loadDossiers(): void {
-  this.isLoading = true;
-  console.log("➡️ Chargement des dossiers ACTIFS...");
-  this.dossierService.getDossiersActifs().subscribe({
-    next: (data) => {
-      console.log("✅ Dossiers actifs reçus :", data);  // 🟡 AJOUT ICI
-      this.dossiers = data;
-      this.isLoading = false;
-    },
-    error: (err) => {
-      this.error = 'Erreur de chargement';
-      this.isLoading = false;
-    }
-  });
-}
+loadDossiersArchives(): void {
+    this.isLoading = true;
+    console.log("🔄 Chargement des dossiers ARCHIVÉS...");
+    this.dossierService.getDossiersArchives().subscribe({
+      next: (data) => {
+        console.log("✅ Dossiers archivés reçus:", data.length, "dossiers");
+        this.dossiersArchives = data; // ✅ CORRECTION: Utiliser dossiersArchives
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error("❌ Erreur chargement dossiers archivés:", err);
+        this.error = 'Erreur lors du chargement des archives';
+        this.isLoading = false;
+      }
+    });
+  }
 
+  
 
+  // ✅ CORRECTION 3: loadDossiers() reste identique
+  loadDossiers(): void {
+    this.isLoading = true;
+    console.log("➡️ Chargement des dossiers ACTIFS...");
+    this.dossierService.getDossiersActifs().subscribe({
+      next: (data) => {
+        console.log("✅ Dossiers actifs reçus :", data);
+        this.dossiers = data; // 👈 Pour les dossiers ACTIFS
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.error = 'Erreur de chargement';
+        this.isLoading = false;
+      }
+    });
+  }
   onSearchChange(event: any) {
     const term = event.target.value;
     this.searchSubject.next(term);
@@ -932,117 +949,158 @@ private loadImageBase64(url: string): Promise<string> {
     xhr.send();
   });
 }
-// ========== MÉTHODE DE DÉSARCHIVAGE OPTIMISÉE ==========
-  archiverDossier(id: number): void {
-    if (confirm("Voulez-vous vraiment archiver ce dossier ?")) {
-      this.dossierService.archiverDossier(id).subscribe({
-        next: (response) => {
-          alert("✅ Dossier archivé avec succès !");
-          
-          // ✅ SUPPRIMER de la liste des dossiers actifs
-          this.dossiers = this.dossiers.filter(d => d.id !== id);
-          
-          // ✅ Optionnel : Recharger la liste pour être sûr
-          // this.loadDossiers();
-        },
-        error: (error) => {
-          console.error("Erreur lors de l'archivage :", error);
-          alert("❌ Erreur lors de l'archivage.");
-        }
-      });
-    }
-  }
-
-  // ========== MÉTHODE DE DÉSARCHIVAGE CORRIGÉE ==========
-  desarchiverDossier(id: number): void {
-    if (confirm("Voulez-vous vraiment désarchiver ce dossier ?")) {
-      this.dossierService.desarchiverDossier(id).subscribe({
-        next: (dossierDesarchive) => {
-          alert("✅ Dossier désarchivé avec succès !");
-          
-          // ✅ SUPPRIMER de la liste des archives
-          this.dossiersArchives = this.dossiersArchives.filter(d => d.id !== id);
-          
-          // ✅ AJOUTER à la liste des dossiers actifs (si on est sur la page des dossiers)
-          if (this.dossiers && dossierDesarchive) {
-            this.dossiers.push(dossierDesarchive);
-          }
-        },
-        error: (error) => {
-          console.error("Erreur lors du désarchivage :", error);
-          alert("❌ Une erreur est survenue lors du désarchivage.");
-        }
-      });
-    }
-  }
-
-  // ========== VERSION AVEC RECHARGEMENT COMPLET ==========
-  // Plus sûre mais moins performante
 
 
-
-// ========== MÉTHODES DE CHARGEMENT DES DONNÉES ==========
-
-
-
-// ========== VÉRIFICATION AVANT ARCHIVAGE ==========
-verifierAvantArchivage(id: number): void {
-    this.dossierService.isDossierArchive(id).subscribe({
-        next: (isArchived) => {
-            if (isArchived) {
-                alert("❌ Ce dossier est déjà archivé.");
-            } else {
-                this.archiverDossier(id);
-            }
-        },
-        error: () => {
-            // Si la vérification échoue, on essaie quand même l'archivage
-            this.archiverDossier(id);
-        }
-    });
-}
-
-// ========== MÉTHODE POUR ACTUALISER UNE SEULE LISTE ==========
-// Utilisez cette approche si vous voulez être plus précis
-actualiseListe(listeType: 'dossiers' | 'archives'): void {
-    if (listeType === 'dossiers') {
-        this.loadDossiers();
-    } else if (listeType === 'archives') {
-        this.loadDossiersArchives();
-    }
-}
-
-// ========== EXEMPLE D'UTILISATION DANS LE TEMPLATE ==========
-/*
-<!-- Dans votre template HTML -->
-<button (click)="desarchiverDossier(dossier.id)" 
-        class="btn btn-success btn-sm">
-    <i class="fas fa-undo"></i> Désarchiver
-</button>
-
-<button (click)="archiverDossier(dossier.id)" 
-        class="btn btn-warning btn-sm">
-    <i class="fas fa-archive"></i> Archiver
-</button>
-*/
+// ✅ SOLUTION CORRIGÉE: Archivage avec gestion correcte des listes
 
 archiverDossierAvecRechargement(id: number): void {
-  this.dossierService.archiverDossier(id).subscribe({
-    next: () => {
-      console.log("✅ Archivage OK, rechargement de la liste");
-      this.loadDossiers();  // recharge la liste des ACTIFS
-    }
-  });
+  if (confirm("Voulez-vous vraiment archiver ce dossier ?")) {
+    // 🟡 ÉTAPE 1: Sauvegarder le dossier avant archivage
+    const dossierToArchive = this.dossiers.find(d => d.id === id);
+    
+    this.dossierService.archiverDossier(id).subscribe({
+      next: (dossierArchive) => {
+        console.log("✅ Dossier archivé avec succès");
+        
+        // 🟡 ÉTAPE 2: Supprimer de la liste des ACTIFS
+        this.dossiers = this.dossiers.filter(d => d.id !== id);
+        console.log("📋 Dossiers actifs après suppression:", this.dossiers.length);
+        
+        // 🟡 ÉTAPE 3: Ajouter aux ARCHIVES
+        if (dossierArchive) {
+          // Utiliser le dossier retourné par le serveur
+          this.dossiersArchives.push(dossierArchive);
+        } else if (dossierToArchive) {
+          // Fallback: utiliser le dossier original avec statut modifié
+          const archivedDossier = { ...dossierToArchive, status: this.statusEnum.ARCHIVEE };
+          this.dossiersArchives.push(archivedDossier);
+        }
+        
+        console.log("🗃️ Dossiers archivés après ajout:", this.dossiersArchives.length);
+        
+        // 🟡 ÉTAPE 4: Afficher message de succès
+        this.successMessage = "Dossier archivé avec succès !";
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (error) => {
+        console.error("❌ Erreur lors de l'archivage :", error);
+        this.error = "Erreur lors de l'archivage du dossier.";
+        setTimeout(() => this.error = null, 5000);
+      }
+    });
+  }
 }
-
 
 desarchiverDossierAvecRechargement(id: number): void {
-  this.dossierService.desarchiverDossier(id).subscribe(() => {
-    this.loadDossiers(); // ou loadDossiersArchives() si tu es dans le composant Archives
-  });
-}
-trackByDossierId(index: number, dossier: any): number {
-  return dossier.id;
+  if (confirm("Voulez-vous vraiment désarchiver ce dossier ?")) {
+    // 🟡 ÉTAPE 1: Sauvegarder le dossier avant désarchivage
+    const dossierToRestore = this.dossiersArchives.find(d => d.id === id);
+    
+    this.dossierService.desarchiverDossier(id).subscribe({
+      next: (dossierDesarchive) => {
+        console.log("✅ Dossier désarchivé avec succès");
+        
+        // 🟡 ÉTAPE 2: Supprimer des ARCHIVES
+        this.dossiersArchives = this.dossiersArchives.filter(d => d.id !== id);
+        console.log("🗃️ Dossiers archivés après suppression:", this.dossiersArchives.length);
+        
+        // 🟡 ÉTAPE 3: Ajouter aux ACTIFS
+        if (dossierDesarchive) {
+          // Utiliser le dossier retourné par le serveur
+          this.dossiers.push(dossierDesarchive);
+        } else if (dossierToRestore) {
+          // Fallback: utiliser le dossier original avec statut modifié
+          const restoredDossier = { ...dossierToRestore, status: 'EN_COURS' };
+          this.dossiers.push(restoredDossier);
+        }
+        
+        console.log("📋 Dossiers actifs après ajout:", this.dossiers.length);
+        
+        // 🟡 ÉTAPE 4: Afficher message de succès
+        this.successMessage = "Dossier désarchivé avec succès !";
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (error) => {
+        console.error("❌ Erreur lors du désarchivage :", error);
+        this.error = "Erreur lors du désarchivage du dossier.";
+        setTimeout(() => this.error = null, 5000);
+      }
+    });
+  }
 }
 
+// ✅ MÉTHODE ALTERNATIVE: Si vous préférez recharger depuis le serveur
+archiverDossierAvecRechargementServeur(id: number): void {
+  if (confirm("Voulez-vous vraiment archiver ce dossier ?")) {
+    this.dossierService.archiverDossier(id).subscribe({
+      next: () => {
+        console.log("✅ Archivage OK, rechargement des deux listes");
+        
+        // Recharger les deux listes depuis le serveur
+        this.loadDossiers();        // Recharge les dossiers actifs
+        this.loadDossiersArchives(); // Recharge les dossiers archivés
+        
+        this.successMessage = "Dossier archivé avec succès !";
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (error) => {
+        console.error("❌ Erreur lors de l'archivage :", error);
+        this.error = "Erreur lors de l'archivage du dossier.";
+        setTimeout(() => this.error = null, 5000);
+      }
+    });
+  }
+}
+
+desarchiverDossierAvecRechargementServeur(id: number): void {
+  if (confirm("Voulez-vous vraiment désarchiver ce dossier ?")) {
+    this.dossierService.desarchiverDossier(id).subscribe({
+      next: () => {
+        console.log("✅ Désarchivage OK, rechargement des deux listes");
+        
+        // Recharger les deux listes depuis le serveur
+        this.loadDossiers();        // Recharge les dossiers actifs
+        this.loadDossiersArchives(); // Recharge les dossiers archivés
+        
+        this.successMessage = "Dossier désarchivé avec succès !";
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (error) => {
+        console.error("❌ Erreur lors du désarchivage :", error);
+        this.error = "Erreur lors du désarchivage du dossier.";
+        setTimeout(() => this.error = null, 5000);
+      }
+    });
+  }
+}
+
+// ✅ MÉTHODE DE DEBUG pour vérifier l'état des listes
+debugListes(): void {
+  console.log("🔍 DEBUG - État des listes:");
+  console.log("📋 Dossiers actifs:", this.dossiers.length, this.dossiers.map(d => ({id: d.id, status: d.status})));
+  console.log("🗃️ Dossiers archivés:", this.dossiersArchives.length, this.dossiersArchives.map(d => ({id: d.id, status: d.status})));
+  console.log("👁️ Vue courante:", this.currentView);
+}
+
+
+
+// Propriétés à ajouter dans votre composant
+
+// Méthodes à ajouter dans votre composant
+
+/**
+ * Affiche la vue des dossiers actifs
+ */
+voirDossiersActifs(): void {
+  this.currentView = 'actifs';
+  this.loadDossiers(); // Recharge les dossiers actifs
+}
+
+/**
+ * Affiche la vue des dossiers archivés
+ */
+voirDossiersArchives(): void {
+  this.currentView = 'archives';
+  this.loadDossiersArchives(); // Charge les dossiers archivés
+}
 }

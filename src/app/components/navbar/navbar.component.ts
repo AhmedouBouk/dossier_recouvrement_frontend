@@ -67,45 +67,4 @@ export class NavbarComponent implements OnInit {
   goBack(): void {
     this.location.back(); // Navigates to the previous page in the browser's history
   }
-
-  loadArchiveCount(): void {
-    const countSub = this.dossierService.countDossiersArchives().subscribe({
-      next: (count) => {
-        this.nombreArchives = count;
-        console.log('📊 Nombre d\'archives:', count);
-      },
-      error: (error) => {
-        console.error('❌ Erreur lors du comptage des archives:', error);
-        this.nombreArchives = 0;
-      }
-    });
-    this.subscriptions.push(countSub);
-  }
-
-  /**
-   * ✅ Navigation vers les archives avec actualisation du compteur
-   */
-  navigateToArchives(): void {
-    this.router.navigate(['/archives']);
-    // Actualiser le compteur après navigation
-    setTimeout(() => this.loadArchiveCount(), 100);
-  }
-
-  /**
-   * ✅ Navigation vers les dossiers actifs avec actualisation du compteur
-   */
-  navigateToDossiers(): void {
-    this.router.navigate(['/dossiers']);
-    // Actualiser le compteur après navigation
-    setTimeout(() => this.loadArchiveCount(), 100);
-  }
-
-  /**
-   * ✅ Méthode publique pour actualiser le compteur (à appeler depuis d'autres composants)
-   */
-  refreshArchiveCount(): void {
-    this.loadArchiveCount();
-  }
-
-
 }
