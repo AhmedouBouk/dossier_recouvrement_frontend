@@ -18,14 +18,24 @@
           <i class="material-icons rotating">sync</i>
         </div>
       </div>
+
+      <!-- Bouton Archives -->
+      <button class="archive-toggle-btn" 
+              [class.active]="currentView === 'archives'"
+              (click)="currentView === 'archives' ? voirDossiersActifs() : voirDossiersArchives()">
+        <i class="material-icons">{{ currentView === 'archives' ? 'folder' : 'archive' }}</i>
+        {{ currentView === 'archives' ? 'Dossiers Actifs' : 'Archives' }}
+        <span class="counter-badge" *ngIf="currentView === 'archives' && dossiers.length > 0">({{ dossiers.length }})</span>
+        <span class="counter-badge" *ngIf="currentView !== 'archives' && dossiersArchives && dossiersArchives.length > 0">({{ dossiersArchives.length }})</span>
+      </button>
      
-      <label class="upload-btn">
+      <label class="upload-btn" *ngIf="currentView !== 'archives'">
         <input type="file" (change)="onFileUpload($event)" accept=".csv" hidden>
         <i class="material-icons">file_upload</i>
         Importer CSV
       </label>
 
-      <button class="add-btn" (click)="navigateToAdd()">
+      <button class="add-btn" (click)="navigateToAdd()" *ngIf="currentView !== 'archives'">
         <i class="material-icons">add</i>
         Nouveau Dossier
       </button>
@@ -40,110 +50,218 @@
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-state">
       <i class="material-icons rotating">sync</i>
-      Chargement des dossiers...
+      <span *ngIf="currentView === 'archives'">Chargement des archives...</span>
+      <span *ngIf="currentView !== 'archives'">Chargement des dossiers...</span>
     </div>
 
-    <!-- Dossiers Table -->
-    <div class="table-container" *ngIf="!isLoading && !error && dossiers.length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th>ID Dossier</th>
-            <th>N° Compte</th>
-            <th>Engagement Total</th>
-            <th>Montant Principal</th>
-            <th>Status</th>
-            <th ngif>État de Validation</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let dossier of dossiers">
-          <td>{{ dossier.id }}</td>
-          <td>{{ dossier.compte.nomCompte }}</td>
-            <td>{{ dossier.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</td>
-            <td>{{ dossier.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</td>
-            <td>
-              <span class="status-chip" [ngClass]="{'status-active': dossier.status === 'EN_COURS', 'status-closed': dossier.status === 'TERMINE', 'status-pending': dossier.status === 'SUSPENDU', 'status-cancelled': dossier.status === 'ANNULE'}">
-                {{ dossier.status }}
-              </span>
-            </td>
-            <td>
-              <div class="status-container">
-                <span 
-                  class="status-chip" 
-                  [ngClass]="{
-                    'status-initial': dossier.etatValidation === 'INITIALE', 
-                    'status-valid': dossier.etatValidation === 'VALIDE', 
-                    'status-invalid': dossier.etatValidation === 'NON_VALIDE',
-                    'clickable': dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()
-                  }"
-                  (click)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && openValidationMenu(dossier, $event)"
-                  (keydown)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && $event.key === 'Enter' && openValidationMenu(dossier, $event)">
-                  
-                  {{ dossier.etatValidation }}
-                  
-                  <i *ngIf="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()" class="material-icons tiny-icon">
-                    arrow_drop_down
-                  </i>
+    <!-- DOSSIERS ACTIFS -->
+    <div *ngIf="currentView !== 'archives'">
+      <!-- Dossiers Actifs Table -->
+      <div class="table-container" *ngIf="!isLoading && !error && dossiers.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Dossier</th>
+              <th>N° Compte</th>
+              <th>Engagement Total</th>
+              <th>Montant Principal</th>
+              <th>Status</th>
+              <th>État de Validation</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dossier of dossiers">
+              <td>{{ dossier.id }}</td>
+              <td>{{ dossier.compte.nomCompte }}</td>
+              <td>{{ dossier.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</td>
+              <td>{{ dossier.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</td>
+              <td>
+                <span class="status-chip" [ngClass]="{'status-active': dossier.status === 'EN_COURS', 'status-closed': dossier.status === 'TERMINE', 'status-pending': dossier.status === 'SUSPENDU', 'status-cancelled': dossier.status === 'ANNULE'}">
+                  {{ dossier.status }}
                 </span>
+              </td>
+              <td>
+                <div class="status-container">
+                  <span 
+                    class="status-chip" 
+                    [ngClass]="{
+                      'status-initial': dossier.etatValidation === 'INITIALE', 
+                      'status-valid': dossier.etatValidation === 'VALIDE', 
+                      'status-invalid': dossier.etatValidation === 'NON_VALIDE',
+                      'clickable': dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()
+                    }"
+                    (click)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && openValidationMenu(dossier, $event)"
+                    (keydown)="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission() && $event.key === 'Enter' && openValidationMenu(dossier, $event)">
+                    
+                    {{ dossier.etatValidation }}
+                    
+                    <i *ngIf="dossier.etatValidation === 'INITIALE' && roleService.hasValidationPermission()" class="material-icons tiny-icon">
+                      arrow_drop_down
+                    </i>
+                  </span>
+                
+                  <!-- Menu de validation (visible uniquement si permission) -->
+                  <div *ngIf="selectedDossierForValidation?.id === dossier.id && roleService.hasValidationPermission()" class="validation-menu horizontal-menu">
+                    <button class="icon-btn validation-option accept" data-tooltip="Accepter" (click)="validateDossier(dossier, 'VALIDE')">
+                      <i class="material-icons">check_circle</i>
+                    </button>
+                    <button class="icon-btn validation-option reject" data-tooltip="Refuser" (click)="validateDossier(dossier, 'NON_VALIDE')">
+                      <i class="material-icons">cancel</i>
+                    </button>
+                  </div>
+                </div>
+              </td>
               
-                <!-- Menu de validation (visible uniquement si permission) -->
-                <div *ngIf="selectedDossierForValidation?.id === dossier.id && roleService.hasValidationPermission()" class="validation-menu horizontal-menu">
-                  <button class="icon-btn validation-option accept" data-tooltip="Accepter" (click)="validateDossier(dossier, 'VALIDE')">
-                    <i class="material-icons">check_circle</i>
+              <td>
+                <div class="action-buttons">
+                  <!-- Toujours visible -->
+                  <button class="icon-btn view-btn" data-tooltip="Voir détails" (click)="navigateToDetails(dossier.id)">
+                    <i class="material-icons">visibility</i>
                   </button>
-                  <button class="icon-btn validation-option reject" data-tooltip="Refuser" (click)="validateDossier(dossier, 'NON_VALIDE')">
-                    <i class="material-icons">cancel</i>
+                
+                  <!-- Modifier (besoin de UPDATE_DOSSIERRECOUVREMENT) -->
+                  <button class="icon-btn edit-btn" 
+                          data-tooltip="Modifier" 
+                          *ngIf="roleService.hasUpdateDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
+                          (click)="navigateToEdit(dossier.id)">
+                    <i class="material-icons">edit</i>
+                  </button>
+
+                  <!-- Télécharger PDF Fusionné -->
+                  <button
+                    *ngIf="roleService.hasDownloadCreditFilePermission()"
+                    class="icon-btn download-btn"
+                    data-tooltip="Télécharger PDF complet"
+                    (click)="downloadAllDocumentsFusionnes(dossier)"
+                  >
+                    <i class="material-icons">download</i>
+                  </button>
+
+                  <!-- Si le dossier n'est PAS archivé -->
+                  <button *ngIf="dossier.status !== statusEnum.ARCHIVEE"
+                          class="icon-btn archive-btn"
+                          data-tooltip="Archiver"
+                          (click)="archiverDossierAvecRechargement(dossier.id)">
+                    <i class="material-icons">archive</i>
+                  </button>
+
+                  <!-- Bouton Désarchiver (visible seulement si archivé) -->
+                  <button *ngIf="dossier.status === statusEnum.ARCHIVEE"
+                          class="icon-btn unarchive-btn"
+                          data-tooltip="Désarchiver"
+                          (click)="desarchiverDossierAvecRechargement(dossier.id)">
+                    <i class="material-icons">unarchive</i>
+                  </button>
+
+                  <!-- Télécharger mise en demeure (besoin de DOWNLOAD_MISE_EN_DEMEURE) -->
+                  <button class="icon-btn pdf-btn" 
+                          data-tooltip="Télécharger PDF" 
+                          *ngIf="roleService.hasDownloadMiseEnDemeurePermission()" 
+                          (click)="telechargerMiseEnDemeure(dossier)">
+                    <i class="material-icons">picture_as_pdf</i>
+                  </button>
+
+                  <!-- Supprimer (besoin de DELETE_DOSSIERRECOUVREMENT) -->
+                  <button class="icon-btn delete-btn" 
+                          data-tooltip="Supprimer" 
+                          *ngIf="roleService.hasDeleteDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
+                          (click)="deleteDossier(dossier.id)">
+                    <i class="material-icons">delete</i>
                   </button>
                 </div>
-              </div>
-              
-            </td>
-            <td>
-              <div class="action-buttons">
-                <!-- Toujours visible -->
-                <button class="icon-btn view-btn" data-tooltip="Voir détails" (click)="navigateToDetails(dossier.id)">
-                  <i class="material-icons">visibility</i>
-                </button>
-              
-                <!-- Modifier (besoin de UPDATE_DOSSIERRECOUVREMENT) -->
-                <button class="icon-btn edit-btn" 
-        data-tooltip="Modifier" 
-        *ngIf="roleService.hasUpdateDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
-        (click)="navigateToEdit(dossier.id)">
-  <i class="material-icons">edit</i>
-</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-              
-                <!-- Télécharger mise en demeure (besoin de DOWNLOAD_MISE_EN_DEMEURE) -->
-                <button class="icon-btn pdf-btn" 
-                        data-tooltip="Télécharger PDF" 
-                        *ngIf="roleService.hasDownloadMiseEnDemeurePermission()" 
-                        (click)="telechargerMiseEnDemeure(dossier)">
-                  <i class="material-icons">picture_as_pdf</i>
-                </button>
-              
-                <!-- Supprimer (besoin de DELETE_DOSSIERRECOUVREMENT) -->
-                <button class="icon-btn delete-btn" 
-                        data-tooltip="Supprimer" 
-                        *ngIf="roleService.hasDeleteDossierRecouvrementPermission() && dossier.status !== 'Clôturé'" 
-                        (click)="deleteDossier(dossier.id)">
-                  <i class="material-icons">delete</i>
-                </button>
-              </div>
-              
-              
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- No Dossiers Actifs Message -->
+      <div *ngIf="!isLoading && !error && dossiers.length === 0" class="no-dossiers-message">
+        <i class="material-icons">folder_off</i>
+        <p>Aucun dossier trouvé</p>
+      </div>
     </div>
 
-    <!-- No Dossiers Message -->
-    <div *ngIf="!isLoading && !error && dossiers.length === 0" class="no-dossiers-message">
-      <i class="material-icons">folder_off</i>
-      <p>Aucun dossier trouvé</p>
+    <!-- DOSSIERS ARCHIVÉS -->
+    <div *ngIf="currentView === 'archives'">
+      <!-- Dossiers Archivés Table -->
+      <div class="table-container" *ngIf="!isLoading && !error && dossiersArchives && dossiersArchives.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Dossier</th>
+              <th>N° Compte</th>
+              <th>Engagement Total</th>
+              <th>Montant Principal</th>
+              <th>Status</th>
+              <th>Date d'Archivage</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dossier of dossiersArchives">
+              <td>{{ dossier.id }}</td>
+              <td>{{ dossier.compte.nomCompte }}</td>
+              <td>{{ dossier.engagementTotal | currency:'EUR':'symbol':'1.0-0' }}</td>
+              <td>{{ dossier.montantPrincipal | currency:'EUR':'symbol':'1.0-0' }}</td>
+              <td>
+                <span class="status-chip status-archived">
+                  <i class="material-icons">archive</i>
+                  ARCHIVÉ
+                </span>
+              </td>
+              <td>
+                <span *ngIf="dossier.dateArchivage">
+                  {{ dossier.dateArchivage | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+                <span *ngIf="!dossier.dateArchivage" class="text-muted">Non renseignée</span>
+              </td>
+              
+              <td>
+                <div class="action-buttons">
+                  <!-- Voir détails -->
+                  <button class="icon-btn view-btn" data-tooltip="Voir détails" (click)="navigateToDetails(dossier.id)">
+                    <i class="material-icons">visibility</i>
+                  </button>
+
+                  <!-- Télécharger PDF Fusionné -->
+                  <button
+                    *ngIf="roleService.hasDownloadCreditFilePermission()"
+                    class="icon-btn download-btn"
+                    data-tooltip="Télécharger PDF complet"
+                    (click)="downloadAllDocumentsFusionnes(dossier)"
+                  >
+                    <i class="material-icons">download</i>
+                  </button>
+
+                  <!-- Désarchiver -->
+                  <button class="icon-btn unarchive-btn"
+                          data-tooltip="Désarchiver"
+                          (click)="desarchiverDossierAvecRechargement(dossier.id)">
+                    <i class="material-icons">unarchive</i>
+                  </button>
+
+                  <!-- Supprimer définitivement -->
+                  <button class="icon-btn delete-btn" 
+                          data-tooltip="Supprimer définitivement" 
+                          *ngIf="roleService.hasDeleteDossierRecouvrementPermission()" 
+                          (click)="deleteDossier(dossier.id)">
+                    <i class="material-icons">delete_forever</i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Dossiers Archivés Message -->
+      <div *ngIf="!isLoading && !error && (!dossiersArchives || dossiersArchives.length === 0)" class="no-dossiers-message">
+        <i class="material-icons">archive</i>
+        <h3>Aucun dossier archivé</h3>
+        <p>Vous n'avez pas encore archivé de dossiers.</p>
+      </div>
     </div>
   </div>
 </main>

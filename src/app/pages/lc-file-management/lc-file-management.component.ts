@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { LcFileService } from 'src/app/shared/services/lc-file.service';
 import { RoleService } from 'src/app/shared/services/role.service';
 import { AuthService } from 'src/app/auth/auth.service';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 @Component({
   selector: 'app-lc-file-management',
   templateUrl: './lc-file-management.component.html',
@@ -24,6 +24,7 @@ export class LcFileManagementComponent implements OnInit {
     private lcFileService: LcFileService,
     public roleService: RoleService,
     public authService: AuthService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -81,48 +82,48 @@ onLcFileSelectedAndUpload(event: any, dossier: any): void {
   }
 
   // Visualiser un fichier LC avec option de téléchargement
-  viewLcFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.lcFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
-
-    const fileUrl = this.lcFileService.getFullFileUrl(dossier.lcFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.lcFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
+ // src/app/pages/lc-file-management/lc-file-management.component.ts
+viewLcFile(dossier: DossierRecouvrement, download: boolean = false): void {
+  if (!dossier.id) {
+    alert('Aucun dossier sélectionné.');
+    return;
   }
+
+  // ⚠️ Nouvelle URL : on passe l’ID du dossier, pas le chemin
+  const fileUrl = `/api/lc-files/pdf/${dossier.id}`;
+  const token = this.authService.getToken();
+
+  fetch(fileUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Erreur lors du chargement du fichier');
+    return res.blob();
+  })
+  .then(blob => {
+    const blobUrl = URL.createObjectURL(blob);
+    if (download) {
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      // nom du fichier : dossier.lcFile contient son chemin local
+      a.download = dossier.lcFile.split('/').pop() || 'lcfile.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      window.open(blobUrl, '_blank');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Impossible de charger le fichier.');
+  });
+}
+
+                      
 
   // Supprimer un fichier LC
   deleteLcFile(dossier: DossierRecouvrement): void {

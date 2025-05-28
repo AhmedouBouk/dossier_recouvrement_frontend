@@ -54,4 +54,8 @@ export class CautionsFileService {
     const baseUrl = environment.apiUrl;
     return baseUrl + relativePath;
   }
+
+   downloadPdfByDossier(id: number): Observable<Blob> {
+  return this.http.get(`/api/credits/pdf/${id}`, { responseType: 'blob' });
+}
 }

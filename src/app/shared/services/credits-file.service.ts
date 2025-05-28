@@ -33,4 +33,8 @@ export class CreditsFileService {
     }
     return relativePath;
   }
+  downloadPdfByDossier(id: number): Observable<Blob> {
+  return this.http.get(`/api/credits/pdf/${id}`, { responseType: 'blob' });
+}
+
 }

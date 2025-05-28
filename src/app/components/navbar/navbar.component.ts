@@ -4,8 +4,11 @@ import { Router, NavigationEnd, Event } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { filter } from 'rxjs/operators';
 import { Location } from '@angular/common'; 
+import { Subscription, interval } from 'rxjs';
 import { RoleGuard } from 'src/app/shared/guards/role.guard';
 import { RoleService } from 'src/app/shared/services/role.service';
+
+import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 interface RouteMap {
   [key: string]: string;
 }
@@ -37,15 +40,22 @@ export class NavbarComponent implements OnInit {
     private authService: AuthService, 
     private router: Router,
     private location: Location,
-    public roleService: RoleService
+    public roleService: RoleService ,
+    private dossierService: DossierRecouvrementService
   ) {
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event) => {
       this.currentSection = this.routes[event.url] || this.currentSection ;
     });
-  }
 
+    
+  }
+  currentRoute: string = '';
+ // ✅ Propriété pour le compteur d'archives
+  nombreArchives: number = 0;
+  private subscriptions: Subscription[] = [];
+ 
   ngOnInit(): void {
     this.userName = this.authService.getLoggedInUserName();
     this.userRole = this.authService.getRole() || 'No Role';
