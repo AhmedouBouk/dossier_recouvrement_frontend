@@ -101,16 +101,16 @@
           <div class="form-group">
             <label for="naturesEngagement">Origines de l'engagement</label>
             <div class="input-with-icon">
-              <i class="material-icons">source</i>
-             <textarea
-  id="naturesEngagement"
-  [(ngModel)]="dossier.naturesEngagement"
-  name="naturesEngagement"
-  required
-  #originesEngagement="ngModel"
-  rows="3"
-  class="form-control">
-</textarea>
+  <i class="material-icons">source</i>
+  <textarea
+    id="naturesEngagement"
+    [(ngModel)]="dossier.naturesEngagement"
+    name="naturesEngagement"
+    required
+    #originesEngagement="ngModel"
+    rows="3"
+  ></textarea>
+
 
             </div>
             <div class="error-message" *ngIf="originesEngagement.invalid && (originesEngagement.dirty || originesEngagement.touched)">
