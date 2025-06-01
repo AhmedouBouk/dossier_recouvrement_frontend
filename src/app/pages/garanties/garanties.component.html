@@ -54,17 +54,22 @@
             <!-- Titre de la garantie -->
             <td>
               <ng-container *ngIf="editingGarantie && editingGarantie.id === dossier.id && dossier.status !== 'Clôturé'; else viewMode">
-                <input
-                  [(ngModel)]="editingGarantie.garantiesTitre"
-                  class="edit-input"
-                  placeholder="Titre de la garantie"
-                />
-                <button class="icon-btn save-btn" data-tooltip="Sauvegarder" (click)="updateGarantie(dossier)">
-                  <i class="material-icons">save</i>
-                </button>
-                <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit()">
-                  <i class="material-icons">close</i>
-                </button>
+              
+  <input
+  [(ngModel)]="editingGarantie.garantiesTitre"
+  class="edit-input"
+  placeholder="Titre de la garantie"
+/>
+<div class="edit-buttons">
+  <button class="icon-btn save-btn" data-tooltip="Sauvegarder" (click)="updateGarantie(dossier)">
+    <i class="material-icons">save</i>
+  </button>
+  <button class="icon-btn cancel-btn" data-tooltip="Annuler" (click)="cancelEdit()">
+    <i class="material-icons">close</i>
+  </button>
+</div>
+
+
               </ng-container>
 
               <ng-template #viewMode>

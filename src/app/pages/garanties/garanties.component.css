@@ -185,9 +185,16 @@ color: #6b7280;
 display: flex;
 gap: 8px;
 }
+.edit-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 5px;
+  align-items: center;
+}
 
 .view-btn,
-.edit-btn,
+
 .delete-btn {
 display: flex;
 align-items: center;
