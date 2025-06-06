@@ -71,25 +71,28 @@
           </span>
         </div>
         <div class="detail-item">
-  <span class="label">Titre de la garantie</span>
-  <span class="value">{{ dossierDetails.garantiesTitre || 'Non spécifié' }}</span>
-</div>
-
-<div class="detail-item">
-  <span class="label">Valeur de la garantie</span>
-  <span class="value">{{ dossierDetails.garantiesValeur | currency:'EUR':'symbol':'1.0-0' }}</span>
-</div>
-
-<div class="detail-item">
-  <span class="label">Fichier de la garantie</span>
+  <span class="label">Garanties</span>
   <span class="value">
-    <ng-container *ngIf="dossierDetails.garantiesFile; else noGarantieFile">
-      <a  (click)="viewGarantieFile(dossierDetails, false)">📄 Voir le fichier</a>
+    <ng-container *ngIf="dossierDetails.garanties && dossierDetails.garanties.length > 0; else noGaranties">
+      <div *ngFor="let garantie of dossierDetails.garanties; let i = index" class="garantie-item">
+        <strong>{{ garantie.titre }}</strong>
+        <div class="garantie-actions">
+          <a *ngIf="garantie.filePath" (click)="viewGarantieFile(dossierDetails, garantie.id, false)" class="file-link">📄 Voir</a>
+          <a *ngIf="garantie.filePath && roleService.hasPermission('download_files')" 
+             (click)="viewGarantieFile(dossierDetails, garantie.id, true)" class="file-link">⬇️ Télécharger</a>
+        </div>
+        <small *ngIf="garantie.uploadDate">Ajoutée le {{ garantie.uploadDate | date:'dd/MM/yyyy' }}</small>
+      </div>
     </ng-container>
-    <ng-template #noGarantieFile>
-      📂 Aucun fichier
+    <ng-template #noGaranties>
+      <span class="no-files">Aucune garantie disponible</span>
     </ng-template>
   </span>
+</div>
+
+<div class="detail-item">
+  <span class="label">Valeur des garanties</span>
+  <span class="value">{{ dossierDetails.garantiesValeur | currency:'EUR':'symbol':'1.0-0' }}</span>
 </div>
 <!-- Fichier des crédits -->
 <div class="detail-item">

@@ -17,9 +17,10 @@ export class RoleService {
     return '';
   }
 
-
-
- 
+  // General permission check method
+  hasPermission(permission: string): boolean {
+    return this.authService.hasPermission(permission);
+  }
   
 
   // Client permissions

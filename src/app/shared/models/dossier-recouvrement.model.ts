@@ -1,4 +1,4 @@
-
+import { Garantie } from './garantie.model';
 
 export enum EtatValidation {
   INITIALE = 'INITIALE',
@@ -43,9 +43,9 @@ export interface DossierRecouvrement {
     interetsReserves: number;
   status: string;  // PAS DossierStatus
     etatValidation: EtatValidation;
-    garantiesTitre: string;
-    garantiesValeur: number;
-    garantiesFile: string;
+    garanties?: Garantie[];
+    garantiesValeur?: number; // Valeur des garanties
+    garantiesTitre?: string; // Pour la compatibilité avec l'ancien code
     creditsFile: string;
     cautionsFile: string;
     lcFile: string;
@@ -60,4 +60,3 @@ export interface DossierRecouvrement {
 
    dateArchivage?:Date;
   }
-  

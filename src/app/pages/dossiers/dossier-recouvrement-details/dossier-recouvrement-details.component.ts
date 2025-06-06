@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
+import { Garantie } from 'src/app/shared/models/garantie.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserDataService } from 'src/app/shared/services/user-data.service';
 import { jsPDF } from 'jspdf';
@@ -108,41 +109,79 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     this.router.navigate(['/dossiers']);
   }
   
-  viewGarantieFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.garantiesFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
+  viewGarantieFile(dossier: DossierRecouvrement, garantieIdOrIndex?: number | string, download: boolean = false): void {
+    if (!dossier.garanties || dossier.garanties.length === 0) {
+      alert('Aucune garantie trouvée pour ce dossier.');
       return;
     }
 
-    const fileUrl = this.garantieService.getFullFileUrl(dossier.garantiesFile);
-    const token = this.authService.getToken();
+    // If garantieId is provided, view that specific garantie
+    // Otherwise, if there's only one garantie, view that one
+    // If multiple garanties and no ID specified, show selection dialog
+    let selectedGarantie: Garantie | undefined;
+    
+    if (typeof garantieIdOrIndex === 'number') {
+      // If it's a number, treat it as an ID
+      selectedGarantie = dossier.garanties.find(g => g.id === garantieIdOrIndex);
+      if (!selectedGarantie) {
+        alert('Garantie non trouvée.');
+        return;
+      }
+    } else if (typeof garantieIdOrIndex === 'string') {
+      // If it's a string, treat it as an index
+      const index = Number(garantieIdOrIndex) - 1;
+      if (isNaN(index) || index < 0 || index >= dossier.garanties.length) {
+        alert('Index de garantie invalide.');
+        return;
+      }
+      selectedGarantie = dossier.garanties[index];
+    } else if (dossier.garanties.length === 1) {
+      // If no ID/index provided but only one garantie exists
+      selectedGarantie = dossier.garanties[0];
+    } else {
+      // Multiple garanties but no ID/index provided
+      alert('Veuillez spécifier une garantie.');
+      return;
+    }
 
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Erreur lors du chargement du fichier');
-        return response.blob();
-      })
-      .then((blob) => {
-        const blobUrl = URL.createObjectURL(blob);
-        if (download) {
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = dossier.garantiesFile.split('/').pop() || 'file.pdf';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          window.open(blobUrl, '_blank');
+    if (!selectedGarantie) {
+      alert('Garantie introuvable.');
+      return;
+    }
+
+    if (!selectedGarantie.id) {
+      alert('ID de garantie invalide.');
+      return;
+    }
+
+    // Use the garantie service to get the PDF by ID instead of direct file access
+    this.garantieService.getGarantiePdf(selectedGarantie.id)
+      .subscribe({
+        next: (blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            // Add null checks and provide fallback values
+            if (selectedGarantie && selectedGarantie.filePath) {
+              const fileName = selectedGarantie.filePath.split('/').pop() || `garantie_${selectedGarantie.id || 'unknown'}.pdf`;
+              a.download = fileName;
+            } else if (selectedGarantie && selectedGarantie.id) {
+              a.download = `garantie_${selectedGarantie.id}.pdf`;
+            } else {
+              a.download = 'garantie.pdf';
+            }
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Erreur:', error);
+          alert('Impossible de charger le fichier.');
         }
-      })
-      .catch((error) => {
-        console.error('Erreur:', error);
-        alert('Impossible de charger le fichier.');
       });
   }
 

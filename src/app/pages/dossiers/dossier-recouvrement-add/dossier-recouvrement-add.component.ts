@@ -33,7 +33,6 @@ export class DossierRecouvrementAddComponent implements OnInit {
     interetsReserves: 0,
     garantiesValeur: 0,
     garantiesTitre: '',
-    garantiesFile: '',
     creditsFile: '',
     cautionsFile: '',
     lcFile: '',
