@@ -16,32 +16,42 @@ import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossi
 export class DossierRecouvrementEditComponent implements OnInit {
   dossierId!: number;
   dossier: DossierRecouvrement = {
-      id: 0,
-      compte: {
-          nomCompte: ''
-      },
-      engagementTotal: 0,
-      montantPrincipal: 0,
-      interetContractuel: 0,
-      interetRetard: 0,
-      naturesEngagement: [] as string[],
-      agenceOuvertureCompte: '',
-      referencesChecks: '',
-      referencesCredits: '',
-      referencesCautions: '',
-      referencesLC: '',
-      provision: 0,
-      garantiesValeur: 0,
-      status: '',
-      etatValidation: EtatValidation.INITIALE,
-      interetsReserves: 0,
-      garantiesTitre: '',
-      creditsFile: '',
-      cautionsFile: '',
-      lcFile: '',
-      chequeFiles: [],
-      dateCreation: new Date() // Initialisé avec la date actuelle
-    };
+    id: 0,
+    numeroDossierRecouvrement: '',
+    nomClientRecouvrement: '',
+    compte: { nomCompte: '' },
+    engagementTotal: 0,
+    montantPrincipal: 0,
+    interetContractuel: 0,
+    interetRetard: 0,
+    naturesEngagement: [],
+    agenceOuvertureCompte: '',
+    dateOuvertureCompte: new Date(),
+    situationCompte: '',
+    situationJuridique: '',
+    typeClient: '',
+    natureEngagement: '',
+    natureCredit: '',
+    typeGarantie: '',
+    periodiciteRemboursement: '',
+    dateEcheanceInitiale: new Date(),
+    dateSituation: new Date(),
+    dateCreation: new Date(),
+    status: '',
+    etatValidation: EtatValidation.INITIALE,
+    interetsReserves: 0,
+    garantiesValeur: 0,
+    garantiesTitre: '',
+    creditsFile: '',
+    cautionsFile: '',
+    lcFile: '',
+    chequeFiles: [],
+    referencesChecks: '',
+    referencesCredits: '',
+    referencesCautions: '',
+    referencesLC: '',
+    provision: 0
+  };
   isLoading = false;
   errorMessage = '';
 
@@ -53,8 +63,6 @@ export class DossierRecouvrementEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-   
-
     this.route.params.subscribe(params => {
       this.dossierId = +params['id'];
       this.loadDossierDetails();
@@ -67,6 +75,8 @@ export class DossierRecouvrementEditComponent implements OnInit {
       next: (data) => {
         this.dossier = {
           id: data.id,
+          numeroDossierRecouvrement: data.numeroDossierRecouvrement || '',
+          nomClientRecouvrement: data.nomClientRecouvrement || '',
           compte: data.compte,
           engagementTotal: data.engagementTotal,
           montantPrincipal: data.montantPrincipal,
@@ -74,21 +84,31 @@ export class DossierRecouvrementEditComponent implements OnInit {
           interetRetard: data.interetRetard,
           naturesEngagement: data.naturesEngagement,
           agenceOuvertureCompte: data.agenceOuvertureCompte,
-          referencesChecks: data.referencesChecks,
-          referencesCredits: data.referencesCredits,
-          referencesCautions: data.referencesCautions,
-          referencesLC: data.referencesLC,
-          provision: data.provision,
-          garantiesValeur: data.garantiesValeur,
-          status: data.status,
+          dateOuvertureCompte: data.dateOuvertureCompte,
+          situationCompte: data.situationCompte,
+          situationJuridique: data.situationJuridique,
+          typeClient: data.typeClient,
+          natureEngagement: data.natureEngagement,
+          natureCredit: data.natureCredit,
+          typeGarantie: data.typeGarantie,
+          periodiciteRemboursement: data.periodiciteRemboursement,
+          dateEcheanceInitiale: data.dateEcheanceInitiale,
+          dateSituation: data.dateSituation,
+          dateCreation: data.dateCreation,
+          status: data.status || '',
           etatValidation: data.etatValidation,
           interetsReserves: data.interetsReserves,
+          garantiesValeur: data.garantiesValeur,
           garantiesTitre: data.garantiesTitre,
           creditsFile: data.creditsFile,
           cautionsFile: data.cautionsFile,
           lcFile: data.lcFile,
           chequeFiles: data.chequeFiles,
-          dateCreation:data.dateCreation
+          referencesChecks: data.referencesChecks,
+          referencesCredits: data.referencesCredits,
+          referencesCautions: data.referencesCautions,
+          referencesLC: data.referencesLC,
+          provision: data.provision
         };
         this.isLoading = false;
       },

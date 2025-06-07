@@ -13,9 +13,11 @@ import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossi
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class DossierRecouvrementAddComponent implements OnInit {
+export class DossierRecouvrementAddComponent {
   dossierForm: DossierRecouvrement = {
     id: 0,
+    numeroDossierRecouvrement: '',
+    nomClientRecouvrement: '',
     compte: {
       nomCompte: ''
     },
@@ -25,37 +27,40 @@ export class DossierRecouvrementAddComponent implements OnInit {
     interetRetard: 0,
     naturesEngagement: [],
     agenceOuvertureCompte: '',
+    dateOuvertureCompte: new Date(),
+    situationCompte: '',
+    situationJuridique: '',
+    typeClient: '',
+    natureEngagement: '',
+    natureCredit: '',
+    typeGarantie: '',
+    periodiciteRemboursement: '',
+    dateEcheanceInitiale: new Date(),
+    dateSituation: new Date(),
     referencesChecks: '',
     referencesCredits: '',
     referencesCautions: '',
     referencesLC: '',
     provision: 0,
     interetsReserves: 0,
-    garantiesValeur: 0,
-    garantiesTitre: '',
     creditsFile: '',
     cautionsFile: '',
-    lcFile: '',
-    chequeFiles: [],
-    
+    dateCreation: new Date(),
     status: '',
     etatValidation: EtatValidation.INITIALE,
-    dateCreation: new Date() 
-
+    garanties: []
   };
 
   isLoading = false;
   errorMessage = '';
 
   constructor(
-    private router: Router,
-    private dossierService: DossierRecouvrementService,
-    public roleService: RoleService
+    private readonly router: Router,
+    private readonly dossierService: DossierRecouvrementService,
+    private readonly roleService: RoleService
   ) {}
 
-  ngOnInit(): void {
-    
-  }
+
 
   addDossier() {
     if (!this.validateForm()) {
@@ -94,7 +99,7 @@ export class DossierRecouvrementAddComponent implements OnInit {
       this.errorMessage = 'Le montant principal doit être supérieur à 0';
       return false;
     }
-    if (!this.dossierForm.naturesEngagement || this.dossierForm.naturesEngagement.length === 0) {
+    if (!this.dossierForm.natureEngagement || this.dossierForm.natureEngagement.length === 0) {
       this.errorMessage = 'Les natures de l\'engagement sont obligatoires';
       return false;
     }

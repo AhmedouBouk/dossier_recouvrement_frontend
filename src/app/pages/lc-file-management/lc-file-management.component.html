@@ -1,8 +1,17 @@
-<!-- src/app/pages/lc-file-management/lc-file-management.component.html -->
 <div class="main-content">
   <div class="container">
-    <!-- Barre de recherche et actions -->
-    
+
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="material-icons">error</i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Message de succès -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="material-icons">check_circle</i>
+      {{ successMessage }}
+    </div>
 
     <!-- Indicateur de chargement -->
     <div *ngIf="isLoading" class="loading-state">
@@ -10,109 +19,144 @@
       Chargement en cours...
     </div>
 
-    <!-- Tableau des fichiers LC -->
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <div class="search-container">
+        <i class="material-icons">search</i>
+        <input 
+          type="text" 
+          placeholder="Rechercher par ID dossier ou nom client..." 
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+    </div>
+
+    <!-- Tableau des dossiers et leurs fichiers LC -->
     <div *ngIf="!isLoading" class="table-container">
       <table>
         <thead>
           <tr>
             <th>ID Dossier</th>
             <th>N° Compte</th>
-            <th>Fichier LC</th>
-            <th>Date de Création</th>
+            <th>Fichiers LC</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let dossier of dossiers">
-<td>
-  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
-    {{ dossier.id }}
-  </a>
-</td>
-            <td>{{ dossier.compte.nomCompte }}</td>
+          <tr *ngFor="let dossier of filteredDossiers">
             <td>
-              <span *ngIf="dossier.lcFile; else noFile">
-                {{ dossier.lcFile }}
-              </span>
-              <ng-template #noFile>
-                <span class="no-file">Aucun fichier</span>
+              <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+                {{ dossier.id }}
+              </a>
+            </td>
+            <td>{{ dossier.compte?.nomCompte || 'N/A' }}</td>
+
+            <!-- Liste des fichiers LC -->
+            <td class="lc-files-container" *ngIf="dossier.lcFiles && dossier.lcFiles.length > 0; else noLcFiles">
+              <div class="lc-file-list">
+                <div class="lc-file-row" *ngFor="let lcFile of dossier.lcFiles">
+                  <div class="lc-file-details">
+                    <!-- Titre -->
+                    <div class="lc-file-cell lc-file-title">
+                      <div *ngIf="editingLcFile?.id !== lcFile.id">
+                        <button class="editable-text" (click)="startEdit(lcFile)" [disabled]="dossier.status === 'Clôturé'">
+                          {{ lcFile.title || 'Sans titre' }}
+                        </button>
+                      </div>
+                      <div *ngIf="editingLcFile?.id === lcFile.id">
+                        <input class="edit-input" [ngModel]="editingLcFile?.title" (ngModelChange)="editingLcFile!.title = $event" placeholder="Titre du fichier LC" />
+                        <div class="edit-buttons">
+                          <button class="btn btn-sm btn-success" (click)="updateLcFile()">Enregistrer</button>
+                          <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Annuler</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Nom du fichier -->
+                    <div class="lc-file-cell lc-file-name">
+                      {{ getFileName(lcFile.filePath) }}
+                    </div>
+                    
+                    <!-- Date d'upload -->
+                    <div class="lc-file-cell lc-file-date">
+                      {{ lcFile.uploadDate | date:'dd/MM/yyyy' }}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="lc-file-cell lc-file-actions">
+                      <!-- Visualiser fichier -->
+                      <button
+                        class="icon-btn view-btn"
+                        data-tooltip="Visualiser"
+                        (click)="viewLcFile(lcFile, false)"
+                        *ngIf="lcFile.filePath"
+                      >
+                        <i class="material-icons">visibility</i>
+                      </button>
+
+                      <!-- Télécharger fichier -->
+                      <button 
+                        class="icon-btn download-btn"
+                        data-tooltip="Télécharger"
+                        (click)="viewLcFile(lcFile, true)"
+                        *ngIf="lcFile.filePath && roleService.hasPermission('DOWNLOAD_LC_FILE')"
+                      >
+                        <i class="material-icons">download</i>
+                      </button>
+
+                      <!-- Supprimer fichier -->
+                      <button
+                        class="delete-btn"
+                        data-tooltip="Supprimer"
+                        (click)="deleteLcFile(lcFile)"
+                        *ngIf="dossier.status !== 'Clôturé' && roleService.hasPermission('DELETE_LC')"
+                      >
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <ng-template #noLcFiles>
+                <span class="no-file">Aucun fichier LC</span>
               </ng-template>
             </td>
-            <td>{{ dossier.dateCreation }}</td>
-           <td>
-  <div class="action-buttons">
-    <!-- Input invisible -->
-    <input 
-      type="file"
-      (change)="onLcFileSelectedAndUpload($event, dossier)" 
-      accept=".pdf"
-      hidden
-      id="lc-file-upload-{{ dossier.id }}"
-    />
 
-    <!-- Bouton CHOISIR & UPLOADER AUTOMATIQUEMENT -->
-    <label   *ngIf="roleService.hasUploadLcFilePermission() && dossier.status !== 'Clôturé'" 
+            <!-- Actions pour le dossier -->
+            <td>
+              <div class="action-buttons">
+                <!-- Input de sélection de fichier (invisible) -->
+                <input
+                  type="file"
+                  (change)="onFileUpload($event, dossier.id)"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+                  hidden
+                  id="lc-file-upload-{{ dossier.id }}"
+                />
 
-      for="lc-file-upload-{{ dossier.id }}" 
-      class="icon-btn upload-btn"
-      data-tooltip="Téléverser"
-    >
-      <i class="material-icons">file_upload</i>
-    </label>
-
-    <!-- Bouton Visualiser -->
-    <button
-      class="icon-btn view-btn"
-      data-tooltip="Visualiser"
-      (click)="viewLcFile(dossier)"
-      [disabled]="!dossier.lcFile"
-    >
-      <i class="material-icons">visibility</i>
-    </button>
-
-    <!-- Bouton Télécharger -->
-    <button *ngIf="roleService.hasDownloadLcFilePermission()" 
-      class="icon-btn download-btn"
-      data-tooltip="Télécharger"
-      (click)=" viewLcFile(dossier, true)"
-      [disabled]="!dossier.lcFile"
-    >
-      <i class="material-icons">download</i>
-    </button>
-
-    <!-- Bouton Supprimer -->
-    <button 
-      *ngIf=" roleService.hasDeleteLcPermission() && dossier.status !== 'Clôturé'" 
-      class="icon-btn delete-btn"
-      data-tooltip="Supprimer"
-      (click)="deleteLcFile(dossier)"
-      [disabled]="!dossier.lcFile"
-    >
-      <i class="material-icons">delete</i>
-    </button>
-  </div>
-</td>
-
+                <!-- Bouton AJOUTER FICHIER LC -->
+                <label
+                  *ngIf="roleService.hasPermission('UPLOAD_LC_FILE') && dossier.status !== 'Clôturé'"
+                  for="lc-file-upload-{{ dossier.id }}"
+                  class="icon-btn upload-btn"
+                  data-tooltip="Ajouter un fichier LC"
+                >
+                  <i class="material-icons">add_circle</i>
+                </label>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Messages d'erreur ou de succès -->
-    <div *ngIf="errorMessage" class="error-message">
-      <i class="material-icons">error</i>
-      {{ errorMessage }}
-    </div>
-
-    <div *ngIf="successMessage" class="no-dossiers-message">
-      <i class="material-icons">check_circle</i>
-      <p>{{ successMessage }}</p>
-    </div>
-
-    <!-- Message si aucun dossier n'est trouvé -->
-    <div *ngIf="!isLoading && dossiers.length === 0" class="no-dossiers-message">
+    <!-- Aucun dossier trouvé -->
+    <div *ngIf="!isLoading && filteredDossiers.length === 0" class="no-dossiers-message">
       <i class="material-icons">folder_off</i>
       <p>Aucun dossier trouvé</p>
     </div>
+
+    <!-- No modal needed anymore as we're uploading files immediately after selection -->
   </div>
 </div>

@@ -283,7 +283,8 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
           // Télécharger le fichier
           const a = document.createElement('a');
           a.href = blobUrl;
-          a.download = dossier.lcFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+          const lcFile = dossier.lcFile;
+          a.download = lcFile ? lcFile.split('/').pop() || 'file.pdf' : 'file.pdf'; // Nom du fichier
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -494,17 +495,18 @@ viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void 
     });
   }
 
-  getStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'En cours': 'active',
-      'En attente': 'pending',
-      'Clôturé': 'closed',
-      'Initiale': 'pending',
-      'Validé': 'active',
-      'Non Validé': 'closed'
-    };
-    
-    return statusMap[status] || 'pending';
+  getStatusClass(status: string | undefined): string {
+    const statusText = status || '';
+    switch (statusText.toLowerCase()) {
+      case 'en cours':
+        return 'status-in-progress';
+      case 'clôturé':
+        return 'status-closed';
+      case 'en attente':
+        return 'status-pending';
+      default:
+        return 'status-unknown';
+    }
   }
   
   // Vérifie si l'utilisateur connecté peut éditer/supprimer un commentaire
@@ -954,4 +956,45 @@ this.dossierService.detailsPdfBlobs[this.dossierDetails.id] = blob;
     });
   }
 
+  downloadFile(dossier: DossierRecouvrement, type: string): void {
+    if (!dossier.id) {
+      alert('Aucun dossier sélectionné.');
+      return;
+    }
+
+    let serviceCall;
+    let fileName = 'file.pdf';
+
+    switch (type) {
+      case 'lc':
+        if (dossier.lcFile) {
+          // Use a placeholder service call since DossierRecouvrementService might not have download methods
+          // In a real app, you would inject the correct service (e.g., LcFileService)
+          alert('Téléchargement de fichier LC - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier LC associé à ce dossier.');
+          return;
+        }
+      case 'caution':
+        if (dossier.cautionsFile) {
+          alert('Téléchargement de fichier de caution - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier de caution associé à ce dossier.');
+          return;
+        }
+      case 'credit':
+        if (dossier.creditsFile) {
+          alert('Téléchargement de fichier de crédit - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier de crédit associé à ce dossier.');
+          return;
+        }
+      default:
+        alert('Type de fichier non reconnu.');
+        return;
+    }
+  }
 }
