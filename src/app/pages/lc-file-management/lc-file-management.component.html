@@ -52,7 +52,7 @@
             <td>{{ dossier.compte?.nomCompte || 'N/A' }}</td>
 
             <!-- Liste des fichiers LC -->
-            <td class="lc-files-container" *ngIf="dossier.lcFiles && dossier.lcFiles.length > 0; else noLcFiles">
+            <td class="lc-files-container" *ngIf="dossier.lcFiles && dossier.lcFiles.length > 0">
               <div class="lc-file-list">
                 <div class="lc-file-row" *ngFor="let lcFile of dossier.lcFiles">
                   <div class="lc-file-details">

@@ -297,29 +297,32 @@ tbody tr:hover {
 
 /* LC Files Specific Styles */
 .lc-files-container {
-  max-width: 500px;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
-.lc-file-item {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
+.lc-file-list {
+  width: 100%;
 }
 
 .lc-file-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   padding: 10px;
+  margin-bottom: 10px;
   background-color: #f9f9f9;
 }
 
+.lc-file-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .lc-file-cell {
-  padding: 0 10px;
+  padding: 4px 8px;
 }
 
 .lc-file-title {
@@ -327,18 +330,14 @@ tbody tr:hover {
   min-width: 200px;
 }
 
-.lc-file-number {
+.lc-file-name {
   flex: 1;
-  min-width: 120px;
+  min-width: 150px;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 500;
-  color: #374151;
-}
-
-.lc-file-amount {
-  flex: 1;
-  min-width: 100px;
-  font-weight: 600;
-  color: #059669;
 }
 
 .lc-file-date {
