@@ -1,4 +1,5 @@
 import { Garantie } from './garantie.model';
+import { ChequeFile } from './cheque-file.model';
 
 export enum EtatValidation {
   INITIALE = 'INITIALE',
@@ -49,7 +50,7 @@ export interface DossierRecouvrement {
     creditsFile: string;
     cautionsFile: string;
     lcFile: string;
-    chequeFile: string;
+    chequeFiles?: ChequeFile[]; // Replaced single chequeFile string with an array of ChequeFile objects
     dateCreation: Date; // Assurez-vous que cette propriété existe
     selectedFile?: File; // Ajoutez cette propriété
     selectedCreditsFile? :File

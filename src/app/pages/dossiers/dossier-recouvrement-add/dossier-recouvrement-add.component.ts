@@ -36,7 +36,7 @@ export class DossierRecouvrementAddComponent implements OnInit {
     creditsFile: '',
     cautionsFile: '',
     lcFile: '',
-    chequeFile: '',
+    chequeFiles: [],
     
     status: '',
     etatValidation: EtatValidation.INITIALE,

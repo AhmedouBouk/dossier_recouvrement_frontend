@@ -39,7 +39,7 @@ export class DossierRecouvrementEditComponent implements OnInit {
       creditsFile: '',
       cautionsFile: '',
       lcFile: '',
-      chequeFile: '',
+      chequeFiles: [],
       dateCreation: new Date() // Initialisé avec la date actuelle
     };
   isLoading = false;
@@ -87,7 +87,7 @@ export class DossierRecouvrementEditComponent implements OnInit {
           creditsFile: data.creditsFile,
           cautionsFile: data.cautionsFile,
           lcFile: data.lcFile,
-          chequeFile: data.chequeFile,
+          chequeFiles: data.chequeFiles,
           dateCreation:data.dateCreation
         };
         this.isLoading = false;

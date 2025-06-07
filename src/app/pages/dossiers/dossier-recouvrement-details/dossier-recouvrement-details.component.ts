@@ -414,90 +414,58 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     }
   }
 viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.chequeFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
-  
-    const fileUrl = this.chequeFileService.getFullFileUrl(dossier.chequeFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-  
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.chequeFile; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
+  if (!dossier.chequeFiles || dossier.chequeFiles.length === 0) {
+    alert('Aucun fichier trouvé pour ce dossier.');
+    return;
   }
-  viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.cautionsFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
+  
+  // Temporary message until modal is fully integrated
+  alert('La gestion des multiples fichiers de chèques sera disponible prochainement.');
+  // Future implementation will open a modal to select which cheque file to view/download
+}
 
-    const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
+viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+  if (!dossier.cautionsFile) {
+    alert('Aucun fichier trouvé pour ce dossier.');
+    return;
   }
 
+  const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
+  const token = this.authService.getToken(); // Récupérer le token JWT
+
+  fetch(fileUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Erreur lors du chargement du fichier');
+    }
+    return response.blob(); // Convertir la réponse en Blob
+  })
+  .then(blob => {
+    const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+
+    if (download) {
+      // Télécharger le fichier
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      // Ouvrir dans un nouvel onglet
+      window.open(blobUrl, '_blank');
+    }
+  })
+  .catch(error => {
+    console.error('Erreur:', error);
+    alert('Impossible de charger le fichier.');
+  });
+}
   // Méthode pour basculer l'affichage de la sélection de statut
   toggleStatusSelection() {
     this.showStatusSelection = !this.showStatusSelection;

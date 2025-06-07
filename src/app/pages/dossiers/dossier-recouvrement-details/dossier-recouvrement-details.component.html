@@ -112,7 +112,6 @@
   <span class="label">Fichier des cautions</span>
   <span class="value">
     <ng-container *ngIf="dossierDetails.cautionsFile; else noCautionsFile">
-      <a (click)="viewCautionsFile(dossierDetails, false)">📄 Voir le fichier</a>
     </ng-container>
     <ng-template #noCautionsFile>
       📂 Aucun fichier
@@ -137,7 +136,7 @@
 <div class="detail-item">
   <span class="label">Fichier des chèques</span>
   <span class="value">
-    <ng-container *ngIf="dossierDetails.chequeFile; else noChequeFile">
+    <ng-container *ngIf="dossierDetails.chequeFiles; else noChequeFile">
       <a (click)="viewChequeFile(dossierDetails, false)">📄 Voir le fichier</a>
     </ng-container>
     <ng-template #noChequeFile>
