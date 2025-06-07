@@ -1,4 +1,4 @@
-import { Component, type OnInit } from "@angular/core"
+import { Component, type OnInit, Input } from "@angular/core"
 import { DossierRecouvrement } from "src/app/shared/models/dossier-recouvrement.model"
 import { ChequeFile } from "src/app/shared/models/cheque-file.model"
 import { ChequeFileService } from "src/app/shared/services/cheque-file.service"
@@ -14,6 +14,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms"
   styleUrls: ["./cheque-file-management.component.css"],
 })
 export class ChequeFileManagementComponent implements OnInit {
+  @Input() dossierId: number | null = null;
   dossiers: DossierRecouvrement[] = []
   isLoading = false
   errorMessage: string | null = null

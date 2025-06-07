@@ -47,9 +47,7 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
 
 @NgModule({
   declarations: [
-
     AppComponent,
-    
     LoginComponent,
     UserListComponent,
     UserEditComponent,
@@ -61,15 +59,12 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     ComptesDetailsComponent,
     RoleListComponent,
     GarantiesComponent,
-    ChequeFileManagementComponent,
     HistoryComponent,
-    CreditsFileManagementComponent,
-    CautionsFileManagementComponent,
-    LcFileManagementComponent,
     AuthLayoutComponent,
     MainLayoutComponent,
-    
-
+    ChequeFileManagementComponent,
+    CreditsFileManagementComponent,
+    LcFileManagementComponent
   ],
   imports: [
     BrowserModule,
@@ -93,9 +88,13 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     DossierRecouvrementDetailsComponent,
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
+    CautionsFileManagementComponent,
     AgenceModule,
-    SharedModule,
-    
+    SharedModule
+  ],
+  exports: [
+    ChequeFileManagementComponent,
+    CautionsFileManagementComponent
   ],
   providers: [
     RoleGuard,

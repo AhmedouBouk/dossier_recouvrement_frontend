@@ -596,3 +596,21 @@ tbody tr:hover {
 .btn-secondary:hover {
   background-color: #4b5563;
 }
+
+/* Cheque File Management Component Styles */
+.cheque-file-management {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.cheque-file-management h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.cheque-file-management p {
+  font-size: 14px;
+  color: #666;
+}

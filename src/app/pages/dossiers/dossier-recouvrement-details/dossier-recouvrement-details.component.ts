@@ -15,6 +15,7 @@ import { CreditsFileService } from 'src/app/shared/services/credits-file.service
 import { ChequeFileService } from 'src/app/shared/services/cheque-file.service';
 import { CautionsFileService } from 'src/app/shared/services/cautions-file.service';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 interface Comment {
   id?: number;
@@ -35,13 +36,15 @@ interface Comment {
   templateUrl: './dossier-recouvrement-details.component.html',
   styleUrls: ['./dossier-recouvrement-details.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
+  schemas: [NO_ERRORS_SCHEMA]
 })
 export class DossierRecouvrementDetailsComponent implements OnInit {
   reminderDate: string = ''; 
   reminderTime: string = '';
   currentUserId: number | null = null; // ID de l'utilisateur connecté
   dossierDetails: DossierRecouvrement | null = null;
+  dossier: any;
   comments: Comment[] = [];
   newComment: string = '';
   isLoading = false;

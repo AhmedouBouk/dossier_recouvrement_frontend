@@ -260,6 +260,36 @@
         </div>
       </div>
 
+      <div class="card mb-3">
+        <div class="card-header" id="headingChequeFiles">
+          <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChequeFiles" aria-expanded="false" aria-controls="collapseChequeFiles">
+              Cheque Files
+            </button>
+          </h2>
+        </div>
+        <div id="collapseChequeFiles" class="collapse" aria-labelledby="headingChequeFiles" data-bs-parent="#accordionExample">
+          <div class="card-body">
+            <app-cheque-file-management [dossierId]="dossier?.id"></app-cheque-file-management>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header" id="headingCautionFiles">
+          <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCautionFiles" aria-expanded="false" aria-controls="collapseCautionFiles">
+              Caution Files
+            </button>
+          </h2>
+        </div>
+        <div id="collapseCautionFiles" class="collapse" aria-labelledby="headingCautionFiles" data-bs-parent="#accordionExample">
+          <div class="card-body">
+            <app-caution-file-management [dossierId]="dossier?.id"></app-caution-file-management>
+          </div>
+        </div>
+      </div>
+
       <div class="actions">
         <button class="back-btn" (click)="goBack()">
           <i class="material-icons">arrow_back</i>
@@ -272,4 +302,5 @@
       </div>
     </div>
   </div>
+
 </main>
