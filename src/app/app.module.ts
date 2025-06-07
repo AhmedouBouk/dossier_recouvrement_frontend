@@ -63,7 +63,6 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     AuthLayoutComponent,
     MainLayoutComponent,
     ChequeFileManagementComponent,
-    CreditsFileManagementComponent,
     LcFileManagementComponent
   ],
   imports: [

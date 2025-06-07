@@ -1,117 +1,153 @@
 <!-- src/app/pages/credits-file-management/credits-file-management.component.html -->
 <div class="main-content">
-    <div class="container">
-      <!-- Barre de recherche et actions -->
-     
-  
-      <!-- Indicateur de chargement -->
-      <div *ngIf="isLoading" class="loading-state">
-        <i class="material-icons rotating">sync</i>
-        Chargement en cours...
-      </div>
-  
-      <!-- Tableau des fichiers de crédit -->
-      <div *ngIf="!isLoading" class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID Dossier</th>
-              <th>N° Compte</th>
-              <th>Fichier de Crédit</th>
-              <th>Date de Création</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let dossier of dossiers">
-<td>
-  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
-    {{ dossier.id }}
-  </a>
-</td>
-              <td>{{ dossier.compte.nomCompte }}</td>
-              <td>
-                <span *ngIf="dossier.creditsFile; else noFile">
-                  {{ dossier.creditsFile }}
-                </span>
-                <ng-template #noFile>
-                  <span class="no-file">Aucun fichier</span>
-                </ng-template>
-              </td>
-              <td>{{ dossier.dateCreation }}</td>
-           <td>
-  <div class="action-buttons">
+  <div class="container">
 
-    <!-- Input invisible -->
-    <input
-      type="file"
-      (change)="onFileSelectedAndUpload($event, dossier)"
-      accept=".pdf"
-      hidden
-      id="file-upload-{{ dossier.id }}"
-    />
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="material-icons">error</i>
+      {{ errorMessage }}
+    </div>
 
-    <!-- Bouton CHOISIR & UPLOADER automatiquement -->
-    <label *ngIf="roleService.hasUploadCreditFilePermission()&& dossier.status !== 'Clôturé'" 
-      for="file-upload-{{ dossier.id }}"
-      class="icon-btn upload-btn"
-      data-tooltip="Téléverser"
-    >
-      <i class="material-icons">file_upload</i>
-    </label>
+    <!-- Message de succès -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="material-icons">check_circle</i>
+      {{ successMessage }}
+    </div>
 
-    <!-- Visualiser un fichier -->
-    <button
-      class="icon-btn view-btn"
-      data-tooltip="Visualiser"
-      (click)="viewCreditsFile(dossier)"
-      [disabled]="!dossier.creditsFile"
-    >
-      <i class="material-icons">visibility</i>
-    </button>
+    <!-- Indicateur de chargement -->
+    <div *ngIf="isLoading" class="loading-state">
+      <i class="material-icons rotating">sync</i>
+      Chargement en cours...
+    </div>
 
-    <!-- Télécharger -->
-    <button *ngIf="roleService.hasDownloadCreditFilePermission()" 
-      class="icon-btn download-btn"
-      data-tooltip="Télécharger"
-      (click)="viewCreditsFile(dossier, true)"
-      [disabled]="!dossier.creditsFile"
-    >
-      <i class="material-icons">download</i>
-    </button>
+    <!-- Tableau des dossiers et leurs crédits -->
+    <div *ngIf="!isLoading" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID Dossier</th>
+            <th>N° Compte</th>
+            <th>Crédits</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dossier of dossiers">
+            <td>
+              <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+                {{ dossier.id }}
+              </a>
+            </td>
+            <td>{{ dossier.compte?.nomCompte || 'N/A' }}</td>
 
-    <!-- Supprimer -->
-    <button *ngIf="dossier.status !== 'Clôturé'" 
-      class="delete-btn"
-      (click)="deleteCreditsFile(dossier)"
-      [disabled]="!dossier.creditsFile"
-    >
-      <i class="material-icons">delete</i>
-    </button>
+            <!-- Liste des crédits -->
+            <td class="credits-container">
+              <div *ngIf="dossier.creditsFile && dossier.creditsFile.length > 0; else noCredits">
+                <div *ngFor="let creditFile of dossier.creditsFile">
+                  <div class="credit-item">
+                    <div class="credit-row">
+                      <!-- Titre de crédit -->
+                      <div class="credit-cell credit-titre">
+                        <div *ngIf="editingCreditFile?.id !== creditFile.id">
+                          <button class="editable-text" (click)="startEdit(creditFile)" [disabled]="dossier.status === 'Clôturé'">
+                            {{ creditFile.title || 'Sans titre' }}
+                          </button>
+                        </div>
+                        <div *ngIf="editingCreditFile?.id === creditFile.id">
+                          <input class="edit-input" [ngModel]="editingCreditFile?.title" (ngModelChange)="editingCreditFile!.title = $event" placeholder="Titre du crédit" />
+                          <input class="edit-input" [ngModel]="editingCreditFile?.creditNumber" (ngModelChange)="editingCreditFile!.creditNumber = $event" placeholder="Numéro de crédit" />
+                          <input class="edit-input" [ngModel]="editingCreditFile?.montant" (ngModelChange)="editingCreditFile!.montant = $event" placeholder="Montant" type="number" />
+                          <input class="edit-input" [ngModel]="editingCreditFile?.dateEcheance" (ngModelChange)="editingCreditFile!.dateEcheance = $event" placeholder="Date d'échéance" type="date" />
+                          <div class="edit-buttons">
+                            <button class="btn btn-sm btn-success" (click)="updateCreditFile()">Enregistrer</button>
+                            <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Annuler</button>
+                          </div>
+                        </div>
+                      </div>
 
-  </div>
-</td>
+                      <!-- Nom du fichier -->
+                      <div class="credit-cell credit-filename">
+                        {{ getFileName(creditFile.filePath || null) || 'Aucun fichier' }}
+                      </div>
 
-            </tr>
-          </tbody>
-        </table>
-      </div>
-  
-      <!-- Messages d'erreur ou de succès -->
-      <div *ngIf="errorMessage" class="error-message">
-        <i class="material-icons">error</i>
-        {{ errorMessage }}
-      </div>
-  
-      <div *ngIf="successMessage" class="no-dossiers-message">
-        <i class="material-icons">check_circle</i>
-        <p>{{ successMessage }}</p>
-      </div>
-  
-      <!-- Message si aucun dossier n'est trouvé -->
-      <div *ngIf="!isLoading && dossiers.length === 0" class="no-dossiers-message">
-        <i class="material-icons">folder_off</i>
-        <p>Aucun dossier trouvé</p>
-      </div>
+                      <!-- Date de création -->
+                      <div class="credit-cell credit-date">
+                        {{ creditFile.uploadDate | date:'dd/MM/yyyy' }}
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="credit-cell credit-actions">
+                        <!-- Visualiser fichier -->
+                        <button
+                          class="icon-btn view-btn"
+                          data-tooltip="Visualiser"
+                          (click)="viewCreditFile(creditFile, false)"
+                          *ngIf="creditFile.filePath"
+                        >
+                          <i class="material-icons">visibility</i>
+                        </button>
+
+                        <!-- Télécharger fichier -->
+                        <button 
+                          class="icon-btn download-btn"
+                          data-tooltip="Télécharger"
+                          (click)="viewCreditFile(creditFile, true)"
+                          *ngIf="creditFile.filePath && roleService.hasPermission('DOWNLOAD_CREDIT_FILE')"
+                        >
+                          <i class="material-icons">download</i>
+                        </button>
+
+                        <!-- Supprimer fichier -->
+                        <button
+                          class="delete-btn"
+                          data-tooltip="Supprimer"
+                          (click)="deleteCreditFile(creditFile)"
+                          *ngIf="dossier.status !== 'Clôturé' && roleService.hasPermission('DELETE_CREDIT')"
+                        >
+                          <i class="material-icons">delete</i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noCredits>
+                <span class="no-file">Aucun crédit associé</span>
+              </ng-template>
+            </td>
+
+            <!-- Actions pour le dossier -->
+            <td>
+              <div class="action-buttons">
+                <!-- Input de sélection de fichier (invisible) -->
+                <input
+                  type="file"
+                  (change)="onFileUpload($event, dossier.id)"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+                  hidden
+                  id="file-upload-{{ dossier.id }}"
+                />
+
+                <!-- Bouton AJOUTER FICHIER CREDIT -->
+                <label
+                  *ngIf="roleService.hasPermission('UPLOAD_CREDIT_FILE') && dossier.status !== 'Clôturé'"
+                  for="file-upload-{{ dossier.id }}"
+                  class="icon-btn upload-btn"
+                  data-tooltip="Ajouter un fichier de crédit"
+                >
+                  <i class="material-icons">add_circle</i>
+                </label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Aucun dossier trouvé -->
+    <div *ngIf="!isLoading && (!dossiers || dossiers.length === 0)" class="no-dossiers-message">
+      <i class="material-icons">folder_off</i>
+      <p>Aucun dossier trouvé</p>
     </div>
   </div>
+</div>
