@@ -402,10 +402,24 @@ tbody tr:hover {
   padding: 5px;
   border-radius: 4px;
   transition: background-color 0.3s ease;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: left;
+  font-weight: normal;
+  display: inline-block;
 }
 
 .editable-text:hover {
   background-color: #f0f0f0;
+}
+
+.editable-text:disabled {
+  cursor: default;
+  opacity: 0.7;
+  background: none;
 }
 
 /* Style pour le champ d'édition */
@@ -415,4 +429,84 @@ tbody tr:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
+}
+
+/* Styles pour les garanties multiples */
+.garanties-container {
+  max-width: 500px;
+}
+
+.garantie-item {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.garantie-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.garantie-cell {
+  padding: 0 10px;
+}
+
+.garantie-titre {
+  flex: 2;
+  min-width: 200px;
+}
+
+.garantie-filename {
+  flex: 2;
+  min-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.garantie-cell.garantie-date {
+  flex: 1;
+  min-width: 100px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.garantie-cell.garantie-actions {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.garantie-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.garantie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.garantie-date {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* This style is now handled by .garantie-cell.garantie-actions */
+
+.no-file {
+  color: #6b7280;
+  font-style: italic;
 }

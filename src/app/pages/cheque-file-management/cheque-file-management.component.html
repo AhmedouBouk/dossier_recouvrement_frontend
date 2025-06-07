@@ -1,8 +1,25 @@
-<!-- src/app/pages/cheque-file-management/cheque-file-management.component.html -->
+<div class="cheque-file-management">
+  <h3>Cheque File Management</h3>
+  <div *ngIf="dossierId">
+    <p>Dossier ID: {{dossierId}}</p>
+    <!-- Add file upload and management UI here -->
+  </div>
+</div>
+
 <div class="main-content">
   <div class="container">
-    <!-- Barre de recherche et actions -->
-    
+
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="material-icons">error</i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Message de succès -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="material-icons">check_circle</i>
+      {{ successMessage }}
+    </div>
 
     <!-- Indicateur de chargement -->
     <div *ngIf="isLoading" class="loading-state">
@@ -10,108 +27,130 @@
       Chargement en cours...
     </div>
 
-    <!-- Tableau des fichiers de chèque -->
+    <!-- Tableau des dossiers et leurs fichiers de chèque -->
     <div *ngIf="!isLoading" class="table-container">
       <table>
         <thead>
           <tr>
             <th>ID Dossier</th>
             <th>N° Compte</th>
-            <th>Fichier de Chèque</th>
-            <th>Date de Création</th>
-            <th *ngIf="roleService.hasImportChequePermission() || roleService.hasDeleteChequePermission() || roleService.hasReadChequePermission()">Actions</th>
+            <th>Fichiers de Chèque</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let dossier of dossiers">
-<td>
-  <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
-    {{ dossier.id }}
-  </a>
-</td>
-            <td>{{ dossier.compte.nomCompte }}</td>
             <td>
-             
-              
-                <span *ngIf="dossier.chequeFile; else noFile">
-                  {{ getFileNameFromUrl(dossier.chequeFile) }}
-                </span>
-                <ng-template #noFile>
-                  <span class="no-file">Aucun fichier</span>
-                </ng-template>
-              
+              <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
+                {{ dossier.id }}
+              </a>
             </td>
-            <td>{{ dossier.dateCreation }}</td>
+            <td>{{ dossier.compte?.nomCompte || 'N/A' }}</td>
+
+            <!-- Liste des fichiers de chèque -->
+            <td class="garanties-container">
+              <div *ngIf="dossier.chequeFiles && dossier.chequeFiles.length > 0; else noChequeFiles">
+                <div *ngFor="let chequeFile of dossier.chequeFiles">
+                  <div class="garantie-item">
+                    <div class="garantie-row">
+                      <!-- Titre du fichier de chèque -->
+                      <div class="garantie-cell garantie-titre">
+                        <div *ngIf="editingChequeFile?.id !== chequeFile.id">
+                          <button class="editable-text" (click)="startEdit(chequeFile)" [disabled]="dossier.status === 'Clôturé'">
+                            {{ chequeFile.title || 'Sans titre' }}
+                          </button>
+                        </div>
+                        <div *ngIf="editingChequeFile?.id === chequeFile.id">
+                          <input class="edit-input" [ngModel]="editingChequeFile?.title" (ngModelChange)="editingChequeFile!.title = $event" placeholder="Titre du fichier" />
+                          <div class="edit-buttons">
+                            <button class="btn btn-sm btn-success" (click)="updateChequeFile()">Enregistrer</button>
+                            <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Annuler</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Nom du fichier -->
+                      <div class="garantie-cell garantie-filename">
+                        {{ getFileName(chequeFile.filePath || null) || 'Aucun fichier' }}
+                      </div>
+
+                      <!-- Date de création -->
+                      <div class="garantie-cell garantie-date">
+                        {{ chequeFile.uploadDate | date:'dd/MM/yyyy' }}
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="garantie-cell garantie-actions">
+                        <!-- Visualiser fichier -->
+                        <button
+                          class="icon-btn view-btn"
+                          data-tooltip="Visualiser"
+                          (click)="viewChequeFile(chequeFile, false)"
+                          *ngIf="chequeFile.filePath"
+                        >
+                          <i class="material-icons">visibility</i>
+                        </button>
+
+                        <!-- Télécharger fichier -->
+                        <button 
+                          class="icon-btn download-btn"
+                          data-tooltip="Télécharger"
+                          (click)="viewChequeFile(chequeFile, true)"
+                          *ngIf="chequeFile.filePath && roleService.hasPermission('DOWNLOAD_CHEQUE')"
+                        >
+                          <i class="material-icons">download</i>
+                        </button>
+
+                        <!-- Supprimer fichier -->
+                        <button
+                          class="delete-btn"
+                          data-tooltip="Supprimer"
+                          (click)="deleteChequeFile(chequeFile)"
+                          *ngIf="dossier.status !== 'Clôturé' && roleService.hasPermission('DELETE_CHEQUE')"
+                        >
+                          <i class="material-icons">delete</i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <ng-template #noChequeFiles>
+                <span class="no-file">Aucun fichier de chèque</span>
+              </ng-template>
+            </td>
+
+            <!-- Actions pour le dossier -->
             <td>
-  <div class="action-buttons">
-    <!-- Input FICHIER (upload automatique après sélection) -->
-    <input *ngIf="roleService.hasImportChequePermission() && dossier.status !== 'Clôturé'"
-      type="file"
-      (change)="onFileSelectedAndUpload($event, dossier)"
-      accept=".pdf"
-      hidden
-      id="file-upload-{{ dossier.id }}"
-    />
+              <div class="action-buttons">
+                <!-- Input de sélection de fichier (invisible) -->
+                <input
+                  type="file"
+                  (change)="onFileUpload($event, dossier.id)"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+                  hidden
+                  id="file-upload-{{ dossier.id }}"
+                />
 
-    <!-- BOUTON unique : choisir + upload auto -->
-    <label *ngIf="roleService.hasImportChequePermission() && dossier.status !== 'Clôturé'"
-      for="file-upload-{{ dossier.id }}"
-      class="icon-btn upload-btn"
-      data-tooltip="Téléverser"
-    >
-      <i class="material-icons">file_upload</i>
-    </label>
-
-    <!-- Visualiser -->
-    <button *ngIf="roleService.hasReadChequePermission()"
-      class="icon-btn view-btn"
-      data-tooltip="Visualiser"
-      (click)="viewChequeFile(dossier, false)"
-      [disabled]="!dossier.chequeFile"
-    >
-      <i class="material-icons">visibility</i>
-    </button>
-
-    <!-- Télécharger -->
-    <button *ngIf="roleService.hasReadChequePermission()"
-      class="icon-btn download-btn"
-      data-tooltip="Télécharger"
-      (click)="viewChequeFile(dossier, true)"
-      [disabled]="!dossier.chequeFile"
-    >
-      <i class="material-icons">download</i>
-    </button>
-
-    <!-- Supprimer -->
-    <button *ngIf="roleService.hasDeleteChequePermission() && dossier.status !== 'Clôturé'"
-      class="icon-btn delete-btn"
-      data-tooltip="supprimer le fichier pdf"
-      (click)="deleteChequeFile(dossier)"
-      [disabled]="!dossier.chequeFile"
-    >
-      <i class="material-icons">delete</i>
-    </button>
-  </div>
-</td>
-
+                <!-- Bouton AJOUTER FICHIER CHÈQUE -->
+                <label
+                  *ngIf="roleService.hasPermission('IMPORT_CHEQUE') && dossier.status !== 'Clôturé'"
+                  for="file-upload-{{ dossier.id }}"
+                  class="icon-btn upload-btn"
+                  data-tooltip="Ajouter un fichier de chèque"
+                >
+                  <i class="material-icons">add_circle</i>
+                </label>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Messages d'erreur ou de succès -->
-    <div *ngIf="errorMessage" class="error-message">
-      <i class="material-icons">error</i>
-      {{ errorMessage }}
-    </div>
-
-    <div *ngIf="successMessage" class="no-dossiers-message">
-      <i class="material-icons">check_circle</i>
-      <p>{{ successMessage }}</p>
-    </div>
-
-    <!-- Message si aucun dossier n'est trouvé -->
-    <div *ngIf="!isLoading && dossiers.length === 0" class="no-dossiers-message">
+    <!-- Aucun dossier trouvé -->
+    <div *ngIf="!isLoading && (!dossiers || dossiers.length === 0)" class="no-dossiers-message">
       <i class="material-icons">folder_off</i>
       <p>Aucun dossier trouvé</p>
     </div>

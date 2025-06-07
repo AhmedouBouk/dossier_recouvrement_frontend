@@ -1,46 +1,74 @@
-// src/app/shared/services/cheque-file.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { Injectable } from "@angular/core"
+import  { HttpClient } from "@angular/common/http"
+import  { Observable } from "rxjs"
+import { environment } from "src/environments/environment"
+import  { ChequeFile, ChequeFileUpdateDto } from "../models/cheque-file.model"
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class ChequeFileService {
+  private apiUrl = `${environment.apiUrl}/api/cheques`
 
-  private apiUrl = `${environment.apiUrl}/cheques`;  // Updated to match backend endpoint
+  constructor(private readonly http: HttpClient) {}
 
-  constructor(private http: HttpClient) {}
-
-  // Récupérer la liste des fichiers de chèque
-  getChequeFiles(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}`);
-  }
-
-  // Uploader un fichier de chèque
-  uploadChequeFile(dossierId: number, file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/${dossierId}/upload`, formData);
-  }
-
-  // Supprimer un fichier de chèque
-  deleteChequeFile(dossierId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${dossierId}/delete`);
-  }
-
-  // Récupérer l'URL d'un fichier de chèque
-  getChequeFileUrl(dossierId: number): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/${dossierId}/url`);
-  }
-  
-  // Helper method to construct full URLs
-  getFullFileUrl(relativePath: string): string {
-    // Check if path is already a full URL
-    if (relativePath && !relativePath.startsWith('http')) {
-      return `${environment.apiUrl}${relativePath}`;
+  uploadChequeFile(
+    dossierId: number,
+    title: string,
+    file: File,
+    chequeNumber?: string,
+    montant?: number,
+    dateEcheance?: string,
+  ): Observable<ChequeFile> {
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("title", title)
+    if (chequeNumber) {
+      formData.append("chequeNumber", chequeNumber)
     }
-    return relativePath;
+    if (montant !== undefined && montant !== null) {
+      formData.append("montant", montant.toString())
+    }
+    if (dateEcheance) {
+      formData.append("dateEcheance", dateEcheance)
+    }
+    return this.http.post<ChequeFile>(`${this.apiUrl}/upload/${dossierId}`, formData)
+  }
+
+  getChequeFilesByDossierId(dossierId: number): Observable<ChequeFile[]> {
+    return this.http.get<ChequeFile[]>(`${this.apiUrl}/dossier/${dossierId}`)
+  }
+
+  getChequeFileById(chequeFileId: number): Observable<ChequeFile> {
+    return this.http.get<ChequeFile>(`${this.apiUrl}/${chequeFileId}`)
+  }
+
+  // Fixed: Accept ChequeFileUpdateDto object instead of individual parameters
+  updateChequeFile(chequeFileId: number, updateDto: ChequeFileUpdateDto): Observable<ChequeFile> {
+    return this.http.put<ChequeFile>(`${this.apiUrl}/${chequeFileId}`, updateDto)
+  }
+
+  deleteChequeFileById(chequeFileId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${chequeFileId}`)
+  }
+
+  deleteAllChequeFilesByDossierId(dossierId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/dossier/${dossierId}/all`)
+  }
+
+  downloadChequeFile(chequeFileId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${chequeFileId}`, {
+      responseType: "blob",
+    })
+  }
+
+  // Helper method to construct full download URLs for a ChequeFile or its ID
+  getChequeFileDownloadUrl(item: ChequeFile | number): string {
+    const fileId = typeof item === "number" ? item : item.id
+    if (fileId) {
+      return `${this.apiUrl}/download/${fileId}`
+    }
+    console.warn("ChequeFile ID not available for generating download URL for item:", item)
+    return ""
   }
 }

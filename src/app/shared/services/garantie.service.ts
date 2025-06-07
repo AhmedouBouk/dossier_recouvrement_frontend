@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
+import { Garantie } from '../models/garantie.model';
 
 @Injectable({
   providedIn: 'root',
@@ -21,11 +22,43 @@ export class GarantieService {
   }
 
   // Uploader un fichier de garantie
-  uploadGarantie(dossierId: number, file: File, titre: string): Observable<any> {
+  uploadGarantie(dossierId: number, file: File, titre: string): Observable<DossierRecouvrement> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('titre', titre);
-    return this.http.post(`${this.apiUrl}/${dossierId}/garantie`, formData);
+
+    return this.http.post<DossierRecouvrement>(
+      `${this.apiUrl}/${dossierId}/garantie`,
+      formData
+    );
+  }
+  
+  // Récupérer toutes les garanties d'un dossier
+  getGarantiesByDossierId(dossierId: number): Observable<Garantie[]> {
+    return this.http.get<Garantie[]>(`${this.apiUrl}/${dossierId}/garanties`);
+  }
+  
+  // Récupérer une garantie par son ID
+  getGarantieById(garantieId: number): Observable<Garantie> {
+    return this.http.get<Garantie>(`${this.apiUrl}/garantie/${garantieId}`);
+  }
+
+  // Mettre à jour le titre d'une garantie
+  updateGarantieTitre(garantieId: number, nouveauTitre: string): Observable<Garantie> {
+    const formData = new FormData();
+    formData.append('titre', nouveauTitre);
+    
+    return this.http.put<Garantie>(
+      `${this.apiUrl}/garantie/${garantieId}`,
+      formData
+    );
+  }
+
+  // Télécharger le PDF d'une garantie
+  getGarantiePdf(garantieId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/garantie/${garantieId}/pdf`, {
+      responseType: 'blob'
+    });
   }
 
   // Récupérer l'URL du fichier de garantie
@@ -36,6 +69,11 @@ export class GarantieService {
   // Supprimer un fichier de garantie
   deleteGarantieFile(dossierId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${dossierId}/garantie/delete`);
+  }
+
+  // Supprimer une garantie par son ID
+  deleteGarantie(garantieId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/garantie/${garantieId}`);
   }
 
   // Helper method to construct full URLs
