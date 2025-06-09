@@ -63,8 +63,8 @@ export class DossierRecouvrementService {
     );
   }
   // Delete dossier
-  deleteDossier(id: number): Observable<string> {
-    return this.http.delete<string>(`${this.apiUrl}/delete/${id}`);
+  deleteDossier(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/delete/${id}`, { responseType: 'text' as 'json' });
   }
 
   // Search dossiers
