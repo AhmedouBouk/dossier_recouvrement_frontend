@@ -82,9 +82,9 @@ export class LcFileService {
   }
 
   // Download LC file content
-  downloadLcFile(id: number): Observable<Blob> {
+  downloadLcFile(id: number, download: boolean = false): Observable<Blob> {
     return this.http
-      .get(`${this.apiUrl}/download/${id}`, { responseType: 'blob' })
+      .get(`${this.apiUrl}/download/${id}?download=${download}`, { responseType: 'blob' })
       .pipe(catchError(this.handleError));
   }
 

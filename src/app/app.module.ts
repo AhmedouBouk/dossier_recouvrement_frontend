@@ -62,8 +62,7 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     HistoryComponent,
     AuthLayoutComponent,
     MainLayoutComponent,
-    ChequeFileManagementComponent,
-    LcFileManagementComponent
+    ChequeFileManagementComponent
   ],
   imports: [
     BrowserModule,

@@ -19,17 +19,65 @@
       Chargement en cours...
     </div>
 
-    <!-- Actions Bar -->
-    <div class="actions-bar">
-      <div class="search-container">
-        <i class="material-icons">search</i>
-        <input 
-          type="text" 
-          placeholder="Rechercher par ID dossier ou nom client..." 
-          [(ngModel)]="searchTerm"
-        />
+    <!-- Modal/Form pour ajouter un fichier LC -->
+    <div *ngIf="showAddForm" class="modal-overlay" (click)="closeAddForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Ajouter un fichier LC</h3>
+          <button class="close-btn" (click)="closeAddForm()">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <form [formGroup]="newLcFileForm" (ngSubmit)="submitNewLcFile()" class="lc-form">
+          <div class="form-group">
+            <label for="title">Titre du fichier *</label>
+            <input 
+              type="text" 
+              id="title" 
+              formControlName="title" 
+              class="form-input"
+              placeholder="Entrez le titre du fichier"
+            />
+            <div *ngIf="newLcFileForm.get('title')?.invalid && (newLcFileForm.get('title')?.touched || formSubmitted)" class="error-text">
+              Le titre est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="file">Fichier *</label>
+            <div class="file-input-container">
+              <input 
+                type="file" 
+                id="file" 
+                (change)="onFileSelected($event)"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+                class="file-input"
+              />
+              <div class="file-input-display">
+                <i class="material-icons">attach_file</i>
+                <span>{{ selectedFileName || 'Choisir un fichier' }}</span>
+              </div>
+            </div>
+            <div *ngIf="!selectedFile && formSubmitted" class="error-text">
+              Veuillez sélectionner un fichier
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeAddForm()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="newLcFileForm.invalid || !selectedFile">
+              Ajouter
+            </button>
+          </div>
+        </form>
       </div>
     </div>
+
+    <!-- Actions Bar -->
+    
 
     <!-- Tableau des dossiers et leurs fichiers LC -->
     <div *ngIf="!isLoading" class="table-container">
@@ -43,7 +91,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let dossier of filteredDossiers">
+          <tr *ngFor="let dossier of filteredDossiers; trackBy: trackByDossierId">
             <td>
               <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
                 {{ dossier.id }}
@@ -52,9 +100,9 @@
             <td>{{ dossier.compte?.nomCompte || 'N/A' }}</td>
 
             <!-- Liste des fichiers LC -->
-            <td class="lc-files-container" *ngIf="dossier.lcFiles && dossier.lcFiles.length > 0">
-              <div class="lc-file-list">
-                <div class="lc-file-row" *ngFor="let lcFile of dossier.lcFiles">
+            <td class="lc-files-container">
+              <div *ngIf="dossier.lcFiles && dossier.lcFiles.length > 0; else noLcFiles" class="lc-file-list">
+                <div class="lc-file-row" *ngFor="let lcFile of dossier.lcFiles; trackBy: trackByLcFileId">
                   <div class="lc-file-details">
                     <!-- Titre -->
                     <div class="lc-file-cell lc-file-title">
@@ -64,7 +112,12 @@
                         </button>
                       </div>
                       <div *ngIf="editingLcFile?.id === lcFile.id">
-                        <input class="edit-input" [ngModel]="editingLcFile?.title" (ngModelChange)="editingLcFile!.title = $event" placeholder="Titre du fichier LC" />
+                        <div class="edit-form">
+                          <div class="form-group">
+                            <label>Titre</label>
+                            <input class="edit-input" [(ngModel)]="editingLcFile!.title" placeholder="Titre du fichier LC" />
+                          </div>
+                        </div>
                         <div class="edit-buttons">
                           <button class="btn btn-sm btn-success" (click)="updateLcFile()">Enregistrer</button>
                           <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Annuler</button>
@@ -126,24 +179,15 @@
             <!-- Actions pour le dossier -->
             <td>
               <div class="action-buttons">
-                <!-- Input de sélection de fichier (invisible) -->
-                <input
-                  type="file"
-                  (change)="onFileUpload($event, dossier.id)"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
-                  hidden
-                  id="lc-file-upload-{{ dossier.id }}"
-                />
-
                 <!-- Bouton AJOUTER FICHIER LC -->
-                <label
+                <button
                   *ngIf="roleService.hasPermission('UPLOAD_LC_FILE') && dossier.status !== 'Clôturé'"
-                  for="lc-file-upload-{{ dossier.id }}"
                   class="icon-btn upload-btn"
                   data-tooltip="Ajouter un fichier LC"
+                  (click)="openAddForm(dossier.id)"
                 >
                   <i class="material-icons">add_circle</i>
-                </label>
+                </button>
               </div>
             </td>
           </tr>
@@ -156,7 +200,5 @@
       <i class="material-icons">folder_off</i>
       <p>Aucun dossier trouvé</p>
     </div>
-
-    <!-- No modal needed anymore as we're uploading files immediately after selection -->
   </div>
 </div>

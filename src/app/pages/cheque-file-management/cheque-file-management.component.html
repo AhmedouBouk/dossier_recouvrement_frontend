@@ -1,11 +1,3 @@
-<div class="cheque-file-management">
-  <h3>Cheque File Management</h3>
-  <div *ngIf="dossierId">
-    <p>Dossier ID: {{dossierId}}</p>
-    <!-- Add file upload and management UI here -->
-  </div>
-</div>
-
 <div class="main-content">
   <div class="container">
 
@@ -27,6 +19,69 @@
       Chargement en cours...
     </div>
 
+    <!-- Modal/Form pour ajouter un fichier de chèque -->
+    <div *ngIf="showAddForm" class="modal-overlay" (click)="closeAddForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Ajouter un fichier de chèque</h3>
+          <button class="close-btn" (click)="closeAddForm()">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <form [formGroup]="newChequeFileForm" (ngSubmit)="submitNewChequeFile()" class="garantie-form">
+          <div class="form-group">
+            <label for="title">Titre du fichier *</label>
+            <input 
+              type="text" 
+              id="title" 
+              formControlName="title" 
+              class="form-input"
+              placeholder="Entrez le titre du fichier"
+            />
+            <div *ngIf="newChequeFileForm.get('title')?.invalid && newChequeFileForm.get('title')?.touched" class="error-text">
+              Le titre est requis
+            </div>
+          </div>
+
+          
+
+          
+
+          
+
+          <div class="form-group">
+            <label for="file">Fichier *</label>
+            <div class="file-input-container">
+              <input 
+                type="file" 
+                id="file" 
+                (change)="onFileSelected($event)"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+                class="file-input"
+              />
+              <div class="file-input-display">
+                <i class="material-icons">attach_file</i>
+                <span>{{ selectedFileName || 'Choisir un fichier' }}</span>
+              </div>
+            </div>
+            <div *ngIf="!selectedFile && formSubmitted" class="error-text">
+              Veuillez sélectionner un fichier
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeAddForm()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="newChequeFileForm.invalid || !selectedFile">
+              Ajouter
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Tableau des dossiers et leurs fichiers de chèque -->
     <div *ngIf="!isLoading" class="table-container">
       <table>
@@ -39,7 +94,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let dossier of dossiers">
+          <tr *ngFor="let dossier of dossiers; trackBy: trackByDossierId">
             <td>
               <a [routerLink]="['/dossiers/view', dossier.id]" class="link-id">
                 {{ dossier.id }}
@@ -50,7 +105,7 @@
             <!-- Liste des fichiers de chèque -->
             <td class="garanties-container">
               <div *ngIf="dossier.chequeFiles && dossier.chequeFiles.length > 0; else noChequeFiles">
-                <div *ngFor="let chequeFile of dossier.chequeFiles">
+                <div *ngFor="let chequeFile of dossier.chequeFiles; trackBy: trackByChequeFileId">
                   <div class="garantie-item">
                     <div class="garantie-row">
                       <!-- Titre du fichier de chèque -->
@@ -61,7 +116,12 @@
                           </button>
                         </div>
                         <div *ngIf="editingChequeFile?.id === chequeFile.id">
-                          <input class="edit-input" [ngModel]="editingChequeFile?.title" (ngModelChange)="editingChequeFile!.title = $event" placeholder="Titre du fichier" />
+                          <input 
+                            class="edit-input" 
+                            [ngModel]="editingChequeFile?.title" 
+                            (ngModelChange)="editingChequeFile!.title = $event" 
+                            placeholder="Titre du fichier" 
+                          />
                           <div class="edit-buttons">
                             <button class="btn btn-sm btn-success" (click)="updateChequeFile()">Enregistrer</button>
                             <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Annuler</button>
@@ -124,24 +184,15 @@
             <!-- Actions pour le dossier -->
             <td>
               <div class="action-buttons">
-                <!-- Input de sélection de fichier (invisible) -->
-                <input
-                  type="file"
-                  (change)="onFileUpload($event, dossier.id)"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
-                  hidden
-                  id="file-upload-{{ dossier.id }}"
-                />
-
                 <!-- Bouton AJOUTER FICHIER CHÈQUE -->
-                <label
+                <button
                   *ngIf="roleService.hasPermission('IMPORT_CHEQUE') && dossier.status !== 'Clôturé'"
-                  for="file-upload-{{ dossier.id }}"
                   class="icon-btn upload-btn"
                   data-tooltip="Ajouter un fichier de chèque"
+                  (click)="openAddForm(dossier.id)"
                 >
                   <i class="material-icons">add_circle</i>
-                </label>
+                </button>
               </div>
             </td>
           </tr>

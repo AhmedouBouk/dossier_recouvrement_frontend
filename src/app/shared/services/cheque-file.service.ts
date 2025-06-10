@@ -56,8 +56,8 @@ export class ChequeFileService {
     return this.http.delete<void>(`${this.apiUrl}/dossier/${dossierId}/all`)
   }
 
-  downloadChequeFile(chequeFileId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/download/${chequeFileId}`, {
+  downloadChequeFile(chequeFileId: number, download: boolean = false): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${chequeFileId}?download=${download}`, {
       responseType: "blob",
     })
   }
