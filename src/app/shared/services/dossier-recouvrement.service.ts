@@ -133,7 +133,15 @@ updateComment(commentId: number, content: string, reminderDateTime?: string | nu
 // Delete a comment
 deleteComment(commentId: number): Observable<void> {
   return this.http.delete<void>(`${environment.apiUrl}/api/dossiers/comments/${commentId}`);
-}genererMiseEnDemeure(dossier: DossierRecouvrement) {
+}
+
+// New method to send rejection notification
+sendRejectionNotification(dossierId: number, reason: string, userTypes: string[]): Observable<any> {
+  const payload = { reason, userTypes };
+  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/reject-notification`, payload);
+}
+
+genererMiseEnDemeure(dossier: DossierRecouvrement) {
   if (!dossier) {
     console.error('❌ Aucun dossier fourni pour générer la mise en demeure.');
     return;
