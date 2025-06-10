@@ -1,18 +1,23 @@
-import { Component, OnInit } from "@angular/core"
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core"
+import { CommonModule } from "@angular/common"
+import { RouterModule } from "@angular/router"
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms"
+import { HttpErrorResponse } from "@angular/common/http"
+import { finalize } from "rxjs/operators"
+
 import { DossierRecouvrement } from "src/app/shared/models/dossier-recouvrement.model"
 import { LcFile } from "src/app/shared/models/lc-file.model"
 import { LcFileService } from "src/app/shared/services/lc-file.service"
 import { DossierRecouvrementService } from "src/app/shared/services/dossier-recouvrement.service"
 import { AuthService } from "src/app/auth/auth.service"
-import { HttpErrorResponse } from "@angular/common/http"
 import { RoleService } from "src/app/shared/services/role.service"
-import { FormBuilder, FormGroup, Validators } from "@angular/forms"
-import { finalize } from "rxjs/operators"
 
 @Component({
   selector: "app-lc-file-management",
   templateUrl: "./lc-file-management.component.html",
   styleUrls: ["./lc-file-management.component.css"],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
 })
 export class LcFileManagementComponent implements OnInit {
   dossiers: DossierRecouvrement[] = []
@@ -22,19 +27,24 @@ export class LcFileManagementComponent implements OnInit {
   successMessage: string | null = null
   editingLcFile: LcFile | null = null
 
-  selectedDossierId: number | null = null
+  // New properties for the modal form
+  showAddForm = false
   selectedFile: File | null = null
+  selectedFileName: string | null = null
+  currentDossierId: number | null = null
+  formSubmitted = false
   readonly newLcFileForm: FormGroup
 
   constructor(
-    private lcFileService: LcFileService,
-    private dossierService: DossierRecouvrementService,
+    private readonly lcFileService: LcFileService,
+    private readonly dossierService: DossierRecouvrementService,
     public authService: AuthService,
     public roleService: RoleService,
     private readonly fb: FormBuilder,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.newLcFileForm = this.fb.group({
-      title: ["", Validators.required]
+      title: ["", Validators.required],
     })
   }
 
@@ -52,10 +62,10 @@ export class LcFileManagementComponent implements OnInit {
         this.isLoading = false
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error loading dossiers:', error)
-        this.errorMessage = 'Erreur lors du chargement des dossiers.'
+        console.error("Error loading dossiers:", error)
+        this.errorMessage = "Erreur lors du chargement des dossiers."
         this.isLoading = false
-      }
+      },
     })
   }
 
@@ -75,6 +85,136 @@ export class LcFileManagementComponent implements OnInit {
     return this.dossiers.find((dossier) => dossier.id === dossierId)
   }
 
+  // New methods for the modal form
+  openAddForm(dossierId: number): void {
+    this.currentDossierId = dossierId
+    this.showAddForm = true
+    this.newLcFileForm.reset()
+    this.selectedFile = null
+    this.selectedFileName = null
+    this.formSubmitted = false
+    this.errorMessage = null
+    this.successMessage = null
+  }
+
+  closeAddForm(): void {
+    this.showAddForm = false
+    this.currentDossierId = null
+    this.selectedFile = null
+    this.selectedFileName = null
+    this.formSubmitted = false
+    this.newLcFileForm.reset()
+  }
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0]
+    if (file) {
+      // Check file size (limit to 1MB to match Spring Boot's default)
+      const maxSizeInBytes = 1 * 1024 * 1024 // 1MB in bytes
+      if (file.size > maxSizeInBytes) {
+        this.errorMessage = "Le fichier est trop volumineux. La taille maximale autorisée est de 1 Mo."
+        event.target.value = null
+        return
+      }
+
+      this.selectedFile = file
+      this.selectedFileName = file.name
+
+      // Auto-fill title with filename (without extension) if title is empty
+      if (!this.newLcFileForm.get("title")?.value) {
+        const nameWithoutExtension = file.name.split(".").slice(0, -1).join(".")
+        this.newLcFileForm.patchValue({ title: nameWithoutExtension })
+      }
+    }
+  }
+
+  submitNewLcFile(): void {
+    this.formSubmitted = true
+
+    if (this.newLcFileForm.invalid || !this.selectedFile || !this.currentDossierId) {
+      if (!this.selectedFile) {
+        this.errorMessage = "Veuillez sélectionner un fichier."
+      }
+      return
+    }
+
+    // Check permissions first
+    if (!this.roleService.hasUploadLcFilePermission()) {
+      this.errorMessage = "Vous n'avez pas la permission d'uploader des fichiers LC."
+      return
+    }
+
+    const formValue = this.newLcFileForm.value
+    const title = formValue.title?.trim()
+    if (!title) {
+      this.errorMessage = "Veuillez saisir un titre pour le fichier LC."
+      return
+    }
+
+    this.isLoading = true
+    this.errorMessage = null
+    this.successMessage = null
+
+    // Ensure dossierId is a valid number before sending
+    const dossierId = Number(this.currentDossierId)
+    if (isNaN(dossierId) || dossierId <= 0) {
+      this.errorMessage = "ID de dossier invalide."
+      this.isLoading = false
+      return
+    }
+
+    // Only send title and file
+    this.lcFileService
+      .uploadLcFile(dossierId, title, this.selectedFile)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false
+        }),
+      )
+      .subscribe({
+        next: (newLcFile: any) => {
+          this.successMessage = "Fichier LC ajouté avec succès."
+
+          // Update the dossier in our list
+          const dossierIndex = this.dossiers.findIndex((d) => d.id === dossierId)
+          if (dossierIndex !== -1) {
+            const updatedDossier = { ...this.dossiers[dossierIndex] }
+            if (!updatedDossier.lcFiles) {
+              updatedDossier.lcFiles = []
+            }
+            updatedDossier.lcFiles = [...updatedDossier.lcFiles, newLcFile]
+
+            // Create a new array to trigger change detection
+            this.dossiers = [
+              ...this.dossiers.slice(0, dossierIndex),
+              updatedDossier,
+              ...this.dossiers.slice(dossierIndex + 1),
+            ]
+          }
+
+          // Close the form
+          this.closeAddForm()
+
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            this.successMessage = null
+            this.cdr.detectChanges()
+          }, 3000)
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error("Erreur lors de l'upload", err)
+          this.errorMessage =
+            "Erreur lors de l'upload du fichier LC: " + (err.error?.message ?? err.message ?? "Erreur inconnue")
+        },
+      })
+  }
+
+  // Keep the old method for backward compatibility but modify it to use the new modal approach
+  onFileUpload(event: any, dossierId: number): void {
+    // Instead of processing the file directly, open the modal form
+    this.openAddForm(dossierId)
+  }
+
   startEdit(lcFile: LcFile): void {
     this.editingLcFile = { ...lcFile }
     this.errorMessage = null
@@ -86,129 +226,67 @@ export class LcFileManagementComponent implements OnInit {
 
   updateLcFile(): void {
     if (!this.editingLcFile?.id) {
-      this.errorMessage = 'Aucun fichier LC sélectionné pour modification.'
+      this.errorMessage = "Aucun fichier LC sélectionné pour modification."
+      return
+    }
+
+    const title = this.editingLcFile.title?.trim()
+    if (!title) {
+      this.errorMessage = "Le titre du fichier LC est requis."
       return
     }
 
     this.isLoading = true
     this.errorMessage = null
 
-    this.lcFileService
-      .updateLcFile(
-        this.editingLcFile.id,
-        this.editingLcFile.title,
-        this.editingLcFile.lcNumber ?? '',
-        this.editingLcFile.montant ?? 0,
-        new Date(this.editingLcFile.dateEcheance ?? new Date())
-      )
-      .subscribe({
-        next: (updatedFile: any) => {
-          this.successMessage = 'Fichier LC mis à jour avec succès.'
+    // Only update the title
+    this.lcFileService.updateLcFile(this.editingLcFile.id, this.editingLcFile.title).subscribe({
+      next: (updatedFile: any) => {
+        this.successMessage = "Fichier LC mis à jour avec succès."
 
-          // Update the file in the dossier
-          const dossier = this.getDossierById(updatedFile.dossierId)
-          if (dossier && dossier.lcFiles) {
-            const index = dossier.lcFiles.findIndex(f => f.id === updatedFile.id)
-            if (index !== -1) {
-              dossier.lcFiles[index] = updatedFile as LcFile
+        // Update the file in the dossier using immutable approach
+        const dossierIndex = this.dossiers.findIndex((d) => d.id === updatedFile.dossierId)
+        if (dossierIndex !== -1) {
+          const dossier = this.dossiers[dossierIndex]
+          if (dossier.lcFiles && dossier.lcFiles.length > 0) {
+            // Create a safe copy of lcFiles
+            const lcFiles = [...dossier.lcFiles]
+            const fileIndex = lcFiles.findIndex((f) => f.id === updatedFile.id)
+
+            if (fileIndex !== -1) {
+              lcFiles[fileIndex] = updatedFile as LcFile
+
+              // Create a new dossier object with updated lcFiles
+              const updatedDossier = {
+                ...this.dossiers[dossierIndex],
+                lcFiles,
+              }
+
+              // Update the dossiers array immutably
+              this.dossiers = [
+                ...this.dossiers.slice(0, dossierIndex),
+                updatedDossier,
+                ...this.dossiers.slice(dossierIndex + 1),
+              ]
             }
           }
-
-          this.cancelEdit()
-          this.isLoading = false
-        },
-        error: (error: HttpErrorResponse) => {
-          console.error('Error updating LC file:', error)
-          this.errorMessage = 'Erreur lors de la mise à jour du fichier LC.'
-          this.isLoading = false
         }
-      })
-  }
 
-  onFileUpload(event: any, dossierId: number): void {
-    const file = event.target.files[0]
-    if (file) {
-      if (!this.roleService.hasUploadLcFilePermission()) {
-        this.errorMessage = "Vous n'avez pas la permission d'uploader des fichiers LC."
-        event.target.value = null
-        return
-      }
-      // Check file size (limit to 1MB to match Spring Boot's default)
-      const maxSizeInBytes = 1 * 1024 * 1024; // 1MB in bytes
-      if (file.size > maxSizeInBytes) {
-        this.errorMessage = "Le fichier est trop volumineux. La taille maximale autorisée est de 1 Mo."
-        event.target.value = null
-        return
-      }
-      this.selectedFile = file
-      this.selectedDossierId = dossierId
-      this.newLcFileForm.patchValue({ title: file.name.split('.')[0] })
-      this.uploadLcFile()
-    }
-  }
+        this.cancelEdit()
+        this.isLoading = false
 
-  uploadLcFile(): void {
-    // Check permissions first
-    if (!this.roleService.hasUploadLcFilePermission()) {
-      this.errorMessage = "Vous n'avez pas la permission d'uploader des fichiers LC."
-      return
-    }
-
-    if (!this.selectedFile) {
-      this.errorMessage = 'Veuillez sélectionner un fichier.'
-      return
-    }
-    
-    if (!this.selectedDossierId) {
-      this.errorMessage = 'Aucun dossier sélectionné pour l\'upload.'
-      return
-    }
-
-    if (!this.newLcFileForm.valid) {
-      this.errorMessage = 'Veuillez remplir tous les champs obligatoires.'
-      return
-    }
-
-    const title = this.newLcFileForm.get('title')?.value ?? this.selectedFile.name.split('.')[0]
-
-    this.isLoading = true
-    this.errorMessage = null
-    this.successMessage = null
-
-    // Ensure dossierId is a valid number before sending
-    const dossierId = Number(this.selectedDossierId)
-    if (isNaN(dossierId) || dossierId <= 0) {
-      this.errorMessage = 'ID de dossier invalide.'
-      this.isLoading = false
-      return
-    }
-    
-    // Only send title and file as per simplified form
-    this.lcFileService
-      .uploadLcFile(
-        dossierId,
-        title,
-        this.selectedFile
-      )
-      .subscribe({
-        next: (updatedLcFile: any) => {
-          this.successMessage = 'Fichier LC uploadé avec succès.'
-
-          // Reload dossiers to ensure we have the latest data
-          this.loadDossiers()
-          
-          // Reset form and selected file
-          this.newLcFileForm.reset()
-          this.selectedFile = null
-          this.selectedDossierId = null
-          this.isLoading = false
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error('Erreur lors de l\'upload', err)
-          this.errorMessage = 'Erreur lors de l\'upload du fichier LC: ' + (err.error?.message ?? err.message ?? 'Erreur inconnue')
-          this.isLoading = false
-        }
-      })
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          this.successMessage = null
+          this.cdr.detectChanges()
+        }, 3000)
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error("Error updating LC file:", error)
+        this.errorMessage = "Erreur lors de la mise à jour du fichier LC."
+        this.isLoading = false
+      },
+    })
   }
 
   viewLcFile(lcFile: LcFile, download = false): void {
@@ -223,7 +301,8 @@ export class LcFileManagementComponent implements OnInit {
     }
 
     this.isLoading = true
-    this.lcFileService.downloadLcFile(lcFile.id).subscribe({
+    this.errorMessage = null
+    this.lcFileService.downloadLcFile(lcFile.id, download).subscribe({
       next: (blob: Blob) => {
         this.isLoading = false
         const blobUrl = URL.createObjectURL(blob)
@@ -235,6 +314,7 @@ export class LcFileManagementComponent implements OnInit {
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
+          URL.revokeObjectURL(blobUrl)
         } else {
           window.open(blobUrl, "_blank")
         }
@@ -249,11 +329,11 @@ export class LcFileManagementComponent implements OnInit {
 
   deleteLcFile(lcFile: LcFile): void {
     if (!lcFile || !lcFile.id) {
-      this.errorMessage = 'Aucun fichier LC sélectionné pour suppression.'
+      this.errorMessage = "Aucun fichier LC sélectionné pour suppression."
       return
     }
 
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce fichier LC?')) {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce fichier LC?")) {
       return
     }
 
@@ -262,21 +342,38 @@ export class LcFileManagementComponent implements OnInit {
 
     this.lcFileService.deleteLcFile(lcFile.id).subscribe({
       next: () => {
-        this.successMessage = 'Fichier LC supprimé avec succès.'
+        this.successMessage = "Fichier LC supprimé avec succès."
 
-        // Remove the file from the dossier
-        const dossier = this.getDossierById(lcFile.dossierId)
-        if (dossier && dossier.lcFiles) {
-          dossier.lcFiles = dossier.lcFiles.filter(f => f.id !== lcFile.id)
+        // Remove the file from the dossier using immutable approach
+        const dossierIndex = this.dossiers.findIndex((d) => d.id === lcFile.dossierId)
+        if (dossierIndex !== -1 && this.dossiers[dossierIndex].lcFiles) {
+          // Create a new dossier object with filtered lcFiles
+          const updatedDossier = {
+            ...this.dossiers[dossierIndex],
+            lcFiles: this.dossiers[dossierIndex].lcFiles?.filter((f) => f.id !== lcFile.id) || [],
+          }
+
+          // Update the dossiers array immutably
+          this.dossiers = [
+            ...this.dossiers.slice(0, dossierIndex),
+            updatedDossier,
+            ...this.dossiers.slice(dossierIndex + 1),
+          ]
         }
 
         this.isLoading = false
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          this.successMessage = null
+          this.cdr.detectChanges()
+        }, 3000)
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error deleting LC file:', error)
-        this.errorMessage = 'Erreur lors de la suppression du fichier LC.'
+        console.error("Error deleting LC file:", error)
+        this.errorMessage = "Erreur lors de la suppression du fichier LC."
         this.isLoading = false
-      }
+      },
     })
   }
 
@@ -284,5 +381,14 @@ export class LcFileManagementComponent implements OnInit {
     if (!filePath) return "Aucun fichier"
     const parts = filePath.split(/[/\\]/)
     return parts[parts.length - 1] || "Aucun fichier"
+  }
+
+  // Add these methods to help Angular track changes
+  trackByLcFileId(index: number, lcFile: LcFile): any {
+    return lcFile.id
+  }
+
+  trackByDossierId(index: number, dossier: DossierRecouvrement): any {
+    return dossier.id
   }
 }

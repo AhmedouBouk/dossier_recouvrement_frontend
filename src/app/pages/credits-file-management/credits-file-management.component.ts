@@ -1,5 +1,5 @@
 // src/app/pages/credits-file-management/credits-file-management.component.ts
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -33,9 +33,14 @@ export class CreditsFileManagementComponent implements OnInit {
   successMessage: string | null = null;
   searchTerm = '';
   readonly newCreditFileForm: FormGroup;
-  readonly selectedFiles = new Map<number, File>();
-  isUploading = false;
   editingCreditFile: CreditFile | null = null;
+  
+  // New properties for the add form
+  showAddForm = false;
+  selectedFile: File | null = null;
+  selectedFileName: string | null = null;
+  currentDossierId: number | null = null;
+  formSubmitted = false;
 
   constructor(
     private dossierService: DossierRecouvrementService,
@@ -43,6 +48,7 @@ export class CreditsFileManagementComponent implements OnInit {
     public authService: AuthService,
     public roleService: RoleService,
     private readonly fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {
     this.newCreditFileForm = this.fb.group({
       title: ['', Validators.required],
@@ -97,7 +103,16 @@ export class CreditsFileManagementComponent implements OnInit {
         // Find the dossier in our array and update its creditsFile property
         const dossierIndex = this.dossiers.findIndex(d => d.id === dossierId);
         if (dossierIndex !== -1) {
-          this.dossiers[dossierIndex].creditsFile = creditFiles;
+          // Create a new dossier object with updated creditsFile to trigger change detection
+          this.dossiers = [
+            ...this.dossiers.slice(0, dossierIndex),
+            {
+              ...this.dossiers[dossierIndex],
+              creditsFile: creditFiles
+            },
+            ...this.dossiers.slice(dossierIndex + 1)
+          ];
+          this.cdr.detectChanges();
         }
       },
       error: (err) => {
@@ -124,117 +139,203 @@ export class CreditsFileManagementComponent implements OnInit {
     return this.dossiers.find((dossier) => dossier.id === dossierId);
   }
 
-  onFileUpload(event: Event, dossierId: number): void {
-    const target = event.target as HTMLInputElement;
-    const file: File | null = target.files?.[0] || null;
-    if (!file) return;
-
-    // Store the file temporarily
-    this.selectedFiles.set(dossierId, file);
-
-    // Show the new credit file form
-    this.newCreditFileForm.patchValue({ title: file.name.split('.')[0] });
-
-    // Upload immediately
-    this.uploadCreditFile(dossierId);
+  // New methods for the add form
+  openAddForm(dossierId: number): void {
+    this.currentDossierId = dossierId;
+    this.showAddForm = true;
+    this.newCreditFileForm.reset();
+    this.selectedFile = null;
+    this.selectedFileName = null;
+    this.formSubmitted = false;
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 
-  uploadCreditFile(dossierId: number): void {
-    const file = this.selectedFiles.get(dossierId);
-    if (!file) {
-      this.errorMessage = 'Veuillez sélectionner un fichier.';
+  closeAddForm(): void {
+    this.showAddForm = false;
+    this.currentDossierId = null;
+    this.selectedFile = null;
+    this.selectedFileName = null;
+    this.formSubmitted = false;
+    this.newCreditFileForm.reset();
+  }
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.selectedFileName = file.name;
+      
+      // Auto-fill title with filename (without extension) if title is empty
+      if (!this.newCreditFileForm.get('title')?.value) {
+        const nameWithoutExtension = file.name.split('.').slice(0, -1).join('.');
+        this.newCreditFileForm.patchValue({ title: nameWithoutExtension });
+      }
+    }
+  }
+
+  submitNewCreditFile(): void {
+    this.formSubmitted = true;
+    
+    if (this.newCreditFileForm.invalid || !this.selectedFile || !this.currentDossierId) {
+      if (!this.selectedFile) {
+        this.errorMessage = 'Veuillez sélectionner un fichier.';
+      }
       return;
     }
 
-    if (!this.newCreditFileForm.valid) {
-      this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+    const formValue = this.newCreditFileForm.value;
+    const title = formValue.title?.trim();
+    if (!title) {
+      this.errorMessage = 'Veuillez saisir un titre pour le fichier de crédit.';
       return;
     }
 
-    const title = this.newCreditFileForm.get('title')?.value || '';
-    const creditNumber = this.newCreditFileForm.get('creditNumber')?.value || '';
-    const montantStr = this.newCreditFileForm.get('montant')?.value;
+    const creditNumber = formValue.creditNumber || undefined;
+    const montantStr = formValue.montant;
     const montant = montantStr ? parseFloat(montantStr) : undefined;
-    const dateEcheanceStr = this.newCreditFileForm.get('dateEcheance')?.value;
+    const dateEcheanceStr = formValue.dateEcheance;
     const dateEcheance = dateEcheanceStr ? new Date(dateEcheanceStr) : undefined;
 
-    this.isUploading = true;
-    
-    // Call the service with the correct parameters based on the service signature
-    // Using FormData for file upload which is a common approach in Angular
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
     this.creditsFileService.uploadCreditFile(
-      dossierId, 
-      title, 
-      file, 
-      creditNumber || undefined, 
-      montant || undefined, 
-      dateEcheance || undefined
-    ).pipe(
-      finalize(() => {
-        this.isUploading = false;
-      })
-    ).subscribe({
-      next: (response: CreditFile) => {
-        this.successMessage = 'Fichier de crédit téléversé avec succès.';
-        this.loadDossiers();
-        this.newCreditFileForm.reset();
-        this.selectedFiles.delete(dossierId);
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Erreur lors du téléversement du fichier de crédit', err);
-        this.errorMessage = `Erreur lors du téléversement : ${err.error?.message || err.message}`;
-      },
-    });
+      this.currentDossierId,
+      title,
+      this.selectedFile,
+      creditNumber,
+      montant,
+      dateEcheance
+    )
+      .pipe(finalize(() => {
+        this.isLoading = false;
+      }))
+      .subscribe({
+        next: (newCreditFile: CreditFile) => {
+          this.successMessage = 'Fichier de crédit ajouté avec succès.';
+          
+          // Update the dossier in our list
+          const dossierIndex = this.dossiers.findIndex(d => d.id === this.currentDossierId);
+          if (dossierIndex !== -1) {
+            const updatedDossier = { ...this.dossiers[dossierIndex] };
+            if (!updatedDossier.creditsFile) {
+              updatedDossier.creditsFile = [];
+            }
+            updatedDossier.creditsFile = [...updatedDossier.creditsFile, newCreditFile];
+            
+            // Create a new array to trigger change detection
+            this.dossiers = [
+              ...this.dossiers.slice(0, dossierIndex),
+              updatedDossier,
+              ...this.dossiers.slice(dossierIndex + 1)
+            ];
+          }
+          
+          // Close the form
+          this.closeAddForm();
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            this.successMessage = null;
+            this.cdr.detectChanges();
+          }, 3000);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error("Erreur lors de l'upload", err);
+          this.errorMessage = "Erreur lors de l'ajout du fichier de crédit.";
+        },
+      });
   }
 
-  // Updated method to handle CreditFile objects
-  viewCreditFile(creditFile: CreditFile, download = false): void {
+  // Keep the old method for backward compatibility (if needed elsewhere)
+  onFileUpload(event: any, dossierId: number): void {
+    // This method is now deprecated in favor of the new form approach
+    // but kept for compatibility if used elsewhere
+    this.openAddForm(dossierId);
+  }
+
+  viewCreditFile(creditFile: CreditFile, download: boolean = false): void {
     if (!creditFile.filePath) {
       alert('Aucun fichier trouvé pour ce crédit.');
       return;
     }
 
-    this.creditsFileService.downloadCreditFile(creditFile.id).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        if (download) {
-          // Extract filename from path or use a generic name
-          const fileName = this.getFileName(creditFile.filePath) || `credit_${creditFile.id}.pdf`;
-          link.download = fileName;
-          link.click();
-        } else {
-          window.open(url, '_blank');
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.creditsFileService.downloadCreditFile(creditFile.id, download)
+      .subscribe({
+        next: (blob: Blob) => {
+          this.isLoading = false;
+          
+          // Check if the blob is empty or too small (likely an error)
+          if (blob.size < 100) {
+            // Try to read the blob as text to see if it contains an error message
+            const reader = new FileReader();
+            reader.onload = () => {
+              try {
+                const text = reader.result as string;
+                console.error('Server response:', text);
+                this.errorMessage = `Erreur: ${text}`;
+              } catch (e) {
+                this.errorMessage = 'Impossible de charger le fichier: format invalide';
+              }
+            };
+            reader.readAsText(blob);
+            return;
+          }
+          
+          const blobUrl = URL.createObjectURL(blob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            // Add null check for filePath
+            const fileName = creditFile.filePath ? creditFile.filePath.split('/').pop() : null;
+            a.download = fileName ?? 'credit.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          console.error('Erreur lors du téléchargement:', error);
+          
+          // Extract more detailed error information
+          let errorMsg = 'Impossible de charger le fichier.';
+          if (error.error instanceof Blob) {
+            // Try to read the error blob as text
+            const reader = new FileReader();
+            reader.onload = () => {
+              try {
+                const errorText = reader.result as string;
+                console.error('Error response content:', errorText);
+                try {
+                  const errorObj = JSON.parse(errorText);
+                  errorMsg = errorObj.message || errorObj.error || errorText;
+                } catch (e) {
+                  errorMsg = errorText;
+                }
+                this.errorMessage = `Erreur: ${errorMsg}`;
+              } catch (e) {
+                this.errorMessage = errorMsg;
+              }
+            };
+            reader.readAsText(error.error);
+          } else {
+            this.errorMessage = `Erreur: ${error.status} ${error.statusText} - ${error.message || 'Impossible de charger le fichier'}`;
+          }
         }
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Erreur lors de la récupération du fichier', err);
-        alert('Erreur lors de la récupération du fichier');
-      },
-    });
+      });
   }
 
-  // Updated method to handle CreditFile objects
-  deleteCreditFile(creditFile: CreditFile): void {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce fichier de crédit ?')) return;
-
-    this.creditsFileService.deleteCreditFileById(creditFile.id).subscribe({
-      next: () => {
-        this.successMessage = 'Fichier de crédit supprimé avec succès.';
-        this.loadDossiers();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Erreur lors de la suppression du fichier', err);
-        this.errorMessage = 'Erreur lors de la suppression du fichier.';
-      },
-    });
-  }
-
-  // Methods for editing credit file details
   startEdit(creditFile: CreditFile): void {
     this.editingCreditFile = { ...creditFile };
+    this.errorMessage = null;
   }
 
   cancelEdit(): void {
@@ -244,22 +345,119 @@ export class CreditsFileManagementComponent implements OnInit {
   updateCreditFile(): void {
     if (!this.editingCreditFile) return;
 
+    const title = this.editingCreditFile.title?.trim();
+    if (!title) {
+      this.errorMessage = 'Le titre du fichier de crédit est requis.';
+      return;
+    }
+
+    this.isLoading = true;
     this.creditsFileService.updateCreditFile(this.editingCreditFile.id, this.editingCreditFile).subscribe({
-      next: () => {
+      next: (updatedCreditFile) => {
         this.successMessage = 'Fichier de crédit mis à jour avec succès.';
+        
+        // Update the credit file in the dossier more reliably
+        if (updatedCreditFile) {
+          // Find the dossier that contains this credit file
+          for (let i = 0; i < this.dossiers.length; i++) {
+            const dossier = this.dossiers[i];
+            if (dossier.creditsFile) {
+              const creditIndex = dossier.creditsFile.findIndex(c => c.id === updatedCreditFile.id);
+              if (creditIndex !== -1) {
+                // Create a new dossier object with updated creditsFile array
+                const updatedDossier = { ...dossier };
+                updatedDossier.creditsFile = [
+                  ...dossier.creditsFile.slice(0, creditIndex),
+                  updatedCreditFile,
+                  ...dossier.creditsFile.slice(creditIndex + 1)
+                ];
+                
+                // Update the dossiers array
+                this.dossiers = [
+                  ...this.dossiers.slice(0, i),
+                  updatedDossier,
+                  ...this.dossiers.slice(i + 1)
+                ];
+                break;
+              }
+            }
+          }
+        }
+        
+        // Clear editing state
         this.editingCreditFile = null;
-        this.loadDossiers();
+        this.errorMessage = null;
+        this.isLoading = false;
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          this.successMessage = null;
+          this.cdr.detectChanges();
+        }, 3000);
       },
       error: (err: HttpErrorResponse) => {
         console.error('Erreur lors de la mise à jour du fichier', err);
-        this.errorMessage = 'Erreur lors de la mise à jour du fichier.';
+        this.errorMessage = 'Erreur lors de la mise à jour du fichier de crédit.';
+        this.isLoading = false;
       },
     });
   }
 
-  onSearchChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchTerm = target.value;
-    // Filter dossiers based on search term if needed
+  deleteCreditFile(creditFile: CreditFile): void {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce fichier de crédit ?')) return;
+
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    this.creditsFileService.deleteCreditFileById(creditFile.id).subscribe({
+      next: () => {
+        this.successMessage = 'Fichier de crédit supprimé avec succès.';
+        
+        // Remove the credit file from the dossier more reliably
+        // Find the dossier that contains this credit file
+        for (let i = 0; i < this.dossiers.length; i++) {
+          const dossier = this.dossiers[i];
+          if (dossier.creditsFile) {
+            const creditIndex = dossier.creditsFile.findIndex(c => c.id === creditFile.id);
+            if (creditIndex !== -1) {
+              // Create a new dossier object with updated creditsFile array
+              const updatedDossier = { ...dossier };
+              updatedDossier.creditsFile = dossier.creditsFile.filter(c => c.id !== creditFile.id);
+              
+              // Update the dossiers array
+              this.dossiers = [
+                ...this.dossiers.slice(0, i),
+                updatedDossier,
+                ...this.dossiers.slice(i + 1)
+              ];
+              break;
+            }
+          }
+        }
+        
+        this.isLoading = false;
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          this.successMessage = null;
+          this.cdr.detectChanges();
+        }, 3000);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Erreur lors de la suppression du fichier de crédit', err);
+        this.errorMessage = 'Erreur lors de la suppression du fichier de crédit.';
+        this.isLoading = false;
+      },
+    });
+  }
+  
+  // Add these methods to help Angular track changes
+  trackByCreditFileId(index: number, creditFile: CreditFile): any {
+    return creditFile.id;
+  }
+
+  trackByDossierId(index: number, dossier: ExtendedDossierRecouvrement): any {
+    return dossier.id;
   }
 }

@@ -43,8 +43,15 @@ export class CautionFileService {
     return this.http.get<CautionFile>(`${this.apiUrl}/${cautionFileId}`)
   }
 
-  updateCautionFile(cautionFileId: number, updateDto: CautionFileUpdateDto): Observable<CautionFile> {
-    return this.http.put<CautionFile>(`${this.apiUrl}/${cautionFileId}`, updateDto)
+  updateCautionFile(cautionFileId: number, updateDto: any): Observable<CautionFile> {
+    // Create a new object with only the fields that the backend DTO expects
+    const cleanDto = {
+      title: updateDto.title,
+      cautionNumber: updateDto.cautionNumber,
+      montant: updateDto.montant,
+      dateEcheance: updateDto.dateEcheance
+    };
+    return this.http.put<CautionFile>(`${this.apiUrl}/${cautionFileId}`, cleanDto);
   }
 
   deleteCautionFileById(cautionFileId: number): Observable<void> {
@@ -55,8 +62,8 @@ export class CautionFileService {
     return this.http.delete<void>(`${this.apiUrl}/dossier/${dossierId}/all`)
   }
 
-  downloadCautionFile(cautionFileId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/download/${cautionFileId}`, {
+  downloadCautionFile(cautionFileId: number, download: boolean = false): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${cautionFileId}?download=${download}`, {
       responseType: "blob",
     })
   }

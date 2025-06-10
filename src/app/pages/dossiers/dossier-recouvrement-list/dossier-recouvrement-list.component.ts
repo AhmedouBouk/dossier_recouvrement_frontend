@@ -194,11 +194,24 @@ loadDossiersArchives(): void {
 
   deleteDossier(dossierId: number) {
     if (dossierId && confirm('Confirmer la suppression ?')) {
+      this.isLoading = true;
       this.dossierService.deleteDossier(dossierId).subscribe({
-        next: () => this.loadDossiers(),
+        next: (response) => {
+          console.log('Dossier supprimé avec succès', response);
+          this.successMessage = 'Dossier supprimé avec succès';
+          this.error = null;
+          this.loadDossiers();
+          this.isLoading = false;
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            this.successMessage = null;
+          }, 3000);
+        },
         error: (err) => {
           console.error('Erreur de suppression', err);
-          this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la suppression';
+          this.error = 'Une erreur est survenue lors de la suppression';
+          this.successMessage = null;
+          this.isLoading = false;
         }
       });
     }

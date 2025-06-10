@@ -129,8 +129,8 @@ export class CreditsFileService {
    * Download a credit file
    * @param id The ID of the credit file
    */
-  downloadCreditFile(id: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/download/${id}`, {
+  downloadCreditFile(id: number, download: boolean = false): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${id}?download=${download}`, {
       responseType: 'blob'
     });
   }
