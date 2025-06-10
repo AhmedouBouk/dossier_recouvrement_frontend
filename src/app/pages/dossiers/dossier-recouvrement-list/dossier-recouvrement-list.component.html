@@ -263,5 +263,44 @@
         <p>Vous n'avez pas encore archivé de dossiers.</p>
       </div>
     </div>
+
+    <!-- Rejection Dialog -->
+    <div *ngIf="showRejectDialog" class="dialog-overlay">
+      <div class="dialog-panel">
+        <h2>Refuser le Dossier #{{ currentDossierForRejection?.id }}</h2>
+        <p>Veuillez indiquer le motif du refus et les types d'utilisateurs à notifier.</p>
+        
+        <div class="form-group">
+          <label for="rejectReason">Motif du Refus:</label>
+          <textarea id="rejectReason" [(ngModel)]="rejectReason" rows="4" placeholder="Saisissez le motif du refus ici..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Notifier les types d'utilisateurs:</label>
+          <div class="user-type-checkboxes">
+            <label *ngFor="let userType of availableUserTypes" class="checkbox-container">
+              <input 
+                type="checkbox" 
+                [value]="userType" 
+                (change)="onUserTypeChange(userType, $event)" 
+                [checked]="selectedUserTypesForNotification.includes(userType)">
+              {{ userType }}
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="dialog-actions">
+          <button class="btn cancel-btn" (click)="cancelReject()">
+            <i class="material-icons">close</i>
+            Annuler
+          </button>
+          <button class="btn confirm-btn" (click)="confirmRejectDossier()" [disabled]="isLoading">
+            <i class="material-icons">check_circle</i>
+            Confirmer le refus
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </main>

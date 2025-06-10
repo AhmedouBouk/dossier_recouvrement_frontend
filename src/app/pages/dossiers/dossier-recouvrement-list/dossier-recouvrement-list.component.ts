@@ -6,7 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoleService } from '../../../shared/services/role.service';
 import { DossierRecouvrementService } from '../../../shared/services/dossier-recouvrement.service';
-import { DossierRecouvrement} from '../../../shared/models/dossier-recouvrement.model';
+import { DossierRecouvrement, EtatValidation } from '../../../shared/models/dossier-recouvrement.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { CreditsFileService } from 'src/app/shared/services/credits-file.service';
 import { GarantieService } from 'src/app/shared/services/garantie.service';
@@ -31,8 +31,13 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   canValidateDossier = false;
   selectedDossierForValidation: DossierRecouvrement | null = null;
   successMessage: string | null = null;
+  showRejectDialog: boolean = false;
+  rejectReason: string = '';
+  selectedUserTypesForNotification: string[] = [];
+  availableUserTypes: string[] = ['Agence', 'Recouvrement', 'Risque', 'Do', 'Admin'];
+  currentDossierForRejection: DossierRecouvrement | null = null;
 
- statusEnum = Status; // Remplace etatValidationEnum
+  statusEnum = EtatValidation; // Remplace etatValidationEnum
 
   dossiers: DossierRecouvrement[] = [];
   searchTerm: string = '';
@@ -293,78 +298,87 @@ loadDossiersArchives(): void {
    * Ouvre le menu de validation pour un dossier spécifique
    */
   openValidationMenu(dossier: DossierRecouvrement, event: MouseEvent | KeyboardEvent): void {
-    // Empêcher la propagation de l'événement pour éviter de fermer le menu immédiatement
+    this.selectedDossierForValidation = dossier; // Set the selected dossier for validation
+    // Stop propagation to prevent immediate closing from document click
     event.stopPropagation();
-    
-    // Si on clique sur le même dossier, on ferme le menu
-    if (this.selectedDossierForValidation && this.selectedDossierForValidation.id === dossier.id) {
-      this.selectedDossierForValidation = null;
-      return;
-    }
-    
-    this.selectedDossierForValidation = dossier;
   }
 
   /**
    * Ferme le menu de validation lors d'un clic à l'extérieur
    */
   closeValidationMenu(event: MouseEvent): void {
-    // Ne pas fermer si le clic est sur un élément du menu ou sur le statut lui-même
-    if ((event.target as HTMLElement).closest('.validation-menu') || 
-        (event.target as HTMLElement).closest('.status-chip.clickable')) {
-      return;
+    // Check if the click occurred inside the validation menu or on its trigger button
+    // If it's a click outside, then close the menu.
+    const target = event.target as HTMLElement;
+    if (!target.closest('.validation-menu') && !target.closest('.status-chip.clickable')) {
+      this.selectedDossierForValidation = null;
     }
-    this.selectedDossierForValidation = null;
   }
 
   /**
    * Valide ou refuse un dossier
    */
   validateDossier(dossier: DossierRecouvrement, newState: 'VALIDE' | 'NON_VALIDE'): void {
-    this.isLoading = true;
-    this.error = null;
-    
-    // Créer un commentaire basé sur l'action
-    const commentContent = newState === 'VALIDE' 
-      ? 'Dossier accepté' 
-      : 'Dossier refusé';
-    
-    // Mettre à jour l'état du dossier
-    const updatedDossier = { ...dossier, Status: newState as Status};
-    
-    // Appeler le service pour mettre à jour le dossier
-    this.dossierService.updateDossier(dossier.id, updatedDossier).subscribe({
-      next: (response) => {
-        // Ajouter un commentaire au dossier
-        this.dossierService.addComment(dossier.id, commentContent, null).subscribe({
-          next: () => {
-            this.loadDossiers(); // Recharger la liste après la mise à jour
-            this.selectedDossierForValidation = null; // Fermer le menu
-            
-            // Afficher un message de succès approprié
-            if (newState === 'VALIDE') {
-              this.successMessage = `Le dossier #${dossier.id} a été accepté avec succès`;
-            } else {
-              this.successMessage = `Le dossier #${dossier.id} a été refusé avec succès`;
+    if (newState === 'NON_VALIDE') {
+      this.openRejectDialog(dossier);
+    } else {
+      this.isLoading = true;
+      this.error = null;
+      
+      // Créer un commentaire basé sur l'action
+      const commentContent = newState === 'VALIDE' 
+        ? 'Dossier accepté' 
+        : 'Dossier refusé'; // This line will not be reached for NON_VALIDE anymore
+      
+      // Mettre à jour l'état du dossier
+      const updatedDossier = { ...dossier, etatValidation: newState as EtatValidation };
+      
+      // Appeler le service pour mettre à jour le dossier
+      this.dossierService.updateDossier(dossier.id, updatedDossier).subscribe({
+        next: (response) => {
+          // Ajouter un commentaire au dossier
+          this.dossierService.addComment(dossier.id, commentContent, null).subscribe({
+            next: () => {
+              this.loadDossiers(); // Recharger la liste après la mise à jour
+              this.selectedDossierForValidation = null; // Fermer le menu
+              
+              // Afficher un message de succès approprié
+              if (newState === 'VALIDE') {
+                this.successMessage = `Le dossier #${dossier.id} a été accepté avec succès`;
+              } else {
+                this.successMessage = `Le dossier #${dossier.id} a été refusé avec succès`;
+              }
+              
+              // Masquer le message après 5 secondes
+              this.hideSuccessMessageAfterDelay();
+            },
+            error: (err) => {
+              console.error('Erreur lors de l\'ajout du commentaire:', err);
+              // L'état a été mis à jour, donc on recharge quand même les dossiers
+              this.loadDossiers();
+              this.selectedDossierForValidation = null;
             }
-            
-            // Masquer le message après 5 secondes
-            this.hideSuccessMessageAfterDelay();
-          },
-          error: (err) => {
-            console.error('Erreur lors de l\'ajout du commentaire:', err);
-            // L'état a été mis à jour, donc on recharge quand même les dossiers
-            this.loadDossiers();
-            this.selectedDossierForValidation = null;
+          });
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Erreur lors de la validation du dossier:', err);
+          if (err.error) {
+            if (typeof err.error === 'string') {
+              this.error = err.error;
+            } else if (err.error.message) {
+              this.error = err.error.message;
+            } else {
+              this.error = 'Une erreur est survenue lors de la validation du dossier. Code: ' + err.status;
+            }
+          } else if (err.message) {
+            this.error = err.message;
+          } else {
+            this.error = 'Une erreur est survenue lors de la validation du dossier. Veuillez vérifier la console pour plus de détails.';
           }
-        });
-      },
-      error: (err) => {
-        console.error('Erreur lors de la validation du dossier:', err);
-        this.error = typeof err === 'string' ? err : 'Une erreur est survenue lors de la validation du dossier';
-        this.isLoading = false;
-      }
-    });
+          this.isLoading = false;
+        }
+      });
+    }
   }
   
   /**
@@ -566,11 +580,6 @@ async testBackendConnectivity(dossierId: number): Promise<void> {
   }
 }
 /**
- * Méthode pour afficher les messages d'erreur (à adapter selon votre système de notifications)
- */
-
-
-/**
  * Vérifie et affiche l'état des fichiers disponibles
  */
 async checkFilesStatus(dossierId: number): Promise<void> {
@@ -706,8 +715,7 @@ async generateDetailsPdfAsBlob(dossier: DossierRecouvrement): Promise<Blob> {
       doc.setFontSize(14);
       doc.setTextColor(33, 33, 33);
       doc.setFont('helvetica', 'bold');
-      doc.text(dossier.status || 'Non défini', margin, y + 7);
-      doc.text(dossier.etatValidation || 'Non défini', margin + colWidth, y + 7);
+      doc.text(dossier.etatValidation || 'Non défini', margin, y + 7);
       doc.setFont('helvetica', 'normal');
       y += 18;
 
@@ -1115,5 +1123,78 @@ voirDossiersActifs(): void {
 voirDossiersArchives(): void {
   this.currentView = 'archives';
   this.loadDossiersArchives(); // Charge les dossiers archivés
+}
+
+openRejectDialog(dossier: DossierRecouvrement): void {
+  this.currentDossierForRejection = dossier;
+  this.rejectReason = ''; // Reset reason
+  this.selectedUserTypesForNotification = []; // Reset selected user types
+  this.showRejectDialog = true;
+  this.selectedDossierForValidation = null; // Close the validation menu
+}
+
+onUserTypeChange(userType: string, event: any): void {
+  if (event.target.checked) {
+    this.selectedUserTypesForNotification.push(userType);
+  } else {
+    this.selectedUserTypesForNotification = this.selectedUserTypesForNotification.filter(type => type !== userType);
+  }
+}
+
+confirmRejectDossier(): void {
+  if (!this.currentDossierForRejection) return;
+
+  this.isLoading = true;
+  this.error = null;
+
+  const dossierId = this.currentDossierForRejection.id;
+  const updatedDossier = { ...this.currentDossierForRejection, etatValidation: EtatValidation.NON_VALIDE };
+
+  // First, update the dossier status
+  this.dossierService.updateDossier(dossierId, updatedDossier).subscribe({
+    next: () => {
+      // Then, send the rejection notification
+      console.log(`Notification sent to: ${this.selectedUserTypesForNotification.join(', ')} with reason: ${this.rejectReason}`);
+      
+      this.dossierService.sendRejectionNotification(dossierId, this.rejectReason, this.selectedUserTypesForNotification).subscribe({
+        next: () => {
+          console.log('Rejection notification sent successfully!');
+        },
+        error: (notificationErr) => {
+          console.error('Error sending rejection notification:', notificationErr);
+          // Still proceed with loading dossiers even if notification fails
+        }
+      });
+      
+      this.loadDossiers();
+      this.showRejectDialog = false; // Close the dialog
+      this.successMessage = `Le dossier #${dossierId} a été refusé avec succès.`;
+      this.hideSuccessMessageAfterDelay();
+    },
+    error: (err: HttpErrorResponse) => {
+      console.error('Erreur lors de la validation du dossier (refus):', err);
+      if (err.error) {
+        if (typeof err.error === 'string') {
+          this.error = err.error;
+        } else if (err.error.message) {
+          this.error = err.error.message;
+        } else {
+          this.error = 'Une erreur est survenue lors du refus du dossier. Code: ' + err.status;
+        }
+      } else if (err.message) {
+        this.error = err.message;
+      } else {
+        this.error = 'Une erreur est survenue lors du refus du dossier. Veuillez vérifier la console pour plus de détails.';
+      }
+      this.isLoading = false;
+    }
+  });
+}
+
+cancelReject(): void {
+  this.showRejectDialog = false;
+  this.currentDossierForRejection = null;
+  this.rejectReason = '';
+  this.selectedUserTypesForNotification = [];
 }
 }
