@@ -16,8 +16,8 @@ import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossi
 export class DossierRecouvrementAddComponent {
   dossierForm: DossierRecouvrement = {
     id: 0,
-    numeroDossierRecouvrement: '',
-    nomClientRecouvrement: '',
+    accountNumber: '',
+    // nomClientRecouvrement is now optional
     compte: {
       nomCompte: ''
     },
@@ -27,16 +27,17 @@ export class DossierRecouvrementAddComponent {
     interetRetard: 0,
     naturesEngagement: [],
     agenceOuvertureCompte: '',
-    dateOuvertureCompte: new Date(),
-    situationCompte: '',
-    situationJuridique: '',
-    typeClient: '',
-    natureEngagement: '',
-    natureCredit: '',
-    typeGarantie: '',
-    periodiciteRemboursement: '',
-    dateEcheanceInitiale: new Date(),
-    dateSituation: new Date(),
+    // Removed fields that don't exist in backend entity
+    // dateOuvertureCompte: new Date(),
+    // situationCompte: '',
+    // situationJuridique: '',
+    // typeClient: '',
+    // natureEngagement: '',
+    // natureCredit: '',
+    // typeGarantie: '',
+    // periodiciteRemboursement: '',
+    // dateEcheanceInitiale: new Date(),
+    // dateSituation: new Date(),
     referencesChecks: '',
     referencesCredits: '',
     referencesCautions: '',
@@ -99,8 +100,8 @@ export class DossierRecouvrementAddComponent {
       this.errorMessage = 'Le montant principal doit être supérieur à 0';
       return false;
     }
-    if (!this.dossierForm.natureEngagement || this.dossierForm.natureEngagement.length === 0) {
-      this.errorMessage = 'Les natures de l\'engagement sont obligatoires';
+    if (!this.dossierForm.naturesEngagement || this.dossierForm.naturesEngagement.length === 0) {
+      this.errorMessage = 'Les origines de l\'engagement sont obligatoires';
       return false;
     }
     if (!this.dossierForm.agenceOuvertureCompte) {

@@ -213,45 +213,9 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="status">Status</label>
-            <div class="input-with-icon">
-              <i class="material-icons">flag</i>
-              <select 
-                id="status"
-                [(ngModel)]="dossier.status"
-                name="status"
-                required
-                #status="ngModel">
-                <option value="En cours">En cours</option>
-                <option value="En attente">En attente</option>
-                <option value="Clôturé">Clôturé</option>
-              </select>
-            </div>
-            <div class="error-message" *ngIf="status.invalid && (status.dirty || status.touched)">
-              Ce champ est requis
-            </div>
-          </div>
+          
 
-          <div class="form-group">
-            <label for="etatValidation">État de Validation</label>
-            <div class="input-with-icon">
-              <i class="material-icons">verified</i>
-              <select 
-                id="etatValidation"
-                [(ngModel)]="dossier.etatValidation"
-                name="etatValidation"
-                required
-                #etatValidation="ngModel">
-                <option value="Initiale">Initiale</option>
-                <option value="Validé">Validé</option>
-                <option value="Non Validé">Non Validé</option>
-              </select>
-            </div>
-            <div class="error-message" *ngIf="etatValidation.invalid && (etatValidation.dirty || etatValidation.touched)">
-              Ce champ est requis
-            </div>
-          </div>
+          
         </div>
       </div>
 

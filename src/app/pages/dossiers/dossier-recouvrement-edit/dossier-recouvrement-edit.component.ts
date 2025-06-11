@@ -17,8 +17,8 @@ export class DossierRecouvrementEditComponent implements OnInit {
   dossierId!: number;
   dossier: DossierRecouvrement = {
     id: 0,
-    numeroDossierRecouvrement: '',
-    nomClientRecouvrement: '',
+    accountNumber: '',
+    // nomClientRecouvrement is now optional
     compte: { nomCompte: '' },
     engagementTotal: 0,
     montantPrincipal: 0,
@@ -26,16 +26,17 @@ export class DossierRecouvrementEditComponent implements OnInit {
     interetRetard: 0,
     naturesEngagement: [],
     agenceOuvertureCompte: '',
-    dateOuvertureCompte: new Date(),
-    situationCompte: '',
-    situationJuridique: '',
-    typeClient: '',
-    natureEngagement: '',
-    natureCredit: '',
-    typeGarantie: '',
-    periodiciteRemboursement: '',
-    dateEcheanceInitiale: new Date(),
-    dateSituation: new Date(),
+    // Removed fields that don't exist in backend entity
+    // dateOuvertureCompte: new Date(),
+    // situationCompte: '',
+    // situationJuridique: '',
+    // typeClient: '',
+    // natureEngagement: '',
+    // natureCredit: '',
+    // typeGarantie: '',
+    // periodiciteRemboursement: '',
+    // dateEcheanceInitiale: new Date(),
+    // dateSituation: new Date(),
     dateCreation: new Date(),
     status: '',
     etatValidation: EtatValidation.INITIALE,
@@ -75,41 +76,51 @@ export class DossierRecouvrementEditComponent implements OnInit {
       next: (data) => {
         this.dossier = {
           id: data.id,
-          numeroDossierRecouvrement: data.numeroDossierRecouvrement || '',
-          nomClientRecouvrement: data.nomClientRecouvrement || '',
+          accountNumber: data.accountNumber || '',
+          // nomClientRecouvrement removed as it doesn't exist in backend entity
           compte: data.compte,
           engagementTotal: data.engagementTotal,
           montantPrincipal: data.montantPrincipal,
           interetContractuel: data.interetContractuel,
           interetRetard: data.interetRetard,
-          naturesEngagement: data.naturesEngagement,
+          naturesEngagement: [],  // Initialize as empty array and handle separately
           agenceOuvertureCompte: data.agenceOuvertureCompte,
-          dateOuvertureCompte: data.dateOuvertureCompte,
-          situationCompte: data.situationCompte,
-          situationJuridique: data.situationJuridique,
-          typeClient: data.typeClient,
-          natureEngagement: data.natureEngagement,
-          natureCredit: data.natureCredit,
-          typeGarantie: data.typeGarantie,
-          periodiciteRemboursement: data.periodiciteRemboursement,
-          dateEcheanceInitiale: data.dateEcheanceInitiale,
-          dateSituation: data.dateSituation,
+          // Removed fields that don't exist in backend entity
+          // dateOuvertureCompte: data.dateOuvertureCompte,
+          // situationCompte: data.situationCompte,
+          // situationJuridique: data.situationJuridique,
+          // typeClient: data.typeClient,
+          // natureEngagement: data.natureEngagement,
+          // natureCredit: data.natureCredit,
+          // typeGarantie: data.typeGarantie,
+          // periodiciteRemboursement: data.periodiciteRemboursement,
+          // dateEcheanceInitiale: data.dateEcheanceInitiale,
+          // dateSituation: data.dateSituation,
           dateCreation: data.dateCreation,
           status: data.status || '',
           etatValidation: data.etatValidation,
-          interetsReserves: data.interetsReserves,
+          referencesChecks: data.referencesChecks || '',
+          referencesCredits: data.referencesCredits || '',
+          referencesCautions: data.referencesCautions || '',
+          referencesLC: data.referencesLC || '',
+          provision: data.provision || 0,
+          interetsReserves: data.interetsReserves || 0,
           garantiesValeur: data.garantiesValeur,
-          garantiesTitre: data.garantiesTitre,
-          creditsFile: data.creditsFile,
-          cautionsFile: data.cautionsFile,
-          lcFile: data.lcFile,
-          chequeFiles: data.chequeFiles,
-          referencesChecks: data.referencesChecks,
-          referencesCredits: data.referencesCredits,
-          referencesCautions: data.referencesCautions,
-          referencesLC: data.referencesLC,
-          provision: data.provision
+          creditsFile: data.creditsFile || '',
+          cautionsFile: data.cautionsFile || '',
+          lcFile: data.lcFile || '',
+          garanties: data.garanties || []
         };
+        
+        // Handle naturesEngagement separately to avoid TypeScript errors
+        if (data.naturesEngagement) {
+          if (typeof data.naturesEngagement === 'string') {
+            // Use explicit casting to string to fix TypeScript error
+            this.dossier.naturesEngagement = (data.naturesEngagement as string).split(',');
+          } else if (Array.isArray(data.naturesEngagement)) {
+            this.dossier.naturesEngagement = data.naturesEngagement;
+          }
+        }
         this.isLoading = false;
       },
       error: (error) => {
