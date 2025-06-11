@@ -138,8 +138,16 @@ export class DossierRecouvrementEditComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    
+    // Create a copy of the dossier to modify for sending to backend
+    const dossierToUpdate: any = { ...this.dossier };
+    
+    // Convert naturesEngagement array to comma-separated string
+    if (Array.isArray(dossierToUpdate.naturesEngagement)) {
+      dossierToUpdate.naturesEngagement = dossierToUpdate.naturesEngagement.join(',');
+    }
 
-    this.dossierService.updateDossier(this.dossierId, this.dossier).subscribe({
+    this.dossierService.updateDossier(this.dossierId, dossierToUpdate).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/dossiers']);

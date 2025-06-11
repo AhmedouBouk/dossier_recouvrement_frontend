@@ -70,8 +70,16 @@ export class DossierRecouvrementAddComponent {
 
     this.isLoading = true;
     this.errorMessage = '';
+    
+    // Create a copy of the dossier to modify for sending to backend
+    const dossierToCreate: any = { ...this.dossierForm };
+    
+    // Convert naturesEngagement array to comma-separated string
+    if (Array.isArray(dossierToCreate.naturesEngagement)) {
+      dossierToCreate.naturesEngagement = dossierToCreate.naturesEngagement.join(',');
+    }
 
-    this.dossierService.createDossier(this.dossierForm).subscribe({
+    this.dossierService.createDossier(dossierToCreate).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/dossiers']);
