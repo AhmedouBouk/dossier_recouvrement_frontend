@@ -5,52 +5,114 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
+// Define the LcFile interface if not already defined elsewhere
+interface LcFile {
+  id?: number;
+  title: string;
+  lcNumber: string;
+  montant: number;
+  dateEcheance: Date;
+  filePath?: string;
+  uploadDate?: Date;
+  createdBy?: string;
+  updatedAt?: Date;
+  updatedBy?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class LcFileService {
-  private apiUrl = `${environment.apiUrl}/lc-files`;
+  private readonly apiUrl = `${environment.apiUrl}/lc`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
-  // Uploader un fichier LC
-  uploadLcFile(dossierId: number, file: File): Observable<any> {
+  // Upload a new LC file - simplified to only require title and file
+  uploadLcFile(dossierId: number, title: string, file: File): Observable<LcFile> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('title', title);
+    // Upload date will be set automatically by the backend to current date
     return this.http
-      .post(`${this.apiUrl}/${dossierId}/upload`, formData)
+      .post<LcFile>(`${environment.apiUrl}/lc/upload/${dossierId}`, formData)
       .pipe(catchError(this.handleError));
   }
 
-  // Supprimer un fichier LC
-  deleteLcFile(dossierId: number): Observable<void> {
+  // Get all LC files for a specific dossier
+  getLcFilesByDossierId(dossierId: number): Observable<LcFile[]> {
     return this.http
-      .delete<void>(`${this.apiUrl}/${dossierId}/delete`)
+      .get<LcFile[]>(`${this.apiUrl}/dossier/${dossierId}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Récupérer l'URL du fichier LC
-  getLcFileUrl(dossierId: number): Observable<string> {
+  // Get a specific LC file by ID
+  getLcFileById(id: number): Observable<LcFile> {
     return this.http
-      .get<string>(`${this.apiUrl}/${dossierId}/url`)
+      .get<LcFile>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Gestion des erreurs
-  private handleError(error: HttpErrorResponse) {
-    console.error('Une erreur s\'est produite:', error);
-    return throwError(
-      'Une erreur s\'est produite lors de la gestion des fichiers LC.'
-    );
+  // Update an existing LC file's metadata
+  updateLcFile(id: number, title: string, lcNumber?: string, montant?: number, dateEcheance?: Date): Observable<LcFile> {
+    const formData = new FormData();
+    formData.append('title', title);
+    
+    if (lcNumber) {
+      formData.append('lcNumber', lcNumber);
+    }
+    
+    if (montant !== undefined && montant !== null) {
+      formData.append('montant', montant.toString());
+    }
+    
+    if (dateEcheance) {
+      formData.append('dateEcheance', dateEcheance.toISOString());
+    }
+    
+    return this.http
+      .put<LcFile>(`${this.apiUrl}/update/${id}`, formData)
+      .pipe(catchError(this.handleError));
   }
-  
-  // Ajouter cette méthode pour être cohérent avec les autres services
+
+  // Delete an LC file
+  deleteLcFile(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/delete/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Download LC file content
+  downloadLcFile(id: number, download: boolean = false): Observable<Blob> {
+    return this.http
+      .get(`${this.apiUrl}/download/${id}?download=${download}`, { responseType: 'blob' })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Get full file URL if needed
   getFullFileUrl(relativePath: string): string {
-    // Vérifie si le chemin est déjà une URL complète
+    // Check if the path is already a complete URL
     if (relativePath && !relativePath.startsWith('http')) {
       return `${environment.apiUrl}${relativePath}`;
     }
     return relativePath;
   }
-  
+
+  // Error handling
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error('An error occurred:', error);
+    let errorMessage = 'An error occurred while managing LC files.';
+    
+    // Handle specific HTTP error codes
+    if (error.status === 403) {
+      errorMessage = "Vous n'avez pas la permission d'effectuer cette action.";
+    } else if (error.status === 400) {
+      errorMessage = error.error?.message ?? 'Données invalides. Veuillez vérifier vos entrées.';
+    } else if (error.status === 404) {
+      errorMessage = 'La ressource demandée est introuvable.';
+    } else if (error.status === 500) {
+      errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
+    }
+    
+    return throwError(() => new Error(errorMessage));
+  }
 }

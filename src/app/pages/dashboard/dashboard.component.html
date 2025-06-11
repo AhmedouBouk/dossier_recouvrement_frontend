@@ -82,7 +82,8 @@
             <i *ngIf="notification.type === 'GARANTIE'" class="material-icons">security</i>
             <i *ngIf="notification.type === 'CHEQUE'" class="material-icons">payments</i>
             <i *ngIf="notification.type === 'DOCUMENT_DO'" class="material-icons">description</i>
-            <i *ngIf="notification.type !== 'GARANTIE' && notification.type !== 'CHEQUE' && notification.type !== 'DOCUMENT_DO'" class="material-icons">notifications</i>
+            <i *ngIf="notification.type === 'REFUS_DOSSIER'" class="material-icons">warning</i>
+            <i *ngIf="notification.type !== 'GARANTIE' && notification.type !== 'CHEQUE' && notification.type !== 'DOCUMENT_DO' && notification.type !== 'REFUS_DOSSIER'" class="material-icons">notifications</i>
           </div>
           
           <div class="notification-content">

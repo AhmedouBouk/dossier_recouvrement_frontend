@@ -101,14 +101,17 @@
           <div class="form-group">
             <label for="naturesEngagement">Origines de l'engagement</label>
             <div class="input-with-icon">
-              <i class="material-icons">source</i>
-              <input 
-                id="naturesEngagement"
-                [(ngModel)]="dossier.naturesEngagement"
-                name="naturesEngagement"
-                type="text"
-                required
-                #originesEngagement="ngModel">
+  <i class="material-icons">source</i>
+  <textarea
+    id="naturesEngagement"
+    [(ngModel)]="dossier.naturesEngagement"
+    name="naturesEngagement"
+    required
+    #originesEngagement="ngModel"
+    rows="3"
+  ></textarea>
+
+
             </div>
             <div class="error-message" *ngIf="originesEngagement.invalid && (originesEngagement.dirty || originesEngagement.touched)">
               Ce champ est requis
@@ -210,45 +213,9 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="status">Status</label>
-            <div class="input-with-icon">
-              <i class="material-icons">flag</i>
-              <select 
-                id="status"
-                [(ngModel)]="dossier.status"
-                name="status"
-                required
-                #status="ngModel">
-                <option value="En cours">En cours</option>
-                <option value="En attente">En attente</option>
-                <option value="Clôturé">Clôturé</option>
-              </select>
-            </div>
-            <div class="error-message" *ngIf="status.invalid && (status.dirty || status.touched)">
-              Ce champ est requis
-            </div>
-          </div>
+          
 
-          <div class="form-group">
-            <label for="etatValidation">État de Validation</label>
-            <div class="input-with-icon">
-              <i class="material-icons">verified</i>
-              <select 
-                id="etatValidation"
-                [(ngModel)]="dossier.etatValidation"
-                name="etatValidation"
-                required
-                #etatValidation="ngModel">
-                <option value="Initiale">Initiale</option>
-                <option value="Validé">Validé</option>
-                <option value="Non Validé">Non Validé</option>
-              </select>
-            </div>
-            <div class="error-message" *ngIf="etatValidation.invalid && (etatValidation.dirty || etatValidation.touched)">
-              Ce champ est requis
-            </div>
-          </div>
+          
         </div>
       </div>
 

@@ -63,8 +63,8 @@ export class DossierRecouvrementService {
     );
   }
   // Delete dossier
-  deleteDossier(id: number): Observable<string> {
-    return this.http.delete<string>(`${this.apiUrl}/delete/${id}`);
+  deleteDossier(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/delete/${id}`, { responseType: 'text' as 'json' });
   }
 
   // Search dossiers
@@ -106,34 +106,42 @@ export class DossierRecouvrementService {
   }
   // Get comments for a dossier
 getComments(dossierId: number): Observable<any[]> {
-  return this.http.get<any[]>(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`);
+  return this.http.get<any[]>(`${this.apiUrl}/${dossierId}/comments`);
 }
 
 // Add a comment to a dossier
 addComment(dossierId: number, content: string, reminderDateTime?: string | null): Observable<any> {
   const payload: any = { content };
   if (reminderDateTime) payload.reminderDateTime = reminderDateTime;
-  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/comments`, payload);
+  return this.http.post(`${environment.apiUrl}/dossiers/${dossierId}/comments`, payload);
 }
 
 // Update status and add a comment to a dossier
 updateStatusWithComment(dossierId: number, status: string, content: string, reminderDateTime?: string | null): Observable<any> {
   const payload: any = { status, content };
   if (reminderDateTime) payload.reminderDateTime = reminderDateTime;
-  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/status-with-comment`, payload);
+  return this.http.post(`${environment.apiUrl}/dossiers/${dossierId}/status-with-comment`, payload);
 }
 
 // Update an existing comment
 updateComment(commentId: number, content: string, reminderDateTime?: string | null): Observable<any> {
   const payload: any = { content };
   if (reminderDateTime) payload.reminderDateTime = reminderDateTime;
-  return this.http.put(`${environment.apiUrl}/api/dossiers/comments/${commentId}`, payload);
+  return this.http.put(`${environment.apiUrl}/dossiers/comments/${commentId}`, payload);
 }
 
 // Delete a comment
 deleteComment(commentId: number): Observable<void> {
   return this.http.delete<void>(`${environment.apiUrl}/api/dossiers/comments/${commentId}`);
-}genererMiseEnDemeure(dossier: DossierRecouvrement) {
+}
+
+// New method to send rejection notification
+sendRejectionNotification(dossierId: number, reason: string, userTypes: string[]): Observable<any> {
+  const payload = { reason, userTypes };
+  return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/reject-notification`, payload);
+}
+
+genererMiseEnDemeure(dossier: DossierRecouvrement) {
   if (!dossier) {
     console.error('❌ Aucun dossier fourni pour générer la mise en demeure.');
     return;

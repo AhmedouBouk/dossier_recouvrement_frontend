@@ -1,50 +1,81 @@
 // src/app/shared/services/cautions-file.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { CautionFile, CautionFileUpdateDto } from '../models/caution-file.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CautionsFileService {
-  private apiUrl = `${environment.apiUrl}/cautions`;
+  private apiUrl = `${environment.apiUrl}/api/caution-files`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
-  // Uploader un fichier de caution
-  uploadCautionsFile(dossierId: number, file: File): Observable<any> {
+  uploadCautionsFile(
+    dossierId: number,
+    title: string,
+    file: File,
+    cautionNumber?: string,
+    montant?: number,
+    dateEcheance?: string,
+  ): Observable<CautionFile> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http
-      .post(`${this.apiUrl}/${dossierId}/upload`, formData)
-      .pipe(catchError(this.handleError));
+    formData.append('title', title);
+    if (cautionNumber) {
+      formData.append('cautionNumber', cautionNumber);
+    }
+    if (montant !== undefined && montant !== null) {
+      formData.append('montant', montant.toString());
+    }
+    if (dateEcheance) {
+      formData.append('dateEcheance', dateEcheance);
+    }
+    return this.http.post<CautionFile>(`${this.apiUrl}/upload/${dossierId}`, formData);
   }
 
-  // Supprimer un fichier de caution
-  deleteCautionsFile(dossierId: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${dossierId}/delete`)
-      .pipe(catchError(this.handleError));
+  getCautionsFilesByDossierId(dossierId: number): Observable<CautionFile[]> {
+    return this.http.get<CautionFile[]>(`${this.apiUrl}/dossier/${dossierId}`);
   }
 
-  // Récupérer l'URL du fichier de caution
-  getCautionsFileUrl(dossierId: number): Observable<string> {
-    return this.http
-      .get<string>(`${this.apiUrl}/${dossierId}/url`)
-      .pipe(catchError(this.handleError));
+  getCautionsFileById(cautionFileId: number): Observable<CautionFile> {
+    return this.http.get<CautionFile>(`${this.apiUrl}/${cautionFileId}`);
   }
 
-  // Gestion des erreurs
-  private handleError(error: HttpErrorResponse) {
-    console.error('Une erreur s\'est produite:', error);
-    return throwError(
-      'Une erreur s\'est produite lors de la gestion des fichiers de caution.'
-    );
+  updateCautionsFile(cautionFileId: number, updateDto: CautionFileUpdateDto): Observable<CautionFile> {
+    return this.http.put<CautionFile>(`${this.apiUrl}/${cautionFileId}`, updateDto);
   }
 
-  // Ajouter cette méthode au service CautionsFileService
+  deleteCautionsFileById(cautionFileId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${cautionFileId}`);
+  }
+
+  deleteAllCautionsFilesByDossierId(dossierId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/dossier/${dossierId}/all`);
+  }
+
+  downloadCautionsFile(cautionFileId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${cautionFileId}`, {
+      responseType: 'blob',
+    });
+  }
+
+  // Helper method to construct full download URLs for a CautionFile or its ID
+  getCautionsFileDownloadUrl(item: CautionFile | number): string {
+    const fileId = typeof item === 'number' ? item : item.id;
+    if (fileId) {
+      return `${this.apiUrl}/download/${fileId}`;
+    }
+    console.warn('CautionFile ID not available for generating download URL for item:', item);
+    return '';
+  }
+
+  downloadPdfByDossier(id: number): Observable<Blob> {
+    return this.http.get(`/api/credits/pdf/${id}`, { responseType: 'blob' });
+  }
+
   getFullFileUrl(relativePath: string): string {
     // Si le chemin est déjà une URL complète, la retourner
     if (relativePath.startsWith('http')) {
@@ -54,8 +85,4 @@ export class CautionsFileService {
     const baseUrl = environment.apiUrl;
     return baseUrl + relativePath;
   }
-
-   downloadPdfByDossier(id: number): Observable<Blob> {
-  return this.http.get(`/api/credits/pdf/${id}`, { responseType: 'blob' });
-}
 }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
+import { Garantie } from 'src/app/shared/models/garantie.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserDataService } from 'src/app/shared/services/user-data.service';
 import { jsPDF } from 'jspdf';
@@ -14,6 +15,7 @@ import { CreditsFileService } from 'src/app/shared/services/credits-file.service
 import { ChequeFileService } from 'src/app/shared/services/cheque-file.service';
 import { CautionsFileService } from 'src/app/shared/services/cautions-file.service';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 interface Comment {
   id?: number;
@@ -34,13 +36,15 @@ interface Comment {
   templateUrl: './dossier-recouvrement-details.component.html',
   styleUrls: ['./dossier-recouvrement-details.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
+  schemas: [NO_ERRORS_SCHEMA]
 })
 export class DossierRecouvrementDetailsComponent implements OnInit {
   reminderDate: string = ''; 
   reminderTime: string = '';
   currentUserId: number | null = null; // ID de l'utilisateur connecté
   dossierDetails: DossierRecouvrement | null = null;
+  dossier: any;
   comments: Comment[] = [];
   newComment: string = '';
   isLoading = false;
@@ -50,16 +54,15 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   commentairesParDossier: { [id: number]: any[] } = {};
   // Liste des statuts disponibles
   statusOptions = [
-    'En cours de traitement',
-    'Relancé',
-    'Mis en demeure',
-    'Protocole d\'accord signé',
-    'Recouvrement amiable',
-    'Non respect du protocole',
-    'En justice',
-    'Adjudication des garanties',
-    'Clôturé'
+    'EN_COURS',
+    'ARCHIVEE'
   ];
+  
+  // Mapping pour l'affichage des statuts
+  statusDisplayMap: { [key: string]: string } = {
+    'EN_COURS': 'En cours',
+    'ARCHIVEE': 'Archivé'
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -108,41 +111,79 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     this.router.navigate(['/dossiers']);
   }
   
-  viewGarantieFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.garantiesFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
+  viewGarantieFile(dossier: DossierRecouvrement, garantieIdOrIndex?: number | string, download: boolean = false): void {
+    if (!dossier.garanties || dossier.garanties.length === 0) {
+      alert('Aucune garantie trouvée pour ce dossier.');
       return;
     }
 
-    const fileUrl = this.garantieService.getFullFileUrl(dossier.garantiesFile);
-    const token = this.authService.getToken();
+    // If garantieId is provided, view that specific garantie
+    // Otherwise, if there's only one garantie, view that one
+    // If multiple garanties and no ID specified, show selection dialog
+    let selectedGarantie: Garantie | undefined;
+    
+    if (typeof garantieIdOrIndex === 'number') {
+      // If it's a number, treat it as an ID
+      selectedGarantie = dossier.garanties.find(g => g.id === garantieIdOrIndex);
+      if (!selectedGarantie) {
+        alert('Garantie non trouvée.');
+        return;
+      }
+    } else if (typeof garantieIdOrIndex === 'string') {
+      // If it's a string, treat it as an index
+      const index = Number(garantieIdOrIndex) - 1;
+      if (isNaN(index) || index < 0 || index >= dossier.garanties.length) {
+        alert('Index de garantie invalide.');
+        return;
+      }
+      selectedGarantie = dossier.garanties[index];
+    } else if (dossier.garanties.length === 1) {
+      // If no ID/index provided but only one garantie exists
+      selectedGarantie = dossier.garanties[0];
+    } else {
+      // Multiple garanties but no ID/index provided
+      alert('Veuillez spécifier une garantie.');
+      return;
+    }
 
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Erreur lors du chargement du fichier');
-        return response.blob();
-      })
-      .then((blob) => {
-        const blobUrl = URL.createObjectURL(blob);
-        if (download) {
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = dossier.garantiesFile.split('/').pop() || 'file.pdf';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          window.open(blobUrl, '_blank');
+    if (!selectedGarantie) {
+      alert('Garantie introuvable.');
+      return;
+    }
+
+    if (!selectedGarantie.id) {
+      alert('ID de garantie invalide.');
+      return;
+    }
+
+    // Use the garantie service to get the PDF by ID instead of direct file access
+    this.garantieService.getGarantiePdf(selectedGarantie.id)
+      .subscribe({
+        next: (blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            // Add null checks and provide fallback values
+            if (selectedGarantie && selectedGarantie.filePath) {
+              const fileName = selectedGarantie.filePath.split('/').pop() || `garantie_${selectedGarantie.id || 'unknown'}.pdf`;
+              a.download = fileName;
+            } else if (selectedGarantie && selectedGarantie.id) {
+              a.download = `garantie_${selectedGarantie.id}.pdf`;
+            } else {
+              a.download = 'garantie.pdf';
+            }
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Erreur:', error);
+          alert('Impossible de charger le fichier.');
         }
-      })
-      .catch((error) => {
-        console.error('Erreur:', error);
-        alert('Impossible de charger le fichier.');
       });
   }
 
@@ -241,7 +282,8 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
           // Télécharger le fichier
           const a = document.createElement('a');
           a.href = blobUrl;
-          a.download = dossier.lcFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+          const lcFile = dossier.lcFile;
+          a.download = lcFile ? lcFile.split('/').pop() || 'file.pdf' : 'file.pdf'; // Nom du fichier
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -375,90 +417,58 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     }
   }
 viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.chequeFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
-  
-    const fileUrl = this.chequeFileService.getFullFileUrl(dossier.chequeFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-  
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.chequeFile; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
+  if (!dossier.chequeFiles || dossier.chequeFiles.length === 0) {
+    alert('Aucun fichier trouvé pour ce dossier.');
+    return;
   }
-  viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.cautionsFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
+  
+  // Temporary message until modal is fully integrated
+  alert('La gestion des multiples fichiers de chèques sera disponible prochainement.');
+  // Future implementation will open a modal to select which cheque file to view/download
+}
 
-    const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
+viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+  if (!dossier.cautionsFile) {
+    alert('Aucun fichier trouvé pour ce dossier.');
+    return;
   }
 
+  const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
+  const token = this.authService.getToken(); // Récupérer le token JWT
+
+  fetch(fileUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Erreur lors du chargement du fichier');
+    }
+    return response.blob(); // Convertir la réponse en Blob
+  })
+  .then(blob => {
+    const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
+
+    if (download) {
+      // Télécharger le fichier
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      // Ouvrir dans un nouvel onglet
+      window.open(blobUrl, '_blank');
+    }
+  })
+  .catch(error => {
+    console.error('Erreur:', error);
+    alert('Impossible de charger le fichier.');
+  });
+}
   // Méthode pour basculer l'affichage de la sélection de statut
   toggleStatusSelection() {
     this.showStatusSelection = !this.showStatusSelection;
@@ -484,17 +494,18 @@ viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
     });
   }
 
-  getStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'En cours': 'active',
-      'En attente': 'pending',
-      'Clôturé': 'closed',
-      'Initiale': 'pending',
-      'Validé': 'active',
-      'Non Validé': 'closed'
-    };
-    
-    return statusMap[status] || 'pending';
+  getStatusClass(status: string | undefined): string {
+    const statusText = status || '';
+    switch (statusText.toLowerCase()) {
+      case 'en cours':
+        return 'status-in-progress';
+      case 'clôturé':
+        return 'status-closed';
+      case 'en attente':
+        return 'status-pending';
+      default:
+        return 'status-unknown';
+    }
   }
   
   // Vérifie si l'utilisateur connecté peut éditer/supprimer un commentaire
@@ -944,4 +955,45 @@ this.dossierService.detailsPdfBlobs[this.dossierDetails.id] = blob;
     });
   }
 
+  downloadFile(dossier: DossierRecouvrement, type: string): void {
+    if (!dossier.id) {
+      alert('Aucun dossier sélectionné.');
+      return;
+    }
+
+    let serviceCall;
+    let fileName = 'file.pdf';
+
+    switch (type) {
+      case 'lc':
+        if (dossier.lcFile) {
+          // Use a placeholder service call since DossierRecouvrementService might not have download methods
+          // In a real app, you would inject the correct service (e.g., LcFileService)
+          alert('Téléchargement de fichier LC - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier LC associé à ce dossier.');
+          return;
+        }
+      case 'caution':
+        if (dossier.cautionsFile) {
+          alert('Téléchargement de fichier de caution - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier de caution associé à ce dossier.');
+          return;
+        }
+      case 'credit':
+        if (dossier.creditsFile) {
+          alert('Téléchargement de fichier de crédit - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier de crédit associé à ce dossier.');
+          return;
+        }
+      default:
+        alert('Type de fichier non reconnu.');
+        return;
+    }
+  }
 }

@@ -16,33 +16,43 @@ import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossi
 export class DossierRecouvrementEditComponent implements OnInit {
   dossierId!: number;
   dossier: DossierRecouvrement = {
-      id: 0,
-      compte: {
-          nomCompte: ''
-      },
-      engagementTotal: 0,
-      montantPrincipal: 0,
-      interetContractuel: 0,
-      interetRetard: 0,
-      naturesEngagement: [] as string[],
-      agenceOuvertureCompte: '',
-      referencesChecks: '',
-      referencesCredits: '',
-      referencesCautions: '',
-      referencesLC: '',
-      provision: 0,
-      garantiesValeur: 0,
-      status: '',
-      etatValidation: EtatValidation.INITIALE,
-      interetsReserves: 0,
-      garantiesTitre: '',
-      garantiesFile: '',
-      creditsFile: '',
-      cautionsFile: '',
-      lcFile: '',
-      chequeFile: '',
-      dateCreation: new Date() // Initialisé avec la date actuelle
-    };
+    id: 0,
+    accountNumber: '',
+    // nomClientRecouvrement is now optional
+    compte: { nomCompte: '' },
+    engagementTotal: 0,
+    montantPrincipal: 0,
+    interetContractuel: 0,
+    interetRetard: 0,
+    naturesEngagement: [],
+    agenceOuvertureCompte: '',
+    // Removed fields that don't exist in backend entity
+    // dateOuvertureCompte: new Date(),
+    // situationCompte: '',
+    // situationJuridique: '',
+    // typeClient: '',
+    // natureEngagement: '',
+    // natureCredit: '',
+    // typeGarantie: '',
+    // periodiciteRemboursement: '',
+    // dateEcheanceInitiale: new Date(),
+    // dateSituation: new Date(),
+    dateCreation: new Date(),
+    status: '',
+    etatValidation: EtatValidation.INITIALE,
+    interetsReserves: 0,
+    garantiesValeur: 0,
+    garantiesTitre: '',
+    creditsFile: '',
+    cautionsFile: '',
+    lcFile: '',
+    chequeFiles: [],
+    referencesChecks: '',
+    referencesCredits: '',
+    referencesCautions: '',
+    referencesLC: '',
+    provision: 0
+  };
   isLoading = false;
   errorMessage = '';
 
@@ -54,8 +64,6 @@ export class DossierRecouvrementEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-   
-
     this.route.params.subscribe(params => {
       this.dossierId = +params['id'];
       this.loadDossierDetails();
@@ -68,30 +76,51 @@ export class DossierRecouvrementEditComponent implements OnInit {
       next: (data) => {
         this.dossier = {
           id: data.id,
+          accountNumber: data.accountNumber || '',
+          // nomClientRecouvrement removed as it doesn't exist in backend entity
           compte: data.compte,
           engagementTotal: data.engagementTotal,
           montantPrincipal: data.montantPrincipal,
           interetContractuel: data.interetContractuel,
           interetRetard: data.interetRetard,
-          naturesEngagement: data.naturesEngagement,
+          naturesEngagement: [],  // Initialize as empty array and handle separately
           agenceOuvertureCompte: data.agenceOuvertureCompte,
-          referencesChecks: data.referencesChecks,
-          referencesCredits: data.referencesCredits,
-          referencesCautions: data.referencesCautions,
-          referencesLC: data.referencesLC,
-          provision: data.provision,
-          garantiesValeur: data.garantiesValeur,
-          status: data.status,
+          // Removed fields that don't exist in backend entity
+          // dateOuvertureCompte: data.dateOuvertureCompte,
+          // situationCompte: data.situationCompte,
+          // situationJuridique: data.situationJuridique,
+          // typeClient: data.typeClient,
+          // natureEngagement: data.natureEngagement,
+          // natureCredit: data.natureCredit,
+          // typeGarantie: data.typeGarantie,
+          // periodiciteRemboursement: data.periodiciteRemboursement,
+          // dateEcheanceInitiale: data.dateEcheanceInitiale,
+          // dateSituation: data.dateSituation,
+          dateCreation: data.dateCreation,
+          status: data.status || '',
           etatValidation: data.etatValidation,
-          interetsReserves: data.interetsReserves,
-          garantiesTitre: data.garantiesTitre,
-          garantiesFile: data.garantiesFile,
-          creditsFile: data.creditsFile,
-          cautionsFile: data.cautionsFile,
-          lcFile: data.lcFile,
-          chequeFile: data.chequeFile,
-          dateCreation:data.dateCreation
+          referencesChecks: data.referencesChecks || '',
+          referencesCredits: data.referencesCredits || '',
+          referencesCautions: data.referencesCautions || '',
+          referencesLC: data.referencesLC || '',
+          provision: data.provision || 0,
+          interetsReserves: data.interetsReserves || 0,
+          garantiesValeur: data.garantiesValeur,
+          creditsFile: data.creditsFile || '',
+          cautionsFile: data.cautionsFile || '',
+          lcFile: data.lcFile || '',
+          garanties: data.garanties || []
         };
+        
+        // Handle naturesEngagement separately to avoid TypeScript errors
+        if (data.naturesEngagement) {
+          if (typeof data.naturesEngagement === 'string') {
+            // Use explicit casting to string to fix TypeScript error
+            this.dossier.naturesEngagement = (data.naturesEngagement as string).split(',');
+          } else if (Array.isArray(data.naturesEngagement)) {
+            this.dossier.naturesEngagement = data.naturesEngagement;
+          }
+        }
         this.isLoading = false;
       },
       error: (error) => {
@@ -109,8 +138,16 @@ export class DossierRecouvrementEditComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    
+    // Create a copy of the dossier to modify for sending to backend
+    const dossierToUpdate: any = { ...this.dossier };
+    
+    // Convert naturesEngagement array to comma-separated string
+    if (Array.isArray(dossierToUpdate.naturesEngagement)) {
+      dossierToUpdate.naturesEngagement = dossierToUpdate.naturesEngagement.join(',');
+    }
 
-    this.dossierService.updateDossier(this.dossierId, this.dossier).subscribe({
+    this.dossierService.updateDossier(this.dossierId, dossierToUpdate).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/dossiers']);
