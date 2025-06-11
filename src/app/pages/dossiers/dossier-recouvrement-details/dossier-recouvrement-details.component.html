@@ -172,7 +172,7 @@
               [(ngModel)]="selectedStatus"
               class="status-dropdown">
               <option value="">-- Sélectionner un statut --</option>
-              <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+              <option *ngFor="let status of statusOptions" [value]="status">{{ statusDisplayMap[status] || status }}</option>
             </select>
           </div>
           
@@ -263,9 +263,7 @@
       <div class="card mb-3">
         <div class="card-header" id="headingChequeFiles">
           <h2 class="mb-0">
-            <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChequeFiles" aria-expanded="false" aria-controls="collapseChequeFiles">
-              Cheque Files
-            </button>
+            
           </h2>
         </div>
         <div id="collapseChequeFiles" class="collapse" aria-labelledby="headingChequeFiles" data-bs-parent="#accordionExample">
@@ -278,9 +276,7 @@
       <div class="card mb-3">
         <div class="card-header" id="headingCautionFiles">
           <h2 class="mb-0">
-            <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCautionFiles" aria-expanded="false" aria-controls="collapseCautionFiles">
-              Caution Files
-            </button>
+            
           </h2>
         </div>
         <div id="collapseCautionFiles" class="collapse" aria-labelledby="headingCautionFiles" data-bs-parent="#accordionExample">
