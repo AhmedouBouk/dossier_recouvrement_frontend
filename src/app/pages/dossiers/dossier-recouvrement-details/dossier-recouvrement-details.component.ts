@@ -54,16 +54,15 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   commentairesParDossier: { [id: number]: any[] } = {};
   // Liste des statuts disponibles
   statusOptions = [
-    'En cours de traitement',
-    'Relancé',
-    'Mis en demeure',
-    'Protocole d\'accord signé',
-    'Recouvrement amiable',
-    'Non respect du protocole',
-    'En justice',
-    'Adjudication des garanties',
-    'Clôturé'
+    'EN_COURS',
+    'ARCHIVEE'
   ];
+  
+  // Mapping pour l'affichage des statuts
+  statusDisplayMap: { [key: string]: string } = {
+    'EN_COURS': 'En cours',
+    'ARCHIVEE': 'Archivé'
+  };
 
   constructor(
     private route: ActivatedRoute,
