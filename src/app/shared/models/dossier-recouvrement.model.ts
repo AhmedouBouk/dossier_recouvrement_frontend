@@ -25,8 +25,10 @@ export interface Comment {
 
 export interface DossierRecouvrement {
     id: number;
-    numeroDossierRecouvrement: string;
-    nomClientRecouvrement: string;
+    accountNumber: string;
+    // Fields removed as they don't exist in backend entity
+    numeroDossierRecouvrement?: string; // Keep for backward compatibility but marked optional
+    nomClientRecouvrement?: string; // Keep for backward compatibility but marked optional
     compte: {
       nomCompte: string;
     };
@@ -38,16 +40,17 @@ export interface DossierRecouvrement {
     interetRetard: number;
     naturesEngagement: string[];
     agenceOuvertureCompte: string;
-    dateOuvertureCompte: Date;
-    situationCompte: string;
-    situationJuridique: string;
-    typeClient: string;
-    natureEngagement: string;
-    natureCredit: string;
-    typeGarantie: string;
-    periodiciteRemboursement: string;
-    dateEcheanceInitiale: Date;
-    dateSituation: Date;
+    // Fields not in backend entity - marked as optional
+    dateOuvertureCompte?: Date;
+    situationCompte?: string;
+    situationJuridique?: string;
+    typeClient?: string;
+    natureEngagement?: string;
+    natureCredit?: string;
+    typeGarantie?: string;
+    periodiciteRemboursement?: string;
+    dateEcheanceInitiale?: Date;
+    dateSituation?: Date;
     referencesChecks: string;
     referencesCredits: string;
     referencesCautions: string;
