@@ -233,6 +233,40 @@
   text-decoration: underline;
 }
 
+/* File item styling */
+.garantie-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.garantie-item strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.garantie-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.file-link {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #f1f5f9;
+  transition: background-color 0.2s;
+}
+
+.file-link:hover {
+  background-color: #e2e8f0;
+}
+
 /* Comments Section Styles */
 .comments-section {
   margin-top: 32px;

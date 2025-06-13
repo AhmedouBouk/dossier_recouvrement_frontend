@@ -1,6 +1,8 @@
 import { Garantie } from './garantie.model';
 import { ChequeFile } from './cheque-file.model';
-import { LcFile } from './lc-file.model'; // Import LcFile model
+import { LcFile } from './lc-file.model';
+import { CreditFile } from './credit-file.model';
+import { CautionFile } from './caution-file.model';
 
 export enum EtatValidation {
   INITIALE = 'INITIALE',
@@ -59,18 +61,20 @@ export interface DossierRecouvrement {
     interetsReserves: number;
     garantiesValeur?: number; // Valeur des garanties
     garantiesTitre?: string; // Pour la compatibilité avec l'ancien code
-    creditsFile: string;
-    cautionsFile: string;
-    lcFile?: string;
-    chequeFiles?: ChequeFile[]; // Replaced single chequeFile string with an array of ChequeFile objects
+    creditsFile?: string; // Legacy single file path
+    cautionsFile?: string; // Legacy single file path
+    lcFile?: string; // Legacy single file path
+    chequeFiles?: ChequeFile[]; // Array of ChequeFile objects
+    creditFiles?: CreditFile[]; // Array of CreditFile objects
+    cautionFiles?: CautionFile[]; // Array of CautionFile objects
+    lcFiles?: LcFile[]; // Array to store multiple LC files associated with this dossier
+    cautionFile?: string; // For backward compatibility
+    creditFile?: string; // For backward compatibility
     dateCreation: Date; // Assurez-vous que cette propriété existe
     selectedFile?: File; // Ajoutez cette propriété
     selectedCreditsFile? :File
     selectedCautionsFile?:File
     selectedLcFile?:File
-    lcFiles?: LcFile[]; // Array to store multiple LC files associated with this dossier
-    cautionFile?: string; // For backward compatibility
-    creditFile?: string; // For backward compatibility
     status?: string;  // PAS DossierStatus
     etatValidation: EtatValidation;
     garanties?: Garantie[];
