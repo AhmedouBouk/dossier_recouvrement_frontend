@@ -157,10 +157,23 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     }
 
     // Use the garantie service to get the PDF by ID instead of direct file access
-    this.garantieService.getGarantiePdf(selectedGarantie.id)
+    this.garantieService.getGarantiePdf(selectedGarantie.id, download)
       .subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          // Determine MIME type based on file extension for proper inline display
+          let mimeType = 'application/pdf'; // Default to PDF
+          if (selectedGarantie && selectedGarantie.filePath) {
+            const fileExtension = selectedGarantie.filePath.split('.').pop()?.toLowerCase();
+            if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
+              mimeType = 'image/jpeg';
+            } else if (fileExtension === 'png') {
+              mimeType = 'image/png';
+            } else if (fileExtension === 'gif') {
+              mimeType = 'image/gif';
+            }
+          }
+          const typedBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: mimeType });
+          const blobUrl = URL.createObjectURL(typedBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -264,7 +277,8 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       if (fileId) {
         this.lcFileService.downloadLcFile(fileId, download).subscribe({
           next: (blob) => {
-            const blobUrl = URL.createObjectURL(blob);
+            const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
             if (download) {
               const a = document.createElement('a');
               a.href = blobUrl;
@@ -377,7 +391,8 @@ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
     if (fileId) {
       this.creditsFileService.downloadCreditFile(fileId, download).subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -409,7 +424,8 @@ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
       console.log('Fetching credit file with ID:', fileId);
       this.creditsFileService.downloadCreditFile(fileId, download).subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -449,7 +465,8 @@ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
     if (fileId) {
       this.cautionsFileService.downloadCautionsFile(fileId).subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -483,7 +500,8 @@ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
       console.log('Fetching caution file with ID:', fileId);
       this.cautionsFileService.downloadCautionsFile(fileId).subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -518,7 +536,8 @@ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
       console.log('Fetching LC file with ID:', fileId);
       this.lcFileService.downloadLcFile(fileId, download).subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -584,7 +603,8 @@ viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
       console.log('Fetching cheque file with ID:', fileId);
       this.chequeFileService.downloadChequeFile(fileId, download).subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
