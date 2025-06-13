@@ -109,7 +109,12 @@ export class DossierRecouvrementEditComponent implements OnInit {
           creditsFile: data.creditsFile || '',
           cautionsFile: data.cautionsFile || '',
           lcFile: data.lcFile || '',
-          garanties: data.garanties || []
+          garanties: data.garanties || [],
+          // Preserve all file arrays to prevent them from being lost during update
+          creditFiles: data.creditFiles || [],
+          cautionFiles: data.cautionFiles || [],
+          chequeFiles: data.chequeFiles || [],
+          lcFiles: data.lcFiles || []
         };
         
         // Handle naturesEngagement separately to avoid TypeScript errors
