@@ -49,7 +49,7 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   newComment: string = '';
   isLoading = false;
   errorMessage = '';
-  showStatusSelection = false;
+  showStatusSelection = false; // Property to control status selection UI visibility
   selectedStatus: string = '';
   commentairesParDossier: { [id: number]: any[] } = {};
   // Liste des statuts disponibles
@@ -157,10 +157,23 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     }
 
     // Use the garantie service to get the PDF by ID instead of direct file access
-    this.garantieService.getGarantiePdf(selectedGarantie.id)
+    this.garantieService.getGarantiePdf(selectedGarantie.id, download)
       .subscribe({
         next: (blob) => {
-          const blobUrl = URL.createObjectURL(blob);
+          // Determine MIME type based on file extension for proper inline display
+          let mimeType = 'application/pdf'; // Default to PDF
+          if (selectedGarantie && selectedGarantie.filePath) {
+            const fileExtension = selectedGarantie.filePath.split('.').pop()?.toLowerCase();
+            if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
+              mimeType = 'image/jpeg';
+            } else if (fileExtension === 'png') {
+              mimeType = 'image/png';
+            } else if (fileExtension === 'gif') {
+              mimeType = 'image/gif';
+            }
+          }
+          const typedBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: mimeType });
+          const blobUrl = URL.createObjectURL(typedBlob);
           if (download) {
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -260,86 +273,34 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
         return;
       }
   
-      const fileUrl = this.lcFileService.getFullFileUrl(dossier.lcFile);
-      const token = this.authService.getToken(); // Récupérer le token JWT
-  
-      fetch(fileUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erreur lors du chargement du fichier');
-        }
-        return response.blob(); // Convertir la réponse en Blob
-      })
-      .then(blob => {
-        const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-        if (download) {
-          // Télécharger le fichier
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          const lcFile = dossier.lcFile;
-          a.download = lcFile ? lcFile.split('/').pop() || 'file.pdf' : 'file.pdf'; // Nom du fichier
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          // Ouvrir dans un nouvel onglet
-          window.open(blobUrl, '_blank');
-        }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        alert('Impossible de charger le fichier.');
-      });
-    }
-  
- viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.creditsFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
-  
-    const fileUrl = this.creditsFileService.getFullFileUrl(dossier.creditsFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-  
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.creditsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+      const fileId = this.extractFileId(dossier.lcFile);
+      if (fileId) {
+        this.lcFileService.downloadLcFile(fileId, download).subscribe({
+          next: (blob) => {
+            const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+            if (download) {
+              const a = document.createElement('a');
+              a.href = blobUrl;
+              a.download = dossier.lcFile?.split('/').pop() || 'file.pdf';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            } else {
+              window.open(blobUrl, '_blank');
+            }
+          },
+          error: (error) => {
+            console.error('Error downloading LC file:', error);
+            alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+          }
+        });
       } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
+        alert('Impossible de déterminer l\'ID du fichier.');
       }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
-  }    
+    }
+  
+    
   
   // Méthode pour détecter si un commentaire devrait avoir une date de rappel
   // basé sur son contenu
@@ -416,66 +377,274 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       });
     }
   }
-viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
-  if (!dossier.chequeFiles || dossier.chequeFiles.length === 0) {
-    alert('Aucun fichier trouvé pour ce dossier.');
-    return;
-  }
-  
-  // Temporary message until modal is fully integrated
-  alert('La gestion des multiples fichiers de chèques sera disponible prochainement.');
-  // Future implementation will open a modal to select which cheque file to view/download
-}
-
-viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
-  if (!dossier.cautionsFile) {
-    alert('Aucun fichier trouvé pour ce dossier.');
-    return;
-  }
-
-  const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
-  const token = this.authService.getToken(); // Récupérer le token JWT
-
-  fetch(fileUrl, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
+viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (dossier.creditFiles && dossier.creditFiles.length > 0) {
+      this.viewSingleCreditFile(dossier.creditFiles[0], download);
+      return;
     }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Erreur lors du chargement du fichier');
+    if (!dossier.creditsFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
     }
-    return response.blob(); // Convertir la réponse en Blob
-  })
-  .then(blob => {
-    const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-
-    if (download) {
-      // Télécharger le fichier
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    // Extract ID from the file path if possible
+    const fileId = this.extractFileId(dossier.creditsFile);
+    if (fileId) {
+      this.creditsFileService.downloadCreditFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = dossier.creditsFile?.split('/').pop() || 'file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error downloading credit file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
     } else {
-      // Ouvrir dans un nouvel onglet
-      window.open(blobUrl, '_blank');
-    }
-  })
-  .catch(error => {
-    console.error('Erreur:', error);
-    alert('Impossible de charger le fichier.');
-  });
-}
-  // Méthode pour basculer l'affichage de la sélection de statut
-  toggleStatusSelection() {
-    this.showStatusSelection = !this.showStatusSelection;
-    if (!this.showStatusSelection) {
-      this.selectedStatus = '';
+      alert('Impossible de déterminer l\'ID du fichier.');
     }
   }
+
+  public viewSingleCreditFile(creditFile: any, download: boolean = false): void {
+    if (!creditFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+    const fileId = typeof creditFile === 'object' ? creditFile.id : this.extractFileId(creditFile);
+    if (fileId) {
+      console.log('Fetching credit file with ID:', fileId);
+      this.creditsFileService.downloadCreditFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (creditFile.filePath || creditFile).split('/').pop() || 'credit_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching credit file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', creditFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    // Check if we have multiple caution files
+    if (dossier.cautionFiles && dossier.cautionFiles.length > 0) {
+      // If we have multiple files but no specific one is selected, show the first one
+      this.viewSingleCautionsFile(dossier.cautionFiles[0], download);
+      return;
+    }
+
+    // Legacy support for single file path
+    if (!dossier.cautionsFile) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+    const fileId = this.extractFileId(dossier.cautionsFile);
+    if (fileId) {
+      this.cautionsFileService.downloadCautionsFile(fileId).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = dossier.cautionsFile?.split('/').pop() || 'file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error downloading caution file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      alert('Impossible de déterminer l\'ID du fichier.');
+    }
+  }
+
+  // Helper method to view a single caution file
+  public viewSingleCautionsFile(cautionsFile: any, download: boolean = false): void {
+    if (!cautionsFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+
+    const fileId = typeof cautionsFile === 'object' ? cautionsFile.id : this.extractFileId(cautionsFile);
+    if (fileId) {
+      console.log('Fetching caution file with ID:', fileId);
+      this.cautionsFileService.downloadCautionsFile(fileId).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (cautionsFile.filePath || cautionsFile).split('/').pop() || 'cautions_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching caution file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', cautionsFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  // Helper method to view a single LC file
+  public viewSingleLcFile(lcFile: any, download: boolean = false): void {
+    if (!lcFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+
+    const fileId = typeof lcFile === 'object' ? lcFile.id : this.extractFileId(lcFile);
+    if (fileId) {
+      console.log('Fetching LC file with ID:', fileId);
+      this.lcFileService.downloadLcFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (lcFile.filePath || lcFile).split('/').pop() || 'lc_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching LC file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', lcFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.chequeFiles || dossier.chequeFiles.length === 0) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+  
+    // If there's only one cheque file, view that one directly
+    if (dossier.chequeFiles.length === 1) {
+      const chequeFile = dossier.chequeFiles[0];
+      this.viewSingleChequeFile(chequeFile, download);
+      return;
+    }
+  
+    // If there are multiple files, let the user select one
+    const fileIndex = prompt(`Plusieurs fichiers de chèques disponibles (${dossier.chequeFiles.length}). Entrez le numéro du fichier à consulter (1-${dossier.chequeFiles.length}):`);
+  
+    if (fileIndex === null) {
+      // User cancelled
+      return;
+    }
+  
+    const index = parseInt(fileIndex) - 1;
+    if (isNaN(index) || index < 0 || index >= dossier.chequeFiles.length) {
+      alert('Numéro de fichier invalide.');
+      return;
+    }
+  
+    const selectedFile = dossier.chequeFiles[index];
+    this.viewSingleChequeFile(selectedFile, download);
+  }
+
+  // Helper method to view a single cheque file
+  public viewSingleChequeFile(chequeFile: any, download: boolean = false): void {
+    if (!chequeFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+
+    const fileId = typeof chequeFile === 'object' ? chequeFile.id : this.extractFileId(chequeFile);
+    if (fileId) {
+      console.log('Fetching cheque file with ID:', fileId);
+      this.chequeFileService.downloadChequeFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (chequeFile.filePath || chequeFile).split('/').pop() || 'cheque_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching cheque file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', chequeFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  // Helper method to extract file ID from path
+  private extractFileId(filePath: string): number | null {
+    if (!filePath) return null;
+    // Try to extract ID from common URL patterns like /download/123 or /files/123_
+    const match = filePath.match(/\/download\/(\d+)|\/[^/]+\/(\d+)[_/]/);
+    if (match) {
+      return parseInt(match[1] || match[2], 10);
+    }
+    console.warn('Could not extract ID from file path:', filePath);
+    return null;
+  }
+
+  /**
+   * Toggle the status selection UI visibility
+   */
+toggleStatusSelection(): void {
+  this.showStatusSelection = !this.showStatusSelection;
+}
 
   formatDate(dateString: string): string {
     if (!dateString) return 'Date inconnue';
