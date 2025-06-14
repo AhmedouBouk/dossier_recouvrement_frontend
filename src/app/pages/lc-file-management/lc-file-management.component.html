@@ -76,9 +76,6 @@
       </div>
     </div>
 
-    <!-- Actions Bar -->
-    
-
     <!-- Tableau des dossiers et leurs fichiers LC -->
     <div *ngIf="!isLoading" class="table-container">
       <table>
@@ -125,11 +122,6 @@
                       </div>
                     </div>
                     
-                    <!-- Nom du fichier -->
-                    <div class="lc-file-cell lc-file-name">
-                      {{ getFileName(lcFile.filePath) }}
-                    </div>
-                    
                     <!-- Date d'upload -->
                     <div class="lc-file-cell lc-file-date">
                       {{ lcFile.uploadDate | date:'dd/MM/yyyy' }}
@@ -159,7 +151,7 @@
 
                       <!-- Supprimer fichier -->
                       <button
-                        class="delete-btn"
+                        class="icon-btn delete-btn"
                         data-tooltip="Supprimer"
                         (click)="deleteLcFile(lcFile)"
                         *ngIf="dossier.status !== 'Clôturé' && roleService.hasPermission('DELETE_LC')"

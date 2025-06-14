@@ -123,11 +123,6 @@
                         </div>
                       </div>
 
-                      <!-- Nom du fichier -->
-                      <div class="caution-cell caution-filename">
-                        {{ getFileName(cautionFile.filePath || null) || 'Aucun fichier' }}
-                      </div>
-
                       <!-- Date de création -->
                       <div class="caution-cell caution-date">
                         {{ cautionFile.uploadDate | date:'dd/MM/yyyy' }}
@@ -157,7 +152,7 @@
 
                         <!-- Supprimer fichier -->
                         <button
-                          class="delete-btn"
+                          class="icon-btn delete-btn"
                           data-tooltip="Supprimer"
                           (click)="deleteCautionFile(cautionFile)"
                           *ngIf="dossier.status !== 'Clôturé' && roleService.hasPermission('DELETE_CAUTION')"

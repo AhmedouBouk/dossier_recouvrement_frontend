@@ -44,12 +44,6 @@
             </div>
           </div>
 
-          
-
-          
-
-          
-
           <div class="form-group">
             <label for="file">Fichier *</label>
             <div class="file-input-container">
@@ -129,11 +123,6 @@
                         </div>
                       </div>
 
-                      <!-- Nom du fichier -->
-                      <div class="garantie-cell garantie-filename">
-                        {{ getFileName(chequeFile.filePath || null) || 'Aucun fichier' }}
-                      </div>
-
                       <!-- Date de création -->
                       <div class="garantie-cell garantie-date">
                         {{ chequeFile.uploadDate | date:'dd/MM/yyyy' }}
@@ -163,7 +152,7 @@
 
                         <!-- Supprimer fichier -->
                         <button
-                          class="delete-btn"
+                          class="icon-btn delete-btn"
                           data-tooltip="Supprimer"
                           (click)="deleteChequeFile(chequeFile)"
                           *ngIf="dossier.status !== 'Clôturé' && roleService.hasPermission('DELETE_CHEQUE')"

@@ -4,7 +4,7 @@
   top: 0;
   left: 270px;
   width: calc(100vw - 270px);
-  height: 70px;
+  height: 60px;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -37,7 +37,7 @@
 
 /* Adjusted margin for the main content to account for the taller navbar */
 body, .main-content, app-root {
-  margin-top: 70px !important;
+  margin-top: 60px !important; /* Change from 70px to 60px */
   transition: margin-top 0.3s ease;
 }
 
@@ -184,8 +184,8 @@ body, .main-content, app-root {
 }
 
 .user-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 30px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   display: flex;

@@ -505,27 +505,9 @@
         </div>
       </div>
 
-      <div class="card mb-3">
-        <div class="card-header" id="headingChequeFiles">
-          
-        </div>
-        <div id="collapseChequeFiles" class="collapse" aria-labelledby="headingChequeFiles" data-bs-parent="#accordionExample">
-          <div class="card-body">
-            <app-cheque-file-management [dossierId]="dossier?.id"></app-cheque-file-management>
-          </div>
-        </div>
-      </div>
+      
 
-      <div class="card mb-3">
-        <div class="card-header" id="headingCautionFiles">
-        
-        </div>
-        <div id="collapseCautionFiles" class="collapse" aria-labelledby="headingCautionFiles" data-bs-parent="#accordionExample">
-          <div class="card-body">
-            <app-caution-file-management [dossierId]="dossier?.id"></app-caution-file-management>
-          </div>
-        </div>
-      </div>
+      
 
       <div class="actions">
         <button class="back-btn" (click)="goBack()">
