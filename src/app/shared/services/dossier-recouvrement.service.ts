@@ -1,36 +1,28 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent } from '@angular/common/http';
-import { catchError, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, Observable, of, BehaviorSubject } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { DossierRecouvrement } from '../models/dossier-recouvrement.model';
 import { environment } from './../../../environments/environment';
-import {jsPDF } from 'jspdf';
-import { map } from 'rxjs/operators';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { jsPDF } from 'jspdf';
 import { CautionsFileService } from './cautions-file.service';
 import { CreditsFileService } from './credits-file.service';
 import { GarantieService } from './garantie.service';
-// Mise à jour du composant ListDossier pour fusionner tous les PDFs
-import { Component, OnInit, ViewChild } from '@angular/core';
-
-import { firstValueFrom } from 'rxjs';
-
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class DossierRecouvrementService {
-  private apiUrl = `${environment.apiUrl}/dossiers`;  // Updated to match backend endpoint
- public detailsPdfBlobs: { [id: number]: Blob } = {};
+  private readonly apiUrl = `${environment.apiUrl}/dossiers`;  // Updated to match backend endpoint
+  private readonly rejetUrl = `${environment.apiUrl}/rejets`;  // URL pour les rejets
+  public detailsPdfBlobs: { [id: number]: Blob } = {};
  
-  constructor
-  (private http: HttpClient,
-   private garantieService: GarantieService,
-   private creditService:CreditsFileService,
-   private cautionService:CautionsFileService
-
-  ) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly garantieService: GarantieService,
+    private readonly creditService: CreditsFileService,
+    private readonly cautionService: CautionsFileService
+  ) { }
 
   // Get all dossiers
   getDossiers(): Observable<DossierRecouvrement[]> {
@@ -53,6 +45,19 @@ export class DossierRecouvrementService {
   // Update dossier
   updateDossier(id: number, dossier: DossierRecouvrement): Observable<DossierRecouvrement> {
     return this.http.put<DossierRecouvrement>(`${this.apiUrl}/update/${id}`, dossier);
+  }
+  
+  /**
+   * Crée un rejet pour un dossier avec notification aux utilisateurs spécifiés
+   * @param dossierId ID du dossier à rejeter
+   * @param motif Motif du rejet
+   * @param typesUtilisateurs Types d'utilisateurs à notifier
+   * @param utilisateursIds IDs des utilisateurs spécifiques à notifier
+   * @returns Observable avec la réponse du serveur
+   */
+  createRejet(dossierId: number, motif: string, typesUtilisateurs: string[], utilisateursIds: number[]): Observable<any> {
+    const payload = { motif, typesUtilisateurs, utilisateursIds };
+    return this.http.post(`${environment.apiUrl}/rejets/dossiers/${dossierId}`, payload);
   }
   getChequeFileUrl(dossierId: number): Observable<string | null> {
     return this.http.get(`${this.apiUrl}/${dossierId}/cheque-file`, { responseType: 'text' }).pipe(
@@ -135,10 +140,23 @@ deleteComment(commentId: number): Observable<void> {
   return this.http.delete<void>(`${environment.apiUrl}/api/dossiers/comments/${commentId}`);
 }
 
-// New method to send rejection notification
+// Méthode obsolète - à utiliser uniquement pour la compatibilité avec le code existant
 sendRejectionNotification(dossierId: number, reason: string, userTypes: string[]): Observable<any> {
   const payload = { reason, userTypes };
   return this.http.post(`${environment.apiUrl}/api/dossiers/${dossierId}/reject-notification`, payload);
+}
+
+// Méthode pour créer un rejet avec notification aux utilisateurs spécifiques
+// Déjà implémentée plus haut
+
+// Récupérer les rejets d'un dossier
+getRejetsForDossier(dossierId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${environment.apiUrl}/api/rejets/dossiers/${dossierId}`);
+}
+
+// Marquer un rejet comme traité
+marquerRejetCommeTraite(rejetId: number): Observable<any> {
+  return this.http.post(`${environment.apiUrl}/api/rejets/${rejetId}/traiter`, {});
 }
 
 genererMiseEnDemeure(dossier: DossierRecouvrement) {
@@ -418,5 +436,12 @@ getDossiersArchives(): Observable<DossierRecouvrement[]> {
   return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}/archives`);
 }
 
+/**
+ * Réinitialise l'état de validation d'un dossier après traitement d'un rejet
+ * @param dossierId L'ID du dossier à réinitialiser
+ */
+resetValidationState(dossierId: number): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/${dossierId}/reset-validation`, {});
+}
   
 }
