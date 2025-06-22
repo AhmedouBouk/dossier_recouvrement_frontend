@@ -53,11 +53,18 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
   selectedStatus: string = '';
   commentairesParDossier: { [id: number]: any[] } = {};
   // Liste des statuts disponibles
-  statusOptions = [
-    'EN_COURS',
-    'ARCHIVEE'
-  ];
-  
+ statusOptions = [
+  'EN_COURS',
+  'CLIENT_RELANCE',
+  'PROTOCOLE_SIGNE',
+  'RECOUVREMENT_AMIABLE',
+  'EN_JUSTICE',
+  'JUGEMENT_RENDU',
+  'ADJUDICATION_EN_COURS',
+  'CLOTURE',
+  'REJETE'
+];
+
   // Mapping pour l'affichage des statuts
   statusDisplayMap: { [key: string]: string } = {
     'EN_COURS': 'En cours',
