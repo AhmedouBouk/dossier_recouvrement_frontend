@@ -1,0 +1,344 @@
+/* -------------------------------------------------- */
+/* 1. Disposition générale de la page                */
+/* -------------------------------------------------- */
+.main-content {
+  padding: 32px;
+  max-width: calc(100vw - 290px);
+  margin-left: 270px;
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+  background-color: #f8fafc;
+}
+
+.container {
+  max-width: calc(100vw - 290px);
+}
+
+/* -------------------------------------------------- */
+/* 2. Messages                                        */
+/* -------------------------------------------------- */
+.error-message,
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+}
+
+/* -------------------------------------------------- */
+/* 3. État de chargement                              */
+/* -------------------------------------------------- */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+/* -------------------------------------------------- */
+/* 4. Tableau principal                               */
+/* -------------------------------------------------- */
+.table-container {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead tr {
+  background-color: #f8f9fa;
+}
+
+th,
+td {
+  padding: 15px 20px;
+  text-align: left;
+  font-size: 16px;
+}
+
+th {
+  color: #333;
+  font-weight: 600;
+}
+
+td {
+  border-top: 1px solid #eee;
+}
+
+tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* -------------------------------------------------- */
+/* 5. Cellules cliquables (s’il y en a)               */
+/* -------------------------------------------------- */
+.clickable-cell {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 15px 20px;
+  margin: -15px -20px;
+  width: calc(100% + 40px);
+  text-align: left;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.clickable-cell:hover {
+  color: #1d4ed8;
+  background-color: rgba(59, 130, 246, 0.05);
+  text-decoration: underline;
+}
+
+.clickable-cell:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+/* -------------------------------------------------- */
+/* 6. Boutons                                         */
+/* -------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.btn-success {
+  background-color: #10b981;
+  color: #fff;
+  border: 1px solid #059669;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  background-color: #f9fafb;
+  color: #374151;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* -------------------------------------------------- */
+/* 7. Badges (état Traité / En attente)               */
+/* -------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* -------------------------------------------------- */
+/* 8. Bloc « motif de rejet » façon “garantie-item”   */
+/* -------------------------------------------------- */
+.garantie-item {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+/* Trois colonnes : motif / date / actions */
+.garantie-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 180px; /* ajuste ici si nécessaire */
+  gap: 16px;
+  align-items: center;
+}
+
+/* Texte du motif (multi-lignes) */
+.motif-text {
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Colonne « actions » (badge + bouton) */
+.garantie-actions {
+  display: flex;
+  align-items: center;      /* verticalement centré */
+  justify-content: flex-start;
+  gap: 10px;                /* espace entre badge et bouton */
+}
+
+/* Date à droite, typographie plus discrète */
+.garantie-date {
+  font-size: 13px;
+  color: #555;
+}
+
+/* -------------------------------------------------- */
+/* 9. Messages “aucun dossier”                        */
+/* -------------------------------------------------- */
+.no-dossiers-message {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.no-dossiers-message i {
+  font-size: 48px;
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.no-dossiers-message p {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* -------------------------------------------------- */
+/* 10. Animation de rotation (loader)                 */
+/* -------------------------------------------------- */
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* -------------------------------------------------- */
+/* 11. Responsive                                     */
+/* -------------------------------------------------- */
+@media (max-width: 1200px) {
+  .main-content,
+  .container {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content { padding: 15px; }
+
+  th, td { padding: 12px 10px; font-size: 14px; }
+  .btn { font-size: 11px; padding: 6px 10px; }
+  .btn-sm { font-size: 10px; padding: 4px 8px; }
+
+  .garantie-row {
+    grid-template-columns: 1fr 120px 150px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  th, td { padding: 8px 6px; font-size: 12px; }
+  .btn { font-size: 10px; padding: 4px 8px; }
+  .btn-sm { font-size: 9px; padding: 3px 6px; }
+
+  .garantie-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .garantie-date,
+  .garantie-actions { justify-content: flex-start; }
+}
+
+/* -------------------------------------------------- */
+/* 12. Impression & accessibilité                     */
+/* -------------------------------------------------- */
+@media print {
+  .main-content { margin: 0; padding: 0; }
+  .btn { display: none; }
+}
+
+.clickable-cell:focus,
+.btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

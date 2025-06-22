@@ -9,7 +9,7 @@ import { Garantie } from '../models/garantie.model';
   providedIn: 'root',
 })
 export class GarantieService {
-  private apiUrl = `${environment.apiUrl}/grantie`;
+  private apiUrl = `${environment.apiUrl}/garantie`;
 
   constructor(private http: HttpClient) {}
 
@@ -55,8 +55,8 @@ export class GarantieService {
   }
 
   // Télécharger le PDF d'une garantie
-  getGarantiePdf(garantieId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/garantie/${garantieId}/pdf`, {
+  getGarantiePdf(garantieId: number, download: boolean = false): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/garantie/${garantieId}/pdf?download=${download}`, {
       responseType: 'blob'
     });
   }
@@ -86,7 +86,7 @@ export class GarantieService {
   }
 
 downloadPdfByDossier(id: number): Observable<Blob> {
-  return this.http.get(`/api/garanties/pdf/${id}`, {
+  return this.http.get(`${this.apiUrl}/garantie/${id}/pdf`, {
     responseType: 'blob'
   });
 }

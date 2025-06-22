@@ -18,6 +18,7 @@ import autoTable from 'jspdf-autotable';
 
 import { HttpClient } from '@angular/common/http';
 import { CautionsFileService } from 'src/app/shared/services/cautions-file.service';
+import { UserService } from '../../../shared/services/user.service';
 
 @Component({
   selector: 'app-dossier-recouvrement-list',
@@ -33,9 +34,12 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   showRejectDialog: boolean = false;
   rejectReason: string = '';
-  selectedUserTypesForNotification: string[] = [];
-  availableUserTypes: string[] = ['Agence', 'Recouvrement', 'Risque', 'Do', 'Admin'];
+  selectedUsersForNotification: number[] = []; // IDs des utilisateurs sélectionnés
+  selectedUserTypesForNotification: string[] = []; // Types d'utilisateurs sélectionnés
+  usersByType: { [type: string]: any[] } = {}; // Utilisateurs groupés par type
+  availableUserTypes: string[] = ['Do', 'Agence', 'Risque'];
   currentDossierForRejection: DossierRecouvrement | null = null;
+  rejectDialogStep: number = 1; // Étape actuelle du dialogue (1, 2 ou 3)
 
   statusEnum = EtatValidation; // Remplace etatValidationEnum
 
@@ -62,12 +66,10 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private cautionService: CautionsFileService,
-    
-    
-   private creditService: CreditsFileService,
+    private creditService: CreditsFileService,
     private garantieService: GarantieService,
-    private mergeService: DossierRecouvrementService
-    
+    private mergeService: DossierRecouvrementService,
+    private userService: UserService
   )
    {
     this.searchSubject.pipe(
@@ -1105,8 +1107,6 @@ debugListes(): void {
 
 
 
-// Propriétés à ajouter dans votre composant
-
 // Méthodes à ajouter dans votre composant
 
 /**
@@ -1129,6 +1129,9 @@ openRejectDialog(dossier: DossierRecouvrement): void {
   this.currentDossierForRejection = dossier;
   this.rejectReason = ''; // Reset reason
   this.selectedUserTypesForNotification = []; // Reset selected user types
+  this.selectedUsersForNotification = []; // Reset selected users
+  this.usersByType = {}; // Reset users by type
+  this.rejectDialogStep = 1; // Reset to first step
   this.showRejectDialog = true;
   this.selectedDossierForValidation = null; // Close the validation menu
 }
@@ -1138,11 +1141,101 @@ onUserTypeChange(userType: string, event: any): void {
     this.selectedUserTypesForNotification.push(userType);
   } else {
     this.selectedUserTypesForNotification = this.selectedUserTypesForNotification.filter(type => type !== userType);
+    // Supprimer également les utilisateurs de ce type qui ont été sélectionnés
+    this.selectedUsersForNotification = this.selectedUsersForNotification.filter(userId => {
+      const user = this.findUserById(userId);
+      return user && !user.userType.includes(userType);
+    });
+  }
+}
+
+// Trouver un utilisateur par son ID
+findUserById(userId: number): any {
+  for (const type in this.usersByType) {
+    const user = this.usersByType[type].find(u => u.id === userId);
+    if (user) return user;
+  }
+  return null;
+}
+
+// Charger les utilisateurs par type
+loadUsersByTypes(): void {
+  if (this.selectedUserTypesForNotification.length === 0) {
+    this.usersByType = {};
+    return;
+  }
+  
+  this.isLoading = true;
+  this.userService.getUsersByTypes(this.selectedUserTypesForNotification).subscribe({
+    next: (users) => {
+      // Grouper les utilisateurs par type
+      this.usersByType = {};
+      users.forEach(user => {
+        if (!this.usersByType[user.userType]) {
+          this.usersByType[user.userType] = [];
+        }
+        this.usersByType[user.userType].push(user);
+      });
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Erreur lors du chargement des utilisateurs:', error);
+      this.error = 'Erreur lors du chargement des utilisateurs. Veuillez réessayer.';
+      this.isLoading = false;
+    }
+  });
+}
+
+// Gérer la sélection d'un utilisateur
+onUserSelectionChange(userId: number, event: any): void {
+  if (event.target.checked) {
+    if (!this.selectedUsersForNotification.includes(userId)) {
+      this.selectedUsersForNotification.push(userId);
+    }
+  } else {
+    this.selectedUsersForNotification = this.selectedUsersForNotification.filter(id => id !== userId);
+  }
+}
+
+// Passer à l'étape suivante du dialogue
+nextRejectStep(): void {
+  if (this.rejectDialogStep === 1) {
+    // Vérifier si au moins un type d'utilisateur est sélectionné
+    if (this.selectedUserTypesForNotification.length === 0) {
+      this.error = 'Veuillez sélectionner au moins un type d\'utilisateur.';
+      setTimeout(() => this.error = null, 3000);
+      return;
+    }
+    // Charger les utilisateurs pour les types sélectionnés
+    this.loadUsersByTypes();
+    this.rejectDialogStep = 2;
+  } else if (this.rejectDialogStep === 2) {
+    // Vérifier si au moins un utilisateur est sélectionné
+    if (this.selectedUsersForNotification.length === 0) {
+      this.error = 'Veuillez sélectionner au moins un utilisateur à notifier.';
+      setTimeout(() => this.error = null, 3000);
+      return;
+    }
+    this.rejectDialogStep = 3;
+  }
+}
+
+// Revenir à l'étape précédente
+previousRejectStep(): void {
+  if (this.rejectDialogStep > 1) {
+    this.rejectDialogStep--;
   }
 }
 
 confirmRejectDossier(): void {
   if (!this.currentDossierForRejection) return;
+  
+  // Vérifier si un motif est saisi
+  if (!this.rejectReason.trim()) {
+    this.error = 'Veuillez saisir un motif de rejet.';
+    setTimeout(() => this.error = null, 3000);
+    return;
+  }
 
   this.isLoading = true;
   this.error = null;
@@ -1153,23 +1246,32 @@ confirmRejectDossier(): void {
   // First, update the dossier status
   this.dossierService.updateDossier(dossierId, updatedDossier).subscribe({
     next: () => {
-      // Then, send the rejection notification
-      console.log(`Notification sent to: ${this.selectedUserTypesForNotification.join(', ')} with reason: ${this.rejectReason}`);
+      // Then, create rejection with notifications to selected users
+      console.log(`Rejet créé pour le dossier ${dossierId} avec motif: ${this.rejectReason}`);
+      console.log(`Types d'utilisateurs: ${this.selectedUserTypesForNotification.join(', ')}`);
+      console.log(`Utilisateurs sélectionnés: ${this.selectedUsersForNotification.join(', ')}`);
       
-      this.dossierService.sendRejectionNotification(dossierId, this.rejectReason, this.selectedUserTypesForNotification).subscribe({
+      this.dossierService.createRejet(
+        dossierId, 
+        this.rejectReason, 
+        this.selectedUserTypesForNotification, 
+        this.selectedUsersForNotification
+      ).subscribe({
         next: () => {
-          console.log('Rejection notification sent successfully!');
+          console.log('Rejet créé et notifications envoyées avec succès!');
+          this.loadDossiers();
+          this.showRejectDialog = false; // Close the dialog
+          this.successMessage = `Le dossier #${dossierId} a été refusé avec succès.`;
+          this.hideSuccessMessageAfterDelay();
+          this.isLoading = false;
         },
         error: (notificationErr) => {
-          console.error('Error sending rejection notification:', notificationErr);
-          // Still proceed with loading dossiers even if notification fails
+          console.error('Erreur lors de la création du rejet:', notificationErr);
+          this.error = 'Le dossier a été refusé mais une erreur est survenue lors de l\'envoi des notifications.';
+          this.loadDossiers();
+          this.isLoading = false;
         }
       });
-      
-      this.loadDossiers();
-      this.showRejectDialog = false; // Close the dialog
-      this.successMessage = `Le dossier #${dossierId} a été refusé avec succès.`;
-      this.hideSuccessMessageAfterDelay();
     },
     error: (err: HttpErrorResponse) => {
       console.error('Erreur lors de la validation du dossier (refus):', err);
@@ -1196,5 +1298,8 @@ cancelReject(): void {
   this.currentDossierForRejection = null;
   this.rejectReason = '';
   this.selectedUserTypesForNotification = [];
+  this.selectedUsersForNotification = [];
+  this.usersByType = {};
+  this.rejectDialogStep = 1;
 }
 }

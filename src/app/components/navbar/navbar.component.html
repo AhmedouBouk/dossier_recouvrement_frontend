@@ -10,7 +10,6 @@
   </div>
   
   <div class="user-actions">
-    <div class="user-profile">
       <div class="user-avatar">
         <i class="material-icons">person</i>
       </div>
@@ -18,7 +17,7 @@
         <span class="user-name">{{ userName }}</span>
         <span class="user-role">{{ userRole }}</span>
       </div>
-    </div>
+    
     
     <button class="btn-logout" (click)="logout()">
       <i class="material-icons">logout</i>
@@ -27,59 +26,3 @@
   </div>
 </nav>
 
-<!-- sidebar.component.html -->
-<aside class="sidebar">
-  <div class="logo">
-    <img src="assets/logo.png" alt="Logo BNM" class="logo-img" />
-    <div class="logo-text">
-      <h3>BNM Systeme</h3>
-      <p>Portail de gestion des dettes</p>
-    </div>
-  </div>
-  
-  <nav class="menu">
-    <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
-      <i class="material-icons">dashboard</i>
-      Dashboard
-    </a>
-    
-    <div class="section-title">Gestion de la récupération</div>
-    
-    <a routerLink="/clients" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadClientPermission()">
-      <i class="material-icons">people</i>
-      Clients
-    </a>
-    <a routerLink="/comptes" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadComptePermission()">
-      <i class="material-icons">account_balance</i>
-      Comptes
-    </a>
-    <a routerLink="/dossiers" routerLinkActive="active" class="menu-item">
-      <i class="material-icons">folder</i>
-      Dossiers Recouvrement
-    </a>
-    <a routerLink="/garanties" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadGrantiePermission()">
-      <i class="material-icons">verified</i>
-      garanties
-    </a>
-
-    <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
-      <i class="material-icons">description</i>
-      Fichiers de chèque
-    </a>
-    <a routerLink="/credits-file-management" routerLinkActive="active" class="menu-item"*ngIf="roleService.hasReadCreditPermission()">
-      <i class="material-icons">credit_card</i>
-Credit    </a>
-    <a routerLink="/lc-file-management" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadLcPermission()">
-      <i class="material-icons">assignment</i>
-                Lettres de Crédit    </a>
-    <a routerLink="/cautions-file-management" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadCautionPermission()">
-      <i class="material-icons">attach_money</i>      cautions
-    </a>
-    
- 
-  
-  
-      
-   
-  </nav>
-</aside>
