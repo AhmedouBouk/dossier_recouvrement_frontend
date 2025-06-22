@@ -264,38 +264,93 @@
       </div>
     </div>
 
-    <!-- Rejection Dialog -->
+    <!-- Rejection Dialog - Multi-étapes -->
     <div *ngIf="showRejectDialog" class="dialog-overlay">
       <div class="dialog-panel">
         <h2>Refuser le Dossier #{{ currentDossierForRejection?.id }}</h2>
-        <p>Veuillez indiquer le motif du refus et les types d'utilisateurs à notifier.</p>
         
-        <div class="form-group">
-          <label for="rejectReason">Motif du Refus:</label>
-          <textarea id="rejectReason" [(ngModel)]="rejectReason" rows="4" placeholder="Saisissez le motif du refus ici..."></textarea>
+        
+        <!-- Étape 1: Sélection des types d'utilisateurs -->
+        <div *ngIf="rejectDialogStep === 1" class="step-content">
+          <p>Sélectionnez les types d'utilisateurs à notifier:</p>
+          <div class="form-group">
+            <div class="user-type-checkboxes">
+              <label *ngFor="let userType of availableUserTypes" class="checkbox-container">
+                <input 
+                  type="checkbox" 
+                  [value]="userType" 
+                  (change)="onUserTypeChange(userType, $event)" 
+                  [checked]="selectedUserTypesForNotification.includes(userType)">
+                {{ userType }}
+                <span class="checkmark"></span>
+              </label>
+            </div>
+          </div>
         </div>
-
-        <div class="form-group">
-          <label>Notifier les types d'utilisateurs:</label>
-          <div class="user-type-checkboxes">
-            <label *ngFor="let userType of availableUserTypes" class="checkbox-container">
-              <input 
-                type="checkbox" 
-                [value]="userType" 
-                (change)="onUserTypeChange(userType, $event)" 
-                [checked]="selectedUserTypesForNotification.includes(userType)">
-              {{ userType }}
-              <span class="checkmark"></span>
-            </label>
+        
+        <!-- Étape 2: Sélection des utilisateurs spécifiques -->
+        <div *ngIf="rejectDialogStep === 2" class="step-content">
+          <p>Sélectionnez les utilisateurs à notifier:</p>
+          <div *ngIf="isLoading" class="loading-spinner">
+            <i class="material-icons rotating">sync</i>
+            Chargement des utilisateurs...
+          </div>
+          <div *ngIf="!isLoading">
+            <div *ngFor="let userType of selectedUserTypesForNotification" class="user-group">
+              <h4>{{ userType }}</h4>
+              <div *ngIf="usersByType[userType] && usersByType[userType].length > 0" class="user-list">
+                <label *ngFor="let user of usersByType[userType]" class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    [value]="user.id" 
+                    (change)="onUserSelectionChange(user.id, $event)" 
+                    [checked]="selectedUsersForNotification.includes(user.id)">
+                  {{ user.nom }} {{ user.prenom }} ({{ user.email }})
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+              <div *ngIf="!usersByType[userType] || usersByType[userType].length === 0" class="no-users">
+                Aucun utilisateur trouvé pour ce type.
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Étape 3: Saisie du motif de rejet -->
+        <div *ngIf="rejectDialogStep === 3" class="step-content">
+          <p>Veuillez indiquer le motif du refus:</p>
+          <div class="form-group">
+            <label for="rejectReason">Motif du Refus:</label>
+            <textarea id="rejectReason" [(ngModel)]="rejectReason" rows="4" placeholder="Saisissez le motif du refus ici..."></textarea>
+          </div>
+          <div class="summary">
+            <p><strong>Récapitulatif:</strong></p>
+            <p>Types d'utilisateurs: {{ selectedUserTypesForNotification.join(', ') }}</p>
+            <p>Nombre d'utilisateurs sélectionnés: {{ selectedUsersForNotification.length }}</p>
           </div>
         </div>
 
+        <!-- Actions du dialogue - différentes selon l'étape -->
         <div class="dialog-actions">
           <button class="btn cancel-btn" (click)="cancelReject()">
             <i class="material-icons">close</i>
             Annuler
           </button>
-          <button class="btn confirm-btn" (click)="confirmRejectDossier()" [disabled]="isLoading">
+          
+          <!-- Bouton Précédent (visible aux étapes 2 et 3) -->
+          <button *ngIf="rejectDialogStep > 1" class="btn back-btn" (click)="previousRejectStep()" [disabled]="isLoading">
+            <i class="material-icons">arrow_back</i>
+            Précédent
+          </button>
+          
+          <!-- Bouton Suivant (visible aux étapes 1 et 2) -->
+          <button *ngIf="rejectDialogStep < 3" class="btn next-btn" (click)="nextRejectStep()" [disabled]="isLoading">
+            <i class="material-icons">arrow_forward</i>
+            Suivant
+          </button>
+          
+          <!-- Bouton Confirmer (visible uniquement à l'étape 3) -->
+          <button *ngIf="rejectDialogStep === 3" class="btn confirm-btn" (click)="confirmRejectDossier()" [disabled]="isLoading">
             <i class="material-icons">check_circle</i>
             Confirmer le refus
           </button>

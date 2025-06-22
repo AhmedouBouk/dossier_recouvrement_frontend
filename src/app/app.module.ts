@@ -44,6 +44,7 @@ import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-ma
 import { AuthInterceptor } from './interceptors/AuthInterceptor';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { RejetListComponent } from './pages/rejets/rejet-list/rejet-list.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,8 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     HistoryComponent,
     AuthLayoutComponent,
     MainLayoutComponent,
-    ChequeFileManagementComponent
+    ChequeFileManagementComponent,
+    RejetListComponent
   ],
   imports: [
     BrowserModule,

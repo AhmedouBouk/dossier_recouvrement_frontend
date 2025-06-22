@@ -24,6 +24,7 @@ import { DossierRecouvrementListComponent } from './pages/dossiers/dossier-recou
 import { DossierRecouvrementDetailsComponent } from './pages/dossiers/dossier-recouvrement-details/dossier-recouvrement-details.component';
 import { DossierRecouvrementAddComponent } from './pages/dossiers/dossier-recouvrement-add/dossier-recouvrement-add.component';
 import { DossierRecouvrementEditComponent } from './pages/dossiers/dossier-recouvrement-edit/dossier-recouvrement-edit.component';
+import { RejetListComponent } from './pages/rejets/rejet-list/rejet-list.component';
 
 // Admin Components
 import { UserListComponent } from './admin/user-list/user-list.component';
@@ -64,6 +65,7 @@ const routes: Routes = [
       { path: 'dossiers/add', component: DossierRecouvrementAddComponent },
       { path: 'dossier-recouvrement/modify/:id', component: DossierRecouvrementEditComponent },
       { path: 'archives', component: DossierRecouvrementListComponent},
+      { path: 'rejets', component: RejetListComponent },
       {
         path: 'admin',
         canActivate: [RoleGuard], // Protège spécifiquement les routes admin
