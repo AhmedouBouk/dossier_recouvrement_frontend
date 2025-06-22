@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { NotificationService } from './notification.service';
 import { DossierRecouvrementService } from './dossier-recouvrement.service';
+import { UserService } from './user.service';
 
 export interface RejetRequest {
   motif: string;
@@ -49,7 +50,8 @@ export class RejetService {
   constructor(
     private readonly http: HttpClient,
     private readonly notificationService: NotificationService,
-    private readonly dossierService: DossierRecouvrementService
+    private readonly dossierService: DossierRecouvrementService,
+    private readonly userService: UserService
   ) { }
 
   /**
@@ -107,5 +109,38 @@ export class RejetService {
    */
   getRejetsPourUtilisateurConnecte(): Observable<Rejet[]> {
     return this.http.get<Rejet[]>(`${this.apiUrl}/mes-rejets`);
+  }
+
+  /**
+   * Envoie une notification à tous les utilisateurs de type Recouvrement
+   * concernant le traitement d'un rejet
+   * @param rejetId L'ID du rejet traité
+   * @param treatedByName Le nom de l'utilisateur qui a traité le rejet
+   */
+  notifyRejetTreated(rejetId: number, treatedByName: string): Observable<any> {
+    // Récupérer d'abord les détails du rejet pour avoir l'ID du dossier
+    return this.http.get<Rejet>(`${this.apiUrl}/${rejetId}`).pipe(
+      switchMap(rejet => {
+        const dossierId = rejet.dossier.id;
+        const titre = `Traitement de rejet - Dossier #${dossierId}`;
+        const message = `Le rejet du dossier ${dossierId} a été traité par ${treatedByName}`;
+        const contenu = `Le rejet concernant le dossier #${dossierId} a été traité par ${treatedByName} le ${new Date().toLocaleString()}. Veuillez consulter le dossier pour plus de détails.`;
+        const lienUrl = `/dossiers/${dossierId}`;
+        
+        // Utiliser la nouvelle méthode notifierParType qui cible spécifiquement les utilisateurs par type
+        // et non par rôle, pour envoyer des notifications à tous les utilisateurs de type 'Recouvrement'
+        return this.notificationService.notifierParType(
+          message,
+          'Recouvrement', // Type d'utilisateur (pas de rôle)
+          lienUrl,
+          titre,
+          contenu
+        ).pipe(
+          tap(notifications => {
+            console.log(`Notifications envoyées à ${notifications?.length ?? 0} utilisateurs de type Recouvrement`);
+          })
+        );
+      })
+    );
   }
 }
