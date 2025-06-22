@@ -1,0 +1,433 @@
+.main-content {
+  padding: 32px;
+  max-width: calc(100vw - 290px);
+  margin-left: 270px;
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+  background-color: #f8fafc;
+}
+
+.container {
+  max-width: calc(100vw - 290px);
+}
+
+/* Messages */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+/* Table Styles */
+.table-container {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead tr {
+  background-color: #f8f9fa;
+}
+
+th {
+  padding: 15px 20px;
+  text-align: left;
+  color: #333;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+td {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+}
+
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.table-success {
+  background-color: #f0fdf4 !important;
+}
+
+.table-success:hover {
+  background-color: #dcfce7 !important;
+}
+
+/* Clickable Cells */
+.clickable-cell {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 15px 20px;
+  margin: -15px -20px;
+  width: calc(100% + 40px);
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.clickable-cell:hover {
+  color: #1d4ed8;
+  background-color: rgba(59, 130, 246, 0.05);
+  text-decoration: underline;
+}
+
+.clickable-cell:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.p-0 {
+  padding: 0 !important;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.btn-success {
+  background-color: #10b981;
+  color: white;
+  border: 1px solid #059669;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  background-color: #f9fafb;
+  color: #374151;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* No Dossiers Message */
+.no-dossiers-message {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.no-dossiers-message i {
+  font-size: 48px;
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.no-dossiers-message p {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Animations */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .main-content {
+    margin-left: 0;
+    max-width: 100%;
+  }
+  .container {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  th,
+  td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .clickable-cell {
+    padding: 12px 10px;
+    margin: -12px -10px;
+    width: calc(100% + 20px);
+  }
+
+  .no-dossiers-message {
+    padding: 30px 15px;
+  }
+
+  .no-dossiers-message i {
+    font-size: 36px;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .btn-sm {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  th,
+  td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .clickable-cell {
+    padding: 8px 6px;
+    margin: -8px -6px;
+    width: calc(100% + 12px);
+    font-size: 12px;
+  }
+
+  .badge {
+    font-size: 9px;
+    padding: 3px 6px;
+  }
+
+  .btn {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .btn-sm {
+    font-size: 9px;
+    padding: 3px 6px;
+  }
+
+  .no-dossiers-message p {
+    font-size: 14px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .main-content {
+    margin: 0;
+    padding: 0;
+  }
+
+  .btn {
+    display: none;
+  }
+
+  tbody tr:hover {
+    transform: none;
+  }
+
+  .clickable-cell:hover {
+    background-color: transparent;
+  }
+}
+
+/* Focus and Accessibility */
+.clickable-cell:focus,
+.btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .table-container {
+    border: 2px solid #000;
+  }
+
+  th,
+  td {
+    border: 1px solid #000;
+  }
+
+  .badge {
+    border: 2px solid currentColor;
+  }
+
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hover effects for better UX */
+tbody tr:hover .clickable-cell {
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+/* Ensure proper spacing and alignment */
+td .btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Loading spinner styling */
+.loading-state .material-icons {
+  font-size: 24px;
+}
+
+/* Error and success message icons */
+.error-message .material-icons,
+.success-message .material-icons {
+  font-size: 20px;
+  flex-shrink: 0;
+}

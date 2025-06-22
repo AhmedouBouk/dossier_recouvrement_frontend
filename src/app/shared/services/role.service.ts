@@ -17,9 +17,10 @@ export class RoleService {
     return '';
   }
 
-
-
- 
+  // General permission check method
+  hasPermission(permission: string): boolean {
+    return this.authService.hasPermission(permission);
+  }
   
 
   // Client permissions
@@ -193,5 +194,12 @@ hasCommentairePermission(): boolean {
 hasValidationPermission(): boolean {
   return this.authService.hasPermission('VALIDATION_DOSSIER');
 }
+hasReadArchivePermission(): boolean {
+  return this.authService.hasPermission('READ_ARCHIVES'); // 
+}
+isNotAdmin(): boolean {
+  return this.authService.getUserRole() !== 'ROLE_ADMIN';
+}
+
 
 }

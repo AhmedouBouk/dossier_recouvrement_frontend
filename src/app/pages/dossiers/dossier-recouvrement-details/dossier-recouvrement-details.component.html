@@ -54,10 +54,7 @@
           <span class="label">Provision</span>
           <span class="value">{{ dossierDetails.provision | currency:'EUR':'symbol':'1.0-0' }}</span>
         </div>
-        <div class="detail-item">
-          <span class="label">Garanties Valeur</span>
-          <span class="value">{{ dossierDetails.garantiesValeur || 'Non spécifié' }}</span>
-        </div>
+        
         <div class="detail-item">
           <span class="label">Status</span>
           <span class="value status-chip" [ngClass]="getStatusClass(dossierDetails.status)">
@@ -70,84 +67,334 @@
             {{ dossierDetails.etatValidation }}
           </span>
         </div>
+
+        <!-- Enhanced Garanties Section -->
+        <div class="detail-item file-section">
+          <span class="label">
+            <i class="material-icons file-type-icon">security</i>
+            Garanties
+          </span>
+          <div class="value">
+            <ng-container *ngIf="dossierDetails.garanties && dossierDetails.garanties.length > 0; else noGaranties">
+              <div class="file-list">
+                <div *ngFor="let garantie of dossierDetails.garanties; let i = index" class="file-card">
+                  <div class="file-header">
+                    <div class="file-info">
+                      <i class="material-icons file-icon">description</i>
+                      <div class="file-details">
+                        <span class="file-title">{{ garantie.titre }}</span>
+                        <span class="file-meta" *ngIf="garantie.uploadDate">
+                          Ajoutée le {{ garantie.uploadDate | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="file-actions">
+                      <button *ngIf="garantie.filePath" 
+                              (click)="viewGarantieFile(dossierDetails, garantie.id, false)" 
+                              class="action-btn view-btn"
+                              title="Voir le fichier">
+                        <i class="material-icons">visibility</i>
+                      </button>
+                      <button *ngIf="garantie.filePath && roleService.hasPermission('download_files')" 
+                              (click)="viewGarantieFile(dossierDetails, garantie.id, true)" 
+                              class="action-btn download-btn"
+                              title="Télécharger le fichier">
+                        <i class="material-icons">download</i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noGaranties>
+              <div class="empty-state">
+                <i class="material-icons">folder_open</i>
+                <span>Aucune garantie disponible</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
         <div class="detail-item">
-  <span class="label">Titre de la garantie</span>
-  <span class="value">{{ dossierDetails.garantiesTitre || 'Non spécifié' }}</span>
-</div>
+          <span class="label">Valeur des garanties</span>
+          <span class="value">{{ dossierDetails.garantiesValeur | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
 
-<div class="detail-item">
-  <span class="label">Valeur de la garantie</span>
-  <span class="value">{{ dossierDetails.garantiesValeur | currency:'EUR':'symbol':'1.0-0' }}</span>
-</div>
+        <!-- Enhanced Fichiers des crédits Section -->
+        <div class="detail-item file-section">
+          <span class="label">
+            <i class="material-icons file-type-icon">account_balance</i>
+            Fichiers des crédits
+          </span>
+          <div class="value">
+            <ng-container *ngIf="dossierDetails.creditFiles && dossierDetails.creditFiles.length > 0; else legacyCreditsFile">
+              <div class="file-list">
+                <div *ngFor="let creditFile of dossierDetails.creditFiles; let i = index" class="file-card">
+                  <div class="file-header">
+                    <div class="file-info">
+                      <i class="material-icons file-icon">description</i>
+                      <div class="file-details">
+                        <span class="file-title">{{ creditFile.title || 'Fichier crédit ' + (i+1) }}</span>
+                        <span class="file-meta" *ngIf="creditFile.uploadDate">
+                          Ajouté le {{ creditFile.uploadDate | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="file-actions">
+                      <button (click)="viewSingleCreditFile(creditFile, false)" 
+                              class="action-btn view-btn"
+                              title="Voir le fichier">
+                        <i class="material-icons">visibility</i>
+                      </button>
+                      <button *ngIf="roleService.hasPermission('download_files')" 
+                              (click)="viewSingleCreditFile(creditFile, true)" 
+                              class="action-btn download-btn"
+                              title="Télécharger le fichier">
+                        <i class="material-icons">download</i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #legacyCreditsFile>
+              <ng-container *ngIf="dossierDetails.creditsFile; else noCreditsFile">
+                <div class="file-list">
+                  <div class="file-card">
+                    <div class="file-header">
+                      <div class="file-info">
+                        <i class="material-icons file-icon">description</i>
+                        <div class="file-details">
+                          <span class="file-title">Fichier des crédits</span>
+                        </div>
+                      </div>
+                      <div class="file-actions">
+                        <button (click)="viewCreditsFile(dossierDetails, false)" 
+                                class="action-btn view-btn"
+                                title="Voir le fichier">
+                          <i class="material-icons">visibility</i>
+                        </button>
+                        <button *ngIf="roleService.hasPermission('download_files')" 
+                                (click)="viewCreditsFile(dossierDetails, true)" 
+                                class="action-btn download-btn"
+                                title="Télécharger le fichier">
+                          <i class="material-icons">download</i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-template>
+            <ng-template #noCreditsFile>
+              <div class="empty-state">
+                <i class="material-icons">folder_open</i>
+                <span>Aucun fichier disponible</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
 
-<div class="detail-item">
-  <span class="label">Fichier de la garantie</span>
-  <span class="value">
-    <ng-container *ngIf="dossierDetails.garantiesFile; else noGarantieFile">
-      <a  (click)="viewGarantieFile(dossierDetails, false)">📄 Voir le fichier</a>
-    </ng-container>
-    <ng-template #noGarantieFile>
-      📂 Aucun fichier
-    </ng-template>
-  </span>
-</div>
-<!-- Fichier des crédits -->
-<div class="detail-item">
-  <span class="label">Fichier des crédits</span>
-  <span class="value">
-    <ng-container *ngIf="dossierDetails.creditsFile; else noCreditsFile">
-      <a (click)="viewCreditsFile(dossierDetails, false)">📄 Voir le fichier</a>
-    </ng-container>
-    <ng-template #noCreditsFile>
-      📂 Aucun fichier
-    </ng-template>
-  </span>
-</div>
+        <!-- Enhanced Fichiers des cautions Section -->
+        <div class="detail-item file-section">
+          <span class="label">
+            <i class="material-icons file-type-icon">verified_user</i>
+            Fichiers des cautions
+          </span>
+          <div class="value">
+            <ng-container *ngIf="dossierDetails.cautionFiles && dossierDetails.cautionFiles.length > 0; else legacyCautionsFile">
+              <div class="file-list">
+                <div *ngFor="let cautionFile of dossierDetails.cautionFiles; let i = index" class="file-card">
+                  <div class="file-header">
+                    <div class="file-info">
+                      <i class="material-icons file-icon">description</i>
+                      <div class="file-details">
+                        <span class="file-title">{{ cautionFile.title || 'Fichier caution ' + (i+1) }}</span>
+                        <span class="file-meta" *ngIf="cautionFile.uploadDate">
+                          Ajouté le {{ cautionFile.uploadDate | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="file-actions">
+                      <button (click)="viewSingleCautionsFile(cautionFile, false)" 
+                              class="action-btn view-btn"
+                              title="Voir le fichier">
+                        <i class="material-icons">visibility</i>
+                      </button>
+                      <button *ngIf="roleService.hasPermission('download_files')" 
+                              (click)="viewSingleCautionsFile(cautionFile, true)" 
+                              class="action-btn download-btn"
+                              title="Télécharger le fichier">
+                        <i class="material-icons">download</i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #legacyCautionsFile>
+              <ng-container *ngIf="dossierDetails.cautionsFile; else noCautionsFile">
+                <div class="file-list">
+                  <div class="file-card">
+                    <div class="file-header">
+                      <div class="file-info">
+                        <i class="material-icons file-icon">description</i>
+                        <div class="file-details">
+                          <span class="file-title">Fichier des cautions</span>
+                        </div>
+                      </div>
+                      <div class="file-actions">
+                        <button (click)="viewCautionsFile(dossierDetails, false)" 
+                                class="action-btn view-btn"
+                                title="Voir le fichier">
+                          <i class="material-icons">visibility</i>
+                        </button>
+                        <button *ngIf="roleService.hasPermission('download_files')" 
+                                (click)="viewCautionsFile(dossierDetails, true)" 
+                                class="action-btn download-btn"
+                                title="Télécharger le fichier">
+                          <i class="material-icons">download</i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-template>
+            <ng-template #noCautionsFile>
+              <div class="empty-state">
+                <i class="material-icons">folder_open</i>
+                <span>Aucun fichier disponible</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
 
-<!-- Fichier des cautions -->
-<div class="detail-item">
-  <span class="label">Fichier des cautions</span>
-  <span class="value">
-    <ng-container *ngIf="dossierDetails.cautionsFile; else noCautionsFile">
-      <a (click)="viewCautionsFile(dossierDetails, false)">📄 Voir le fichier</a>
-    </ng-container>
-    <ng-template #noCautionsFile>
-      📂 Aucun fichier
-    </ng-template>
-  </span>
-</div>
+        <!-- Enhanced Fichier des lettres de crédit Section -->
+        <div class="detail-item file-section">
+          <span class="label">
+            <i class="material-icons file-type-icon">credit_card</i>
+            Fichier des lettres de crédit
+          </span>
+          <div class="value">
+            <ng-container *ngIf="dossierDetails.lcFiles && dossierDetails.lcFiles.length > 0; else lcFileSingular">
+              <div class="file-list">
+                <div *ngFor="let lcFile of dossierDetails.lcFiles; let i = index" class="file-card">
+                  <div class="file-header">
+                    <div class="file-info">
+                      <i class="material-icons file-icon">description</i>
+                      <div class="file-details">
+                        <span class="file-title">{{ lcFile.title || 'LC ' + (i+1) }}</span>
+                        <span class="file-meta" *ngIf="lcFile.uploadDate">
+                          Ajouté le {{ lcFile.uploadDate | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="file-actions">
+                      <button (click)="viewSingleLcFile(lcFile, false)" 
+                              class="action-btn view-btn"
+                              title="Voir le fichier">
+                        <i class="material-icons">visibility</i>
+                      </button>
+                      <button *ngIf="roleService.hasPermission('download_files')" 
+                              (click)="viewSingleLcFile(lcFile, true)" 
+                              class="action-btn download-btn"
+                              title="Télécharger le fichier">
+                        <i class="material-icons">download</i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #lcFileSingular>
+              <ng-container *ngIf="dossierDetails.lcFile; else noLCFile">
+                <div class="file-list">
+                  <div class="file-card">
+                    <div class="file-header">
+                      <div class="file-info">
+                        <i class="material-icons file-icon">description</i>
+                        <div class="file-details">
+                          <span class="file-title">Fichier des lettres de crédit</span>
+                        </div>
+                      </div>
+                      <div class="file-actions">
+                        <button (click)="viewLcFile(dossierDetails, false)" 
+                                class="action-btn view-btn"
+                                title="Voir le fichier">
+                          <i class="material-icons">visibility</i>
+                        </button>
+                        <button *ngIf="roleService.hasPermission('download_files')" 
+                                (click)="viewLcFile(dossierDetails, true)" 
+                                class="action-btn download-btn"
+                                title="Télécharger le fichier">
+                          <i class="material-icons">download</i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-template>
+            <ng-template #noLCFile>
+              <div class="empty-state">
+                <i class="material-icons">folder_open</i>
+                <span>Aucun fichier disponible</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
 
-<!-- Fichier des lettres de crédit (LC) -->
-<div class="detail-item">
-  <span class="label">Fichier des lettres de crédit</span>
-  <span class="value">
-    <ng-container *ngIf="dossierDetails.lcFile; else noLCFile">
-      <a (click)="viewLcFile(dossierDetails, false)">📄 Voir le fichier</a>
-    </ng-container>
-    <ng-template #noLCFile>
-      📂 Aucun fichier
-    </ng-template>
-  </span>
-</div>
-
-<!-- Fichier des chèques -->
-<div class="detail-item">
-  <span class="label">Fichier des chèques</span>
-  <span class="value">
-    <ng-container *ngIf="dossierDetails.chequeFile; else noChequeFile">
-      <a (click)="viewChequeFile(dossierDetails, false)">📄 Voir le fichier</a>
-    </ng-container>
-    <ng-template #noChequeFile>
-      📂 Aucun fichier
-    </ng-template>
-  </span>
-</div>
+        <!-- Enhanced Fichier des chèques Section -->
+        <div class="detail-item file-section">
+          <span class="label">
+            <i class="material-icons file-type-icon">receipt</i>
+            Fichier des chèques
+          </span>
+          <div class="value">
+            <ng-container *ngIf="dossierDetails.chequeFiles && dossierDetails.chequeFiles.length > 0; else noChequeFile">
+              <div class="file-list">
+                <div *ngFor="let chequeFile of dossierDetails.chequeFiles; let i = index" class="file-card">
+                  <div class="file-header">
+                    <div class="file-info">
+                      <i class="material-icons file-icon">description</i>
+                      <div class="file-details">
+                        <span class="file-title">{{ chequeFile.title || 'Chèque ' + (i+1) }}</span>
+                        <span class="file-meta" *ngIf="chequeFile.uploadDate">
+                          Ajouté le {{ chequeFile.uploadDate | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="file-actions">
+                      <button (click)="viewSingleChequeFile(chequeFile, false)" 
+                              class="action-btn view-btn"
+                              title="Voir le fichier">
+                        <i class="material-icons">visibility</i>
+                      </button>
+                      <button *ngIf="roleService.hasPermission('download_files')" 
+                              (click)="viewSingleChequeFile(chequeFile, true)" 
+                              class="action-btn download-btn"
+                              title="Télécharger le fichier">
+                        <i class="material-icons">download</i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noChequeFile>
+              <div class="empty-state">
+                <i class="material-icons">folder_open</i>
+                <span>Aucun fichier disponible</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
 
       </div>
 
       <!-- Comments Section -->
-<!-- Comments Section -->
-<div class="comments-section" *ngIf="canComment()">
+      <div class="comments-section" *ngIf="canComment()">
         <h3 class="section-title">Commentaires</h3>
         
         <!-- Add Comment Form -->
@@ -170,7 +417,7 @@
               [(ngModel)]="selectedStatus"
               class="status-dropdown">
               <option value="">-- Sélectionner un statut --</option>
-              <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+              <option *ngFor="let status of statusOptions" [value]="status">{{ statusDisplayMap[status] || status }}</option>
             </select>
           </div>
           
@@ -182,6 +429,7 @@
               placeholder="{{ showStatusSelection ? 'Ajouter un commentaire avec le changement de statut...' : 'Ajouter un commentaire...' }}"
               [disabled]="isLoading">
           </div>
+         <div class="reminder-row">
           <div class="reminder-datetime-fields">
             <label for="reminder-date">Jour du rappel :</label>
             <input id="reminder-date" type="date" [(ngModel)]="reminderDate" [disabled]="isLoading">
@@ -189,12 +437,13 @@
             <input id="reminder-time" type="time" [(ngModel)]="reminderTime" [disabled]="isLoading">
           </div>
           <button 
-            class="add-comment-btn" 
+            class="add-comment-btn"
             (click)="addComment()"
             [disabled]="(!newComment.trim() || (showStatusSelection && !selectedStatus)) || isLoading">
             <i class="material-icons">send</i>
             {{ isLoading ? 'Envoi...' : 'Ajouter' }}
           </button>
+        </div>
         </div>
 
         <!-- Comments List -->
@@ -233,7 +482,7 @@
                 <label for="edit-reminder-time">Heure du rappel :</label>
                 <input id="edit-reminder-time" type="time" [(ngModel)]="comment.editReminderTime">
                 <span *ngIf="comment.reminderDateTime" class="info-previous-reminder">
-                  Ancienne date de rappel : {{ formatDate(comment.reminderDateTime) }}
+                  Ancienne date de rappel : {{ formatDate(comment.reminderDateTime) }}
                 </span>
               </div>
               
@@ -256,12 +505,21 @@
         </div>
       </div>
 
-      <div class="form-actions">
+      
+
+      
+
+      <div class="actions">
         <button class="back-btn" (click)="goBack()">
           <i class="material-icons">arrow_back</i>
           Retour
         </button>
+        <button class="pdf-btn" (click)="generatePDF()">
+          <i class="material-icons">picture_as_pdf</i>
+          Générer PDF
+        </button>
       </div>
     </div>
   </div>
+
 </main>

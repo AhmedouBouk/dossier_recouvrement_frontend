@@ -4,14 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DossierRecouvrementService } from 'src/app/shared/services/dossier-recouvrement.service';
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
+import { Garantie } from 'src/app/shared/models/garantie.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserDataService } from 'src/app/shared/services/user-data.service';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 import { GarantieService } from 'src/app/shared/services/garantie.service';
 import { LcFileService } from 'src/app/shared/services/lc-file.service';
 import { CreditsFileService } from 'src/app/shared/services/credits-file.service';
 import { ChequeFileService } from 'src/app/shared/services/cheque-file.service';
 import { CautionsFileService } from 'src/app/shared/services/cautions-file.service';
 import { RoleService } from 'src/app/shared/services/role.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 interface Comment {
   id?: number;
@@ -32,32 +36,33 @@ interface Comment {
   templateUrl: './dossier-recouvrement-details.component.html',
   styleUrls: ['./dossier-recouvrement-details.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
+  schemas: [NO_ERRORS_SCHEMA]
 })
 export class DossierRecouvrementDetailsComponent implements OnInit {
-  reminderDate: string = '';
+  reminderDate: string = ''; 
   reminderTime: string = '';
   currentUserId: number | null = null; // ID de l'utilisateur connecté
   dossierDetails: DossierRecouvrement | null = null;
+  dossier: any;
   comments: Comment[] = [];
   newComment: string = '';
   isLoading = false;
   errorMessage = '';
-  showStatusSelection = false;
+  showStatusSelection = false; // Property to control status selection UI visibility
   selectedStatus: string = '';
-
+  commentairesParDossier: { [id: number]: any[] } = {};
   // Liste des statuts disponibles
   statusOptions = [
-    'En cours de traitement',
-    'Relancé',
-    'Mis en demeure',
-    'Protocole d\'accord signé',
-    'Recouvrement amiable',
-    'Non respect du protocole',
-    'En justice',
-    'Adjudication des garanties',
-    'Clôturé'
+    'EN_COURS',
+    'ARCHIVEE'
   ];
+  
+  // Mapping pour l'affichage des statuts
+  statusDisplayMap: { [key: string]: string } = {
+    'EN_COURS': 'En cours',
+    'ARCHIVEE': 'Archivé'
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -106,41 +111,92 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
     this.router.navigate(['/dossiers']);
   }
   
-  viewGarantieFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.garantiesFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
+  viewGarantieFile(dossier: DossierRecouvrement, garantieIdOrIndex?: number | string, download: boolean = false): void {
+    if (!dossier.garanties || dossier.garanties.length === 0) {
+      alert('Aucune garantie trouvée pour ce dossier.');
       return;
     }
 
-    const fileUrl = this.garantieService.getFullFileUrl(dossier.garantiesFile);
-    const token = this.authService.getToken();
+    // If garantieId is provided, view that specific garantie
+    // Otherwise, if there's only one garantie, view that one
+    // If multiple garanties and no ID specified, show selection dialog
+    let selectedGarantie: Garantie | undefined;
+    
+    if (typeof garantieIdOrIndex === 'number') {
+      // If it's a number, treat it as an ID
+      selectedGarantie = dossier.garanties.find(g => g.id === garantieIdOrIndex);
+      if (!selectedGarantie) {
+        alert('Garantie non trouvée.');
+        return;
+      }
+    } else if (typeof garantieIdOrIndex === 'string') {
+      // If it's a string, treat it as an index
+      const index = Number(garantieIdOrIndex) - 1;
+      if (isNaN(index) || index < 0 || index >= dossier.garanties.length) {
+        alert('Index de garantie invalide.');
+        return;
+      }
+      selectedGarantie = dossier.garanties[index];
+    } else if (dossier.garanties.length === 1) {
+      // If no ID/index provided but only one garantie exists
+      selectedGarantie = dossier.garanties[0];
+    } else {
+      // Multiple garanties but no ID/index provided
+      alert('Veuillez spécifier une garantie.');
+      return;
+    }
 
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Erreur lors du chargement du fichier');
-        return response.blob();
-      })
-      .then((blob) => {
-        const blobUrl = URL.createObjectURL(blob);
-        if (download) {
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = dossier.garantiesFile.split('/').pop() || 'file.pdf';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          window.open(blobUrl, '_blank');
+    if (!selectedGarantie) {
+      alert('Garantie introuvable.');
+      return;
+    }
+
+    if (!selectedGarantie.id) {
+      alert('ID de garantie invalide.');
+      return;
+    }
+
+    // Use the garantie service to get the PDF by ID instead of direct file access
+    this.garantieService.getGarantiePdf(selectedGarantie.id, download)
+      .subscribe({
+        next: (blob) => {
+          // Determine MIME type based on file extension for proper inline display
+          let mimeType = 'application/pdf'; // Default to PDF
+          if (selectedGarantie && selectedGarantie.filePath) {
+            const fileExtension = selectedGarantie.filePath.split('.').pop()?.toLowerCase();
+            if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
+              mimeType = 'image/jpeg';
+            } else if (fileExtension === 'png') {
+              mimeType = 'image/png';
+            } else if (fileExtension === 'gif') {
+              mimeType = 'image/gif';
+            }
+          }
+          const typedBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: mimeType });
+          const blobUrl = URL.createObjectURL(typedBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            // Add null checks and provide fallback values
+            if (selectedGarantie && selectedGarantie.filePath) {
+              const fileName = selectedGarantie.filePath.split('/').pop() || `garantie_${selectedGarantie.id || 'unknown'}.pdf`;
+              a.download = fileName;
+            } else if (selectedGarantie && selectedGarantie.id) {
+              a.download = `garantie_${selectedGarantie.id}.pdf`;
+            } else {
+              a.download = 'garantie.pdf';
+            }
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Erreur:', error);
+          alert('Impossible de charger le fichier.');
         }
-      })
-      .catch((error) => {
-        console.error('Erreur:', error);
-        alert('Impossible de charger le fichier.');
       });
   }
 
@@ -217,85 +273,34 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
         return;
       }
   
-      const fileUrl = this.lcFileService.getFullFileUrl(dossier.lcFile);
-      const token = this.authService.getToken(); // Récupérer le token JWT
-  
-      fetch(fileUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erreur lors du chargement du fichier');
-        }
-        return response.blob(); // Convertir la réponse en Blob
-      })
-      .then(blob => {
-        const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-        if (download) {
-          // Télécharger le fichier
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = dossier.lcFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          // Ouvrir dans un nouvel onglet
-          window.open(blobUrl, '_blank');
-        }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        alert('Impossible de charger le fichier.');
-      });
-    }
-  
- viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.creditsFile) {
-      alert('Aucun fichier trouvé pour ce dossier.');
-      return;
-    }
-  
-    const fileUrl = this.creditsFileService.getFullFileUrl(dossier.creditsFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-  
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.creditsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+      const fileId = this.extractFileId(dossier.lcFile);
+      if (fileId) {
+        this.lcFileService.downloadLcFile(fileId, download).subscribe({
+          next: (blob) => {
+            const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+            if (download) {
+              const a = document.createElement('a');
+              a.href = blobUrl;
+              a.download = dossier.lcFile?.split('/').pop() || 'file.pdf';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            } else {
+              window.open(blobUrl, '_blank');
+            }
+          },
+          error: (error) => {
+            console.error('Error downloading LC file:', error);
+            alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+          }
+        });
       } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
+        alert('Impossible de déterminer l\'ID du fichier.');
       }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
-  }    
+    }
+  
+    
   
   // Méthode pour détecter si un commentaire devrait avoir une date de rappel
   // basé sur son contenu
@@ -372,98 +377,274 @@ export class DossierRecouvrementDetailsComponent implements OnInit {
       });
     }
   }
-viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
-    if (!dossier.chequeFile) {
+viewCreditsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (dossier.creditFiles && dossier.creditFiles.length > 0) {
+      this.viewSingleCreditFile(dossier.creditFiles[0], download);
+      return;
+    }
+    if (!dossier.creditsFile) {
       alert('Aucun fichier trouvé pour ce dossier.');
       return;
     }
-  
-    const fileUrl = this.chequeFileService.getFullFileUrl(dossier.chequeFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-  
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-  
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.chequeFile; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
+    // Extract ID from the file path if possible
+    const fileId = this.extractFileId(dossier.creditsFile);
+    if (fileId) {
+      this.creditsFileService.downloadCreditFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = dossier.creditsFile?.split('/').pop() || 'file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error downloading credit file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      alert('Impossible de déterminer l\'ID du fichier.');
+    }
   }
+
+  public viewSingleCreditFile(creditFile: any, download: boolean = false): void {
+    if (!creditFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+    const fileId = typeof creditFile === 'object' ? creditFile.id : this.extractFileId(creditFile);
+    if (fileId) {
+      console.log('Fetching credit file with ID:', fileId);
+      this.creditsFileService.downloadCreditFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (creditFile.filePath || creditFile).split('/').pop() || 'credit_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching credit file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', creditFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
   viewCautionsFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    // Check if we have multiple caution files
+    if (dossier.cautionFiles && dossier.cautionFiles.length > 0) {
+      // If we have multiple files but no specific one is selected, show the first one
+      this.viewSingleCautionsFile(dossier.cautionFiles[0], download);
+      return;
+    }
+
+    // Legacy support for single file path
     if (!dossier.cautionsFile) {
       alert('Aucun fichier trouvé pour ce dossier.');
       return;
     }
-
-    const fileUrl = this.cautionsFileService.getFullFileUrl(dossier.cautionsFile);
-    const token = this.authService.getToken(); // Récupérer le token JWT
-
-    fetch(fileUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}` // Ajouter le token JWT dans l'en-tête
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du fichier');
-      }
-      return response.blob(); // Convertir la réponse en Blob
-    })
-    .then(blob => {
-      const blobUrl = URL.createObjectURL(blob); // Créer un lien temporaire
-
-      if (download) {
-        // Télécharger le fichier
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = dossier.cautionsFile.split('/').pop() || 'file.pdf'; // Nom du fichier
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Ouvrir dans un nouvel onglet
-        window.open(blobUrl, '_blank');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert('Impossible de charger le fichier.');
-    });
-  }
-
-  // Méthode pour basculer l'affichage de la sélection de statut
-  toggleStatusSelection() {
-    this.showStatusSelection = !this.showStatusSelection;
-    if (!this.showStatusSelection) {
-      this.selectedStatus = '';
+    const fileId = this.extractFileId(dossier.cautionsFile);
+    if (fileId) {
+      this.cautionsFileService.downloadCautionsFile(fileId).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = dossier.cautionsFile?.split('/').pop() || 'file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error downloading caution file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      alert('Impossible de déterminer l\'ID du fichier.');
     }
   }
+
+  // Helper method to view a single caution file
+  public viewSingleCautionsFile(cautionsFile: any, download: boolean = false): void {
+    if (!cautionsFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+
+    const fileId = typeof cautionsFile === 'object' ? cautionsFile.id : this.extractFileId(cautionsFile);
+    if (fileId) {
+      console.log('Fetching caution file with ID:', fileId);
+      this.cautionsFileService.downloadCautionsFile(fileId).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (cautionsFile.filePath || cautionsFile).split('/').pop() || 'cautions_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching caution file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', cautionsFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  // Helper method to view a single LC file
+  public viewSingleLcFile(lcFile: any, download: boolean = false): void {
+    if (!lcFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+
+    const fileId = typeof lcFile === 'object' ? lcFile.id : this.extractFileId(lcFile);
+    if (fileId) {
+      console.log('Fetching LC file with ID:', fileId);
+      this.lcFileService.downloadLcFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (lcFile.filePath || lcFile).split('/').pop() || 'lc_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching LC file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', lcFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
+    if (!dossier.chequeFiles || dossier.chequeFiles.length === 0) {
+      alert('Aucun fichier trouvé pour ce dossier.');
+      return;
+    }
+  
+    // If there's only one cheque file, view that one directly
+    if (dossier.chequeFiles.length === 1) {
+      const chequeFile = dossier.chequeFiles[0];
+      this.viewSingleChequeFile(chequeFile, download);
+      return;
+    }
+  
+    // If there are multiple files, let the user select one
+    const fileIndex = prompt(`Plusieurs fichiers de chèques disponibles (${dossier.chequeFiles.length}). Entrez le numéro du fichier à consulter (1-${dossier.chequeFiles.length}):`);
+  
+    if (fileIndex === null) {
+      // User cancelled
+      return;
+    }
+  
+    const index = parseInt(fileIndex) - 1;
+    if (isNaN(index) || index < 0 || index >= dossier.chequeFiles.length) {
+      alert('Numéro de fichier invalide.');
+      return;
+    }
+  
+    const selectedFile = dossier.chequeFiles[index];
+    this.viewSingleChequeFile(selectedFile, download);
+  }
+
+  // Helper method to view a single cheque file
+  public viewSingleChequeFile(chequeFile: any, download: boolean = false): void {
+    if (!chequeFile) {
+      alert('Aucun fichier trouvé.');
+      return;
+    }
+
+    const fileId = typeof chequeFile === 'object' ? chequeFile.id : this.extractFileId(chequeFile);
+    if (fileId) {
+      console.log('Fetching cheque file with ID:', fileId);
+      this.chequeFileService.downloadChequeFile(fileId, download).subscribe({
+        next: (blob) => {
+          const pdfBlob = (blob instanceof Blob && blob.type && blob.type !== '') ? blob : new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          if (download) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = (chequeFile.filePath || chequeFile).split('/').pop() || 'cheque_file.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            window.open(blobUrl, '_blank');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching cheque file:', error);
+          alert('Impossible de charger le fichier: ' + (error.message || 'Erreur inconnue'));
+        }
+      });
+    } else {
+      console.error('Could not extract file ID from:', chequeFile);
+      alert('Impossible de charger le fichier: ID non trouvé');
+    }
+  }
+
+  // Helper method to extract file ID from path
+  private extractFileId(filePath: string): number | null {
+    if (!filePath) return null;
+    // Try to extract ID from common URL patterns like /download/123 or /files/123_
+    const match = filePath.match(/\/download\/(\d+)|\/[^/]+\/(\d+)[_/]/);
+    if (match) {
+      return parseInt(match[1] || match[2], 10);
+    }
+    console.warn('Could not extract ID from file path:', filePath);
+    return null;
+  }
+
+  /**
+   * Toggle the status selection UI visibility
+   */
+toggleStatusSelection(): void {
+  this.showStatusSelection = !this.showStatusSelection;
+}
 
   formatDate(dateString: string): string {
     if (!dateString) return 'Date inconnue';
@@ -482,17 +663,18 @@ viewChequeFile(dossier: DossierRecouvrement, download: boolean = false): void {
     });
   }
 
-  getStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'En cours': 'active',
-      'En attente': 'pending',
-      'Clôturé': 'closed',
-      'Initiale': 'pending',
-      'Validé': 'active',
-      'Non Validé': 'closed'
-    };
-    
-    return statusMap[status] || 'pending';
+  getStatusClass(status: string | undefined): string {
+    const statusText = status || '';
+    switch (statusText.toLowerCase()) {
+      case 'en cours':
+        return 'status-in-progress';
+      case 'clôturé':
+        return 'status-closed';
+      case 'en attente':
+        return 'status-pending';
+      default:
+        return 'status-unknown';
+    }
   }
   
   // Vérifie si l'utilisateur connecté peut éditer/supprimer un commentaire
@@ -582,5 +764,405 @@ canComment(): boolean {
           this.isLoading = false;
         }
       });
+  }
+
+  generatePDF() {
+    try {
+      if (!this.dossierDetails) {
+        console.error('Aucun dossier disponible pour la génération du PDF');
+        return;
+      }
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let y = margin; // Commencer au niveau de la marge
+
+      // --- Configuration du Logo ---
+      const logoPath = 'assets/logo.png'; // <-- Chemin vers votre logo
+      const logoFormat = 'PNG'; // <-- Spécifiez le format (ex: 'PNG', 'JPEG')
+      const logoWidth = 25; // Ajustez la largeur
+      const logoHeight = 25; // Ajustez la hauteur (maintenez les proportions)
+      const logoX = margin; // Position X (gauche)
+      const logoY = margin; // Position Y (haut)
+
+       try {
+           // jsPDF va essayer de charger l'image à partir de ce chemin
+           doc.addImage(logoPath, logoFormat, logoX, logoY, logoWidth, logoHeight);
+       } catch (e) {
+           console.error('Erreur lors de l\'ajout du logo. Assurez-vous que le chemin est correct et que l\'image est accessible:', e);
+       }
+      // --------------------------------
+
+      // Titre du document (sans en-tête bleu)
+      doc.setFontSize(24); // Taille plus grande pour un titre principal
+      doc.setTextColor(30, 64, 175); // Couleur bleue/grise foncée pour le titre
+      // Positionner le titre à droite du logo ou centré si pas de logo
+      const titleX = logoPath && logoPath !== 'assets/logo.png' ? margin + logoWidth + 10 : pageWidth / 2;
+      const titleAlign = logoPath && logoPath !== 'assets/logo.png' ? 'left' : 'center';
+      doc.text('Dossier de Recouvrement', titleX, margin + (logoHeight > 0 ? logoHeight / 2 : 10), { align: titleAlign }); // Ajuster Y pour aligner avec logo ou marge
+
+      doc.setTextColor(0, 0, 0); // Rétablir la couleur noire pour le corps du document
+      // Démarrer le contenu sous le titre et/ou le logo
+      y = margin + (logoHeight > 0 ? logoHeight : 20) + 15; // Position Y pour le contenu
+
+      function cleanNumeric(val: any): string {
+        // Si c'est un nombre, on le formate avec espace pour les milliers
+        if (typeof val === 'number') {
+          return val.toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+        }
+        // Si c'est une chaîne, on enlève tout sauf chiffres
+        if (typeof val === 'string') {
+          // On enlève tout sauf chiffres
+          const cleaned = val.replace(/[^0-9]/g, '');
+          if (cleaned.length > 0) {
+            // On parse en nombre puis on re-formate
+            return Number(cleaned).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+          }
+          return '';
+        }
+        return '';
+      }
+
+      // Préparation des données pour la grille 3 colonnes
+      // LOGS DIAGNOSTIC
+      console.log('Montant Principal brut:', this.dossierDetails.montantPrincipal);
+      console.log('Montant Principal nettoyé:', cleanNumeric(this.dossierDetails.montantPrincipal));
+      console.log('Intérêt Contractuel brut:', this.dossierDetails.interetContractuel);
+      console.log('Intérêt Contractuel nettoyé:', cleanNumeric(this.dossierDetails.interetContractuel));
+      console.log('Intérêt de Retard brut:', this.dossierDetails.interetRetard);
+      console.log('Intérêt de Retard nettoyé:', cleanNumeric(this.dossierDetails.interetRetard));
+      console.log('Engagement Total brut:', this.dossierDetails.engagementTotal);
+      console.log('Engagement Total nettoyé:', cleanNumeric(this.dossierDetails.engagementTotal));
+      console.log('Provision brut:', this.dossierDetails.provision);
+      console.log('Provision nettoyé:', cleanNumeric(this.dossierDetails.provision));
+
+      const fields = [
+        { label: `ID Dossier`, value: this.dossierDetails.id },
+        { label: `Numéro de Compte`, value: this.dossierDetails.compte.nomCompte },
+        { label: `Engagement Total`, value: cleanNumeric(this.dossierDetails.engagementTotal) },
+        { label: `Montant Principal`, value: cleanNumeric(this.dossierDetails.montantPrincipal) },
+        { label: `Intérêt Contractuel`, value: cleanNumeric(this.dossierDetails.interetContractuel) },
+        { label: `Intérêt de Retard`, value: cleanNumeric(this.dossierDetails.interetRetard) },
+        { label: `Origines de l'engagement`, value: this.dossierDetails.naturesEngagement },
+        { label: `Agence d'ouverture`, value: this.dossierDetails.agenceOuvertureCompte },
+        { label: `Références Chèques`, value: this.dossierDetails.referencesChecks || 'Non spécifié' },
+        { label: `Références Crédits`, value: this.dossierDetails.referencesCredits || 'Non spécifié' },
+        { label: `Références Cautions`, value: this.dossierDetails.referencesCautions || 'Non spécifié' },
+        { label: `Références LC`, value: this.dossierDetails.referencesLC || 'Non spécifié' },
+        { label: `Provision`, value: cleanNumeric(this.dossierDetails.provision) },
+        { label: `Garanties Valeur`, value: this.dossierDetails.garantiesValeur || 'Non spécifié' },
+      ];
+
+      // Affichage en grille 3 colonnes
+      const colCount = 3;
+      const colWidth = (pageWidth - 2 * margin) / colCount;
+      for (let i = 0; i < fields.length; i += colCount) {
+        for (let col = 0; col < colCount; col++) {
+          const field = fields[i + col];
+          if (!field) continue;
+          const x = margin + col * colWidth;
+          // Label
+          doc.setFontSize(11);
+          doc.setTextColor(120, 130, 140);
+          doc.text(field.label, x, y);
+          // Valeur
+          doc.setFontSize(14);
+          doc.setTextColor(33, 33, 33);
+          doc.setFont('helvetica', 'bold');
+          doc.text(String(field.value), x, y + 7);
+          doc.setFont('helvetica', 'normal');
+        }
+        y += 18;
+      }
+      y += 5;
+
+      // Statut et État de Validation (même style que les autres champs)
+      doc.setFontSize(11);
+      doc.setTextColor(120, 130, 140);
+      doc.text('Status', margin, y);
+      doc.text('État de Validation', margin + colWidth, y);
+      // Valeurs
+      doc.setFontSize(14);
+      doc.setTextColor(33, 33, 33);
+      doc.setFont('helvetica', 'bold');
+      doc.text(this.dossierDetails.status || '', margin, y + 7);
+      doc.text(this.dossierDetails.etatValidation || '', margin + colWidth, y + 7);
+      doc.setFont('helvetica', 'normal');
+      y += 18;
+
+      // Section Commentaires (couleur inspirée du logo)
+      doc.setFontSize(15);
+      doc.setTextColor(50, 50, 50); // Gris foncé/noir inspiré du logo
+      doc.text('Commentaires', margin, y);
+      y += 8;
+      // Tableau des commentaires
+      const tableData = this.comments.map(comment => [
+        this.formatDate(comment.createdAt),
+        comment.content,
+        comment.reminderDateTime ? this.formatDate(comment.reminderDateTime) : 'Non défini',
+        comment.user?.name || 'Utilisateur inconnu'
+      ]);
+      autoTable(doc, {
+        startY: y,
+        head: [['DATE', 'COMMENTAIRE', 'DATE DE RAPPEL', 'UTILISATEUR']],
+        body: tableData,
+        theme: 'plain', // Utilisation du thème plain
+        styles: {
+          fontSize: 11,
+          cellPadding: 5,
+          halign: 'left',
+          valign: 'top', // Aligner en haut pour les commentaires longs
+          textColor: [50, 50, 50], // Texte gris foncé
+          lineColor: [230, 230, 230], // Lignes très claires
+          lineWidth: 0.2, // Lignes fines
+        },
+        headStyles: {
+          textColor: [30, 64, 175], // Conserver la couleur bleue/grise de l'en-tête du tableau
+          fontStyle: 'bold',
+          fontSize: 12,
+          halign: 'left',
+          // Utiliser lineColor et lineWidth standards pour la ligne sous l'en-tête
+          lineColor: [30, 64, 175], 
+          lineWidth: 0.5, 
+        },
+        alternateRowStyles: {
+          fillColor: [248, 248, 248] // Gris très clair pour les lignes alternées
+        },
+        columnStyles: {
+          0: { cellWidth: 35 },
+          1: { cellWidth: 85 }, // Ajusté légèrement pour le commentaire
+          2: { cellWidth: 35 },
+          3: { cellWidth: 30 }
+        },
+        margin: { top: 10 },
+        // Supprimer didDrawCell, plain theme gère les lignes horizontales
+      });
+
+      // Pied de page
+      const pageCount = doc.getNumberOfPages();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const footerY = pageHeight - 10; // Position Y pour le pied de page
+
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(128, 128, 128);
+
+        // Numéro de page (au centre)
+        doc.text(
+          `Page ${i} sur ${pageCount}`,
+          pageWidth / 2,
+          footerY,
+          { align: 'center' }
+        );
+      }
+
+      // Déplacer la date de génération ici, après le tableau
+      const finalY = (doc as any).lastAutoTable.finalY || y; // Obtenir la position Y finale du tableau ou utiliser la dernière position connue
+      const currentDate = new Date().toLocaleDateString('fr-FR'); // Obtenir la date formatée
+      doc.setFontSize(10);
+      doc.setTextColor(128, 128, 128);
+      doc.text(
+        `Généré le ${currentDate}`,
+        pageWidth - margin,
+        finalY + 10, // Ajouter un petit espace sous le tableau
+        { align: 'right' }
+      );
+const blob = doc.output("blob"); // ou await doc.output("blob") selon ta version
+this.dossierService.detailsPdfBlobs[this.dossierDetails.id] = blob;
+      doc.save(`dossier_recouvrement_${this.dossierDetails.id}.pdf`);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+      alert('Une erreur est survenue lors de la génération du PDF. Veuillez réessayer.');
+    }
+  }
+  async generatePdfAsBlob(): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this.dossierDetails) {
+          reject(new Error('Aucun dossier disponible pour la génération du PDF'));
+          return;
+        }
+        
+        // Code de génération du PDF (même que generatePDF mais sans téléchargement)
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 20;
+        let y = margin; // Commencer au niveau de la marge
+
+        // --- Configuration du Logo ---
+        const logoPath = 'assets/logo.png'; // Chemin vers le logo
+        const logoFormat = 'PNG'; 
+        const logoWidth = 25; 
+        const logoHeight = 25; 
+        const logoX = margin; 
+        const logoY = margin; 
+
+        try {
+          doc.addImage(logoPath, logoFormat, logoX, logoY, logoWidth, logoHeight);
+        } catch (e) {
+          console.error('Erreur lors de l\'ajout du logo:', e);
+        }
+
+        // Titre du document
+        doc.setFontSize(24);
+        doc.setTextColor(30, 64, 175);
+        const titleX = logoPath && logoPath !== 'assets/logo.png' ? margin + logoWidth + 10 : pageWidth / 2;
+        const titleAlign = logoPath && logoPath !== 'assets/logo.png' ? 'left' : 'center';
+        doc.text('Dossier de Recouvrement', titleX, margin + (logoHeight > 0 ? logoHeight / 2 : 10), { align: titleAlign });
+
+        doc.setTextColor(0, 0, 0);
+        y = margin + (logoHeight > 0 ? logoHeight : 20) + 15;
+
+        function cleanNumeric(val: any): string {
+          if (typeof val === 'number') {
+            return val.toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+          }
+          if (typeof val === 'string') {
+            const cleaned = val.replace(/[^0-9]/g, '');
+            if (cleaned.length > 0) {
+              return Number(cleaned).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+            }
+            return '';
+          }
+          return '';
+        }
+
+        // ... reste du code pour générer le PDF ...
+        
+        // Au lieu de télécharger le PDF, retourner un Blob
+        const pdfBlob = doc.output('blob');
+        resolve(pdfBlob);
+      } catch (error) {
+        console.error('Erreur lors de la génération du PDF:', error);
+        reject(error);
+      }
+    });
+  }
+
+ 
+
+
+  async generateDetailsPdfAsBlob(dossier: DossierRecouvrement, comments: any[]): Promise<Blob> {
+    return new Promise(async (resolve) => {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let y = margin;
+
+      try {
+        const logo = await this.loadImageBase64('assets/logo.png');
+        doc.addImage(logo, 'PNG', margin, margin, 25, 25);
+      } catch (e) {
+        console.warn("⚠️ Erreur logo :", e);
+      }
+
+      doc.setFontSize(24);
+      doc.setTextColor(30, 64, 175);
+      doc.text('Dossier de Recouvrement', margin + 35, margin + 15);
+
+      y += 50;
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      const fields = [
+        { label: 'ID Dossier', value: dossier.id },
+        { label: 'Client', value: dossier.compte?.nomCompte },
+        { label: 'Montant Principal', value: dossier.montantPrincipal },
+        { label: 'Engagement Total', value: dossier.engagementTotal },
+        { label: 'Provision', value: dossier.provision },
+        { label: 'Status', value: dossier.status },
+        { label: 'État', value: dossier.etatValidation }
+      ];
+      for (const field of fields) {
+        doc.text(`${field.label} : ${field.value}`, margin, y);
+        y += 10;
+      }
+
+      doc.setFontSize(14);
+      doc.text('Commentaires', margin, y + 10);
+      y += 18;
+
+      const tableData = comments.map(c => [
+        new Date(c.createdAt).toLocaleDateString('fr-FR'),
+        c.content,
+        c.reminderDateTime ? new Date(c.reminderDateTime).toLocaleDateString('fr-FR') : 'Non défini',
+        c.user?.name || 'Utilisateur inconnu'
+      ]);
+
+      autoTable(doc, {
+        startY: y,
+        head: [['DATE', 'COMMENTAIRE', 'DATE DE RAPPEL', 'UTILISATEUR']],
+        body: tableData,
+        theme: 'grid',
+        styles: { fontSize: 10 }
+      });
+
+      const finalY = (doc as any).lastAutoTable?.finalY || y;
+      const currentDate = new Date().toLocaleDateString('fr-FR');
+      doc.setFontSize(10);
+      doc.setTextColor(128, 128, 128);
+      doc.text(`Généré le ${currentDate}`, pageWidth - margin, finalY + 10, { align: 'right' });
+
+      resolve(doc.output("blob"));
+    });
+  }
+
+  
+  loadImageBase64(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.onerror = reject;
+      xhr.open('GET', url);
+      xhr.responseType = 'blob';
+      xhr.send();
+    });
+  }
+
+  downloadFile(dossier: DossierRecouvrement, type: string): void {
+    if (!dossier.id) {
+      alert('Aucun dossier sélectionné.');
+      return;
+    }
+
+    let serviceCall;
+    let fileName = 'file.pdf';
+
+    switch (type) {
+      case 'lc':
+        if (dossier.lcFile) {
+          // Use a placeholder service call since DossierRecouvrementService might not have download methods
+          // In a real app, you would inject the correct service (e.g., LcFileService)
+          alert('Téléchargement de fichier LC - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier LC associé à ce dossier.');
+          return;
+        }
+      case 'caution':
+        if (dossier.cautionsFile) {
+          alert('Téléchargement de fichier de caution - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier de caution associé à ce dossier.');
+          return;
+        }
+      case 'credit':
+        if (dossier.creditsFile) {
+          alert('Téléchargement de fichier de crédit - À implémenter avec le service approprié');
+          return;
+        } else {
+          alert('Aucun fichier de crédit associé à ce dossier.');
+          return;
+        }
+      default:
+        alert('Type de fichier non reconnu.');
+        return;
+    }
   }
 }

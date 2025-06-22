@@ -52,9 +52,7 @@
           <tbody>
             <tr *ngFor="let role of roles" [ngClass]="{'role-inactive': !role.active}">
               <td>
-                <span class="status-badge" [class.status-active]="role.active" [class.status-inactive]="!role.active">
-                  {{ role.active ? 'Active' : 'Inactive' }}
-                </span>
+               
                 {{ role.name }}
               </td>
               <td>

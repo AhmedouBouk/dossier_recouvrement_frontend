@@ -44,12 +44,11 @@ import { LcFileManagementComponent } from './pages/lc-file-management/lc-file-ma
 import { AuthInterceptor } from './interceptors/AuthInterceptor';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { RejetListComponent } from './pages/rejets/rejet-list/rejet-list.component';
 
 @NgModule({
   declarations: [
-
     AppComponent,
-    
     LoginComponent,
     UserListComponent,
     UserEditComponent,
@@ -61,15 +60,11 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     ComptesDetailsComponent,
     RoleListComponent,
     GarantiesComponent,
-    ChequeFileManagementComponent,
     HistoryComponent,
-    CreditsFileManagementComponent,
-    CautionsFileManagementComponent,
-    LcFileManagementComponent,
     AuthLayoutComponent,
     MainLayoutComponent,
-    
-
+    ChequeFileManagementComponent,
+    RejetListComponent
   ],
   imports: [
     BrowserModule,
@@ -93,9 +88,13 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
     DossierRecouvrementDetailsComponent,
     DossierRecouvrementAddComponent,
     DossierRecouvrementEditComponent,
+    CautionsFileManagementComponent,
     AgenceModule,
-    SharedModule,
-    
+    SharedModule
+  ],
+  exports: [
+    ChequeFileManagementComponent,
+    CautionsFileManagementComponent
   ],
   providers: [
     RoleGuard,

@@ -5,6 +5,7 @@
       type="text" 
       id="code" 
       formControlName="code" 
+       class="compact-input"
       [ngClass]="{ 'is-invalid': submitted && f['code'].errors }"
     >
     <div *ngIf="submitted && f['code'].errors" class="error-message">
@@ -19,6 +20,7 @@
       type="text" 
       id="nom" 
       formControlName="nom" 
+       class="compact-input"
       [ngClass]="{ 'is-invalid': submitted && f['nom'].errors }"
     >
     <div *ngIf="submitted && f['nom'].errors" class="error-message">

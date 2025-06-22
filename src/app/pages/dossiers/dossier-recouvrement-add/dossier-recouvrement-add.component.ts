@@ -13,9 +13,11 @@ import { DossierRecouvrement, EtatValidation } from 'src/app/shared/models/dossi
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class DossierRecouvrementAddComponent implements OnInit {
+export class DossierRecouvrementAddComponent {
   dossierForm: DossierRecouvrement = {
     id: 0,
+    accountNumber: '',
+    // nomClientRecouvrement is now optional
     compte: {
       nomCompte: ''
     },
@@ -31,32 +33,24 @@ export class DossierRecouvrementAddComponent implements OnInit {
     referencesLC: '',
     provision: 0,
     interetsReserves: 0,
-    garantiesValeur: 0,
-    garantiesTitre: '',
-    garantiesFile: '',
     creditsFile: '',
     cautionsFile: '',
-    lcFile: '',
-    chequeFile: '',
-    
+    dateCreation: new Date(),
     status: '',
     etatValidation: EtatValidation.INITIALE,
-    dateCreation: new Date() 
-
+    garanties: []
   };
 
   isLoading = false;
   errorMessage = '';
 
   constructor(
-    private router: Router,
-    private dossierService: DossierRecouvrementService,
-    public roleService: RoleService
+    private readonly router: Router,
+    private readonly dossierService: DossierRecouvrementService,
+    private readonly roleService: RoleService
   ) {}
 
-  ngOnInit(): void {
-    
-  }
+
 
   addDossier() {
     if (!this.validateForm()) {
@@ -65,8 +59,16 @@ export class DossierRecouvrementAddComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    
+    // Create a copy of the dossier to modify for sending to backend
+    const dossierToCreate: any = { ...this.dossierForm };
+    
+    // Convert naturesEngagement array to comma-separated string
+    if (Array.isArray(dossierToCreate.naturesEngagement)) {
+      dossierToCreate.naturesEngagement = dossierToCreate.naturesEngagement.join(',');
+    }
 
-    this.dossierService.createDossier(this.dossierForm).subscribe({
+    this.dossierService.createDossier(dossierToCreate).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/dossiers']);
@@ -96,7 +98,7 @@ export class DossierRecouvrementAddComponent implements OnInit {
       return false;
     }
     if (!this.dossierForm.naturesEngagement || this.dossierForm.naturesEngagement.length === 0) {
-      this.errorMessage = 'Les natures de l\'engagement sont obligatoires';
+      this.errorMessage = 'Les origines de l\'engagement sont obligatoires';
       return false;
     }
     if (!this.dossierForm.agenceOuvertureCompte) {
