@@ -101,4 +101,11 @@ export class RejetService {
   getAllRejets(): Observable<Rejet[]> {
     return this.http.get<Rejet[]>(`${this.apiUrl}`);
   }
+
+  /**
+   * Récupère les rejets où l'utilisateur connecté est notifié
+   */
+  getRejetsPourUtilisateurConnecte(): Observable<Rejet[]> {
+    return this.http.get<Rejet[]>(`${this.apiUrl}/mes-rejets`);
+  }
 }
