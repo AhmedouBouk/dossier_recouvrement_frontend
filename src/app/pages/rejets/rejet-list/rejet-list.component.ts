@@ -27,7 +27,7 @@ export class RejetListComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    this.rejetService.getAllRejets()
+    this.rejetService.getRejetsPourUtilisateurConnecte()
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (data) => {
