@@ -37,7 +37,7 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   selectedUsersForNotification: number[] = []; // IDs des utilisateurs sélectionnés
   selectedUserTypesForNotification: string[] = []; // Types d'utilisateurs sélectionnés
   usersByType: { [type: string]: any[] } = {}; // Utilisateurs groupés par type
-  availableUserTypes: string[] = ['Do', 'ADMIN', 'Recouvrement', 'Agence'];
+  availableUserTypes: string[] = ['Do', 'Agence', 'Risque'];
   currentDossierForRejection: DossierRecouvrement | null = null;
   rejectDialogStep: number = 1; // Étape actuelle du dialogue (1, 2 ou 3)
 
