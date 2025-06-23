@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 // ... autres imports de composants ...
 import { AuthGuard } from './shared/guards/auth.guard';
 import { RoleGuard } from './shared/guards/role.guard';
 import { NonAdminGuard } from './shared/guards/non-admin.guard';
+import { FirstLoginGuard } from './shared/guards/first-login.guard';
 
 // Layouts
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
@@ -46,9 +48,14 @@ const routes: Routes = [
     ]
   },
   {
+    path: 'change-password',
+    component: ChangePasswordComponent,
+    canActivate: [AuthGuard] // Only authenticated users can access this route
+  },
+  {
     path: '', // Ce sera le layout principal pour les utilisateurs connectés
     component: MainLayoutComponent,
-    canActivate: [AuthGuard], // Protège toutes les routes enfants
+    canActivate: [AuthGuard, FirstLoginGuard], // Protège toutes les routes enfants et vérifie si l'utilisateur doit changer son mot de passe
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Redirige vers le dashboard par défaut après connexion
       { path: 'dashboard', component: DashboardComponent, canActivate: [NonAdminGuard] },

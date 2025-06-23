@@ -50,7 +50,14 @@ export class LoginComponent implements OnInit {
       next: () => {
         const userRole = this.authService.getUserRole();
         console.log("User logged in with role:", userRole); // Debugging log
-        this.navigateBasedOnRole(userRole);
+        
+        // Check if user needs to change password on first login
+        if (this.authService.isFirstLogin()) {
+          console.log("First login detected, redirecting to change password");
+          this.router.navigate(['/change-password']);
+        } else {
+          this.navigateBasedOnRole(userRole);
+        }
       },
       error: err => {
         this.errorMessage = 'Invalid credentials';
