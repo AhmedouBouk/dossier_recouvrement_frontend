@@ -71,7 +71,7 @@ export class ChangePasswordComponent implements OnInit {
           // Redirect to dashboard after successful password change
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
-          }, 1500);
+          }, 500);
         },
         error: (error) => {
           this.error = error?.error?.message || 'Une erreur est survenue lors du changement de mot de passe';
