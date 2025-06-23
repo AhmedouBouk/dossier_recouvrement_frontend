@@ -4,6 +4,7 @@ import { LoginComponent } from './auth/login/login.component';
 // ... autres imports de composants ...
 import { AuthGuard } from './shared/guards/auth.guard';
 import { RoleGuard } from './shared/guards/role.guard';
+import { NonAdminGuard } from './shared/guards/non-admin.guard';
 
 // Layouts
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
@@ -50,22 +51,22 @@ const routes: Routes = [
     canActivate: [AuthGuard], // Protège toutes les routes enfants
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Redirige vers le dashboard par défaut après connexion
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'clients', component: ClientsComponent },
-      { path: 'clients/details/:nni', component: ClientDetailsComponent },
-      { path: 'comptes', component: ComptesComponent },
-      { path: 'comptes/details/:nomCompte', component: ComptesDetailsComponent },
-      { path: 'garanties', component: GarantiesComponent },
-      { path: 'cautions-file-management', component: CautionsFileManagementComponent },
-      { path: 'lc-file-management', component: LcFileManagementComponent },
-      { path: 'cheque-files', component: ChequeFileManagementComponent },
-      { path: 'credits-file-management', component: CreditsFileManagementComponent },
-      { path: 'dossiers', component: DossierRecouvrementListComponent },
-      { path: 'dossiers/view/:id', component: DossierRecouvrementDetailsComponent },
-      { path: 'dossiers/add', component: DossierRecouvrementAddComponent },
-      { path: 'dossier-recouvrement/modify/:id', component: DossierRecouvrementEditComponent },
-      { path: 'archives', component: DossierRecouvrementListComponent},
-      { path: 'rejets', component: RejetListComponent },
+      { path: 'dashboard', component: DashboardComponent, canActivate: [NonAdminGuard] },
+      { path: 'clients', component: ClientsComponent, canActivate: [NonAdminGuard] },
+      { path: 'clients/details/:nni', component: ClientDetailsComponent, canActivate: [NonAdminGuard] },
+      { path: 'comptes', component: ComptesComponent, canActivate: [NonAdminGuard] },
+      { path: 'comptes/details/:nomCompte', component: ComptesDetailsComponent, canActivate: [NonAdminGuard] },
+      { path: 'garanties', component: GarantiesComponent, canActivate: [NonAdminGuard] },
+      { path: 'cautions-file-management', component: CautionsFileManagementComponent, canActivate: [NonAdminGuard] },
+      { path: 'lc-file-management', component: LcFileManagementComponent, canActivate: [NonAdminGuard] },
+      { path: 'cheque-files', component: ChequeFileManagementComponent, canActivate: [NonAdminGuard] },
+      { path: 'credits-file-management', component: CreditsFileManagementComponent, canActivate: [NonAdminGuard] },
+      { path: 'dossiers', component: DossierRecouvrementListComponent, canActivate: [NonAdminGuard] },
+      { path: 'dossiers/view/:id', component: DossierRecouvrementDetailsComponent, canActivate: [NonAdminGuard] },
+      { path: 'dossiers/add', component: DossierRecouvrementAddComponent, canActivate: [NonAdminGuard] },
+      { path: 'dossier-recouvrement/modify/:id', component: DossierRecouvrementEditComponent, canActivate: [NonAdminGuard] },
+      { path: 'archives', component: DossierRecouvrementListComponent, canActivate: [NonAdminGuard]},
+      { path: 'rejets', component: RejetListComponent, canActivate: [NonAdminGuard] },
       {
         path: 'admin',
         canActivate: [RoleGuard], // Protège spécifiquement les routes admin
