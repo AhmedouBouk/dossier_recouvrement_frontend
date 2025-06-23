@@ -35,10 +35,11 @@ export class AuthService implements OnDestroy {
   }
 
   login(credentials: { email: string; password: string }) {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials)
+    return this.http.post<{ token: string, firstLogin: boolean }>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(response => {
           localStorage.setItem('token', response.token);
+          localStorage.setItem('firstLogin', response.firstLogin.toString());
           const decodedToken = this.decodeToken(response.token);
           if (decodedToken && decodedToken.role) {
             const formattedRole = decodedToken.role.startsWith("ROLE_") ? decodedToken.role : "ROLE_" + decodedToken.role;
@@ -51,6 +52,7 @@ export class AuthService implements OnDestroy {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('firstLogin');
     this.router.navigate(['/auth/login']);
   }
 
@@ -161,5 +163,20 @@ export class AuthService implements OnDestroy {
       return decodedToken?.userType || '';
     }
     return '';
+  }
+  
+  isFirstLogin(): boolean {
+    return localStorage.getItem('firstLogin') === 'true';
+  }
+  
+  changePassword(newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/change-password`, {
+      newPassword,
+      confirmPassword
+    }).pipe(
+      tap(() => {
+        localStorage.setItem('firstLogin', 'false');
+      })
+    );
   }
 }

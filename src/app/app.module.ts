@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { UserListComponent } from './admin/user-list/user-list.component';
 import { UserEditComponent } from './admin/user-edit/user-edit.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -14,6 +15,7 @@ import { DossierRecouvrementDetailsComponent } from './pages/dossiers/dossier-re
 import { DossierRecouvrementAddComponent } from './pages/dossiers/dossier-recouvrement-add/dossier-recouvrement-add.component';
 import { DossierRecouvrementEditComponent } from './pages/dossiers/dossier-recouvrement-edit/dossier-recouvrement-edit.component';
 import { RoleGuard } from './shared/guards/role.guard';
+import { FirstLoginGuard } from './shared/guards/first-login.guard';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -28,6 +30,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientDetailsComponent } from './pages/clients/client-details/client-details.component';
 import { ComptesDetailsComponent } from './pages/comptes/comptes-details/comptes-details.component';
@@ -50,6 +54,7 @@ import { RejetListComponent } from './pages/rejets/rejet-list/rejet-list.compone
   declarations: [
     AppComponent,
     LoginComponent,
+    ChangePasswordComponent,
     UserListComponent,
     UserEditComponent,
     AddUserComponent,
@@ -82,6 +87,8 @@ import { RejetListComponent } from './pages/rejets/rejet-list/rejet-list.compone
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     DossierRecouvrementListComponent,
@@ -98,6 +105,7 @@ import { RejetListComponent } from './pages/rejets/rejet-list/rejet-list.compone
   ],
   providers: [
     RoleGuard,
+    FirstLoginGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptorService,
