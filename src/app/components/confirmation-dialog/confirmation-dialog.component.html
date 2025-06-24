@@ -1,0 +1,24 @@
+<div class="confirmation-dialog-overlay" *ngIf="isVisible">
+  <div class="confirmation-dialog">
+    <div class="dialog-header">
+      <i class="material-icons icon">{{ iconName }}</i>
+      <h3>{{ title }}</h3>
+      <button class="close-btn" (click)="onCancel()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="dialog-content">
+      <p>{{ message }}</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="cancel-btn" (click)="onCancel()">
+        <i class="material-icons">cancel</i>
+        {{ cancelButtonText }}
+      </button>
+      <button class="confirm-btn" (click)="onConfirm()">
+        <i class="material-icons">check_circle</i>
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>

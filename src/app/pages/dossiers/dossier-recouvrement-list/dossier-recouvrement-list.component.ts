@@ -19,13 +19,14 @@ import autoTable from 'jspdf-autotable';
 import { HttpClient } from '@angular/common/http';
 import { CautionsFileService } from 'src/app/shared/services/cautions-file.service';
 import { UserService } from '../../../shared/services/user.service';
+import { ConfirmationDialogComponent } from '../../../components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-dossier-recouvrement-list',
   templateUrl: './dossier-recouvrement-list.component.html',
   styleUrls: ['./dossier-recouvrement-list.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ConfirmationDialogComponent]
 })
 export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   userType: string;
@@ -40,6 +41,12 @@ export class DossierRecouvrementListComponent implements OnInit, OnDestroy {
   availableUserTypes: string[] = ['Do', 'Agence', 'Risque'];
   currentDossierForRejection: DossierRecouvrement | null = null;
   rejectDialogStep: number = 1; // Étape actuelle du dialogue (1, 2 ou 3)
+  
+  // Confirmation dialog properties
+  showConfirmationDialog: boolean = false;
+  confirmationDialogTitle: string = 'Confirmation de suppression';
+  confirmationDialogMessage: string = 'Êtes-vous sûr de vouloir supprimer ce dossier?';
+  dossierToDelete: number | null = null;
 
   statusEnum = EtatValidation; // Remplace etatValidationEnum
 
@@ -195,9 +202,14 @@ loadDossiersArchives(): void {
   }
 
   deleteDossier(dossierId: number) {
-    if (dossierId && confirm('Confirmer la suppression ?')) {
+    this.dossierToDelete = dossierId;
+    this.showConfirmationDialog = true;
+  }
+
+  confirmDeleteDossier() {
+    if (this.dossierToDelete) {
       this.isLoading = true;
-      this.dossierService.deleteDossier(dossierId).subscribe({
+      this.dossierService.deleteDossier(this.dossierToDelete).subscribe({
         next: (response) => {
           console.log('Dossier supprimé avec succès', response);
           this.successMessage = 'Dossier supprimé avec succès';
@@ -216,7 +228,13 @@ loadDossiersArchives(): void {
           this.isLoading = false;
         }
       });
+      this.cancelDeleteDossier();
     }
+  }
+
+  cancelDeleteDossier() {
+    this.showConfirmationDialog = false;
+    this.dossierToDelete = null;
   }
 
   getValidationStatusClass(status: string): string {

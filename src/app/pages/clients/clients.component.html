@@ -1,8 +1,5 @@
 <div class="container">
-  <!-- Loading Overlay -->
- 
-
-  <!-- Actions Bar (similar to dossier list) -->
+  <!-- Actions Bar -->
   <div class="actions-bar">
     <!-- Search Container -->
     <div class="search-container">
@@ -12,10 +9,6 @@
         placeholder="Rechercher par NNI, NIF, nom ou prénom"
         [disabled]="isLoading"
         (input)="onSearchInputChange($event)">
-      <!-- Loading Spinner (optional, if needed for search) -->
-      <!-- <div class="loading-spinner" *ngIf="isSearching">
-        <i class="material-icons rotating">sync</i>
-      </div> -->
     </div>
 
     <!-- Import Actions -->
@@ -43,17 +36,7 @@
     </div>
   </div>
 
-  <!-- Alert Message for Import -->
-  <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type" role="alert">
-    <i class="material-icons">
-      {{ importMessage.type === 'success' ? 'check_circle' :
-          importMessage.type === 'warning' ? 'warning' : 'error' }}
-    </i>
-    <span class="alert-message">{{ importMessage.text }}</span>
-    <button class="alert-close" (click)="importMessage = null">
-      <i class="material-icons">close</i>
-    </button>
-  </div>
+  
 
   <!-- No Results Message for Search -->
   <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
@@ -64,8 +47,15 @@
     </button>
   </div>
 
-  <!-- Clients Table - only show when there are results -->
-  <div class="card-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="material-icons rotating">sync</i>
+    <span>Chargement des clients...</span>
+  </div>
+
+  <!-- Clients Table and No Results Message -->
+  <div class="card-container" *ngIf="!isLoading">
+    <!-- Clients Table - only show when there are results -->
     <div class="table-container" *ngIf="clients && clients.length > 0">
       <table>
         <thead>
@@ -109,7 +99,6 @@
                     (click)="startEdit(client)"
                     [disabled]="isLoading">
                     <i class="material-icons">edit</i>
-                    
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteClientPermission()"
@@ -117,7 +106,6 @@
                     (click)="deleteClient(client.nni)"
                     [disabled]="isLoading">
                     <i class="material-icons">delete</i>
-                    
                   </button>
                 </div>
               </td>
@@ -192,6 +180,12 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Message Aucun Client -->
+    <div *ngIf="clients && clients.length === 0" class="no-clients-message">
+      <i class="material-icons">people_outline</i>
+      <h3>Aucun client trouvé</h3>
     </div>
   </div>
 </div>
