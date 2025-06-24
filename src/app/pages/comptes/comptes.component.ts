@@ -3,7 +3,7 @@ import { CompteService } from '../../shared/services/compte.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoleService } from '../../shared/services/role.service';
-import { RouterModule } from '@angular/router'; // Import de RouterModule
+import { RouterModule } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 @Component({
@@ -11,8 +11,7 @@ import { Subject, debounceTime, distinctUntilChanged, Subscription } from 'rxjs'
   templateUrl: './comptes.component.html',
   styleUrls: ['./comptes.component.css'],
   standalone: true,
-
-  imports: [CommonModule, FormsModule,RouterModule]
+  imports: [CommonModule, FormsModule, RouterModule]
 })
 export class ComptesComponent implements OnInit, OnDestroy {
   comptes: any[] = [];
@@ -25,11 +24,15 @@ export class ComptesComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   importMessage: { type: 'success' | 'error' | 'warning', text: string } | null = null;
   editingCompte: any = null;
+  
+  // ✅ Ajout de la propriété isLoading manquante
+  isLoading: boolean = false;
 
   private searchSubject = new Subject<string>();
   private searchSubscription: Subscription | undefined;
 
-  constructor(private compteService: CompteService,
+  constructor(
+    private compteService: CompteService,
     public roleService: RoleService
   ) { }
 
@@ -44,8 +47,8 @@ export class ComptesComponent implements OnInit, OnDestroy {
 
   setupSearch() {
     this.searchSubscription = this.searchSubject.pipe(
-      debounceTime(300), // Wait for 300ms after the last keystroke
-      distinctUntilChanged() // Only emit if the search term has changed
+      debounceTime(300),
+      distinctUntilChanged()
     ).subscribe(searchTerm => {
       this.searchComptes(searchTerm);
     });
@@ -58,10 +61,12 @@ export class ComptesComponent implements OnInit, OnDestroy {
   loadComptes() {
     this.showNoResultsMessage = false;
     this.globalSearch = '';
+    this.isLoading = true; // ✅ Activer le loading
     
     this.compteService.getAllComptes().subscribe({
       next: (data) => {
         this.comptes = data;
+        this.isLoading = false; // ✅ Désactiver le loading
         if (data.length === 0) {
           this.importMessage = {
             type: 'warning',
@@ -70,6 +75,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
+        this.isLoading = false; // ✅ Désactiver le loading en cas d'erreur
         this.importMessage = {
           type: 'error',
           text: error.message
@@ -77,6 +83,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   getAlertIcon(type: 'success' | 'error' | 'warning'): string {
     const iconMap: Record<'success' | 'error' | 'warning', string> = {
       'success': 'check_circle',
@@ -89,6 +96,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
   searchComptes(searchTerm: string = this.globalSearch) {
     console.log('searchComptes called with searchTerm:', searchTerm);
     this.showNoResultsMessage = false;
+    this.isLoading = true; // ✅ Activer le loading
 
     // If search term is empty, load all comptes
     if (!searchTerm) {
@@ -96,22 +104,24 @@ export class ComptesComponent implements OnInit, OnDestroy {
         next: (data) => {
           console.log('Loaded all comptes:', data);
           this.comptes = data;
+          this.isLoading = false; // ✅ Désactiver le loading
           if (data.length === 0) {
             this.importMessage = {
               type: 'warning',
               text: 'Aucun compte trouvé dans la base de données.'
             };
           } else {
-             this.importMessage = null;
+            this.importMessage = null;
           }
         },
         error: (error) => {
           console.error('Error loading all comptes:', error);
+          this.isLoading = false; // ✅ Désactiver le loading
           this.importMessage = {
             type: 'error',
             text: error.message
           };
-          this.comptes = []; // Clear results on error
+          this.comptes = [];
         }
       });
     } else {
@@ -126,22 +136,24 @@ export class ComptesComponent implements OnInit, OnDestroy {
         next: (data) => {
           console.log('API response data for search:', data);
           this.comptes = data;
+          this.isLoading = false; // ✅ Désactiver le loading
           if (data.length === 0) {
             console.log('No results found for search term:', searchTerm);
             this.showNoResultsMessage = true;
           } else {
-             this.showNoResultsMessage = false;
+            this.showNoResultsMessage = false;
           }
-          this.importMessage = null; // Clear import message on successful search
+          this.importMessage = null;
         },
         error: (error) => {
           console.error('Error during search:', error);
+          this.isLoading = false; // ✅ Désactiver le loading
           this.importMessage = {
             type: 'error',
             text: error.message
           };
-          this.comptes = []; // Clear results on error
-          this.showNoResultsMessage = true; // Show no results message on error
+          this.comptes = [];
+          this.showNoResultsMessage = true;
         }
       });
     }
@@ -156,6 +168,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
   }
 
   updateCompte(compte: any) {
+    this.isLoading = true; // ✅ Activer le loading
     this.compteService.updateCompte(compte.nomCompte, {
       solde: compte.solde,
       etat: compte.etat
@@ -163,12 +176,14 @@ export class ComptesComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.searchComptes();
         this.editingCompte = null;
+        this.isLoading = false; // ✅ Désactiver le loading
         this.importMessage = {
           type: 'success',
           text: 'Compte mis à jour avec succès'
         };
       },
       error: (error) => {
+        this.isLoading = false; // ✅ Désactiver le loading
         this.importMessage = {
           type: 'error',
           text: error.message
@@ -179,15 +194,18 @@ export class ComptesComponent implements OnInit, OnDestroy {
 
   deleteCompte(nomCompte: string) {
     if(confirm('Êtes-vous sûr de vouloir supprimer ce compte ?')) {
+      this.isLoading = true; // ✅ Activer le loading
       this.compteService.deleteCompte(nomCompte).subscribe({
         next: (response) => {
           this.searchComptes();
+          this.isLoading = false; // ✅ Désactiver le loading
           this.importMessage = {
             type: 'success',
             text: 'Compte supprimé avec succès'
           };
         },
         error: (error) => {
+          this.isLoading = false; // ✅ Désactiver le loading
           this.importMessage = {
             type: 'error',
             text: error.message
@@ -205,8 +223,10 @@ export class ComptesComponent implements OnInit, OnDestroy {
   uploadFile() {
     if (this.selectedFile) {
       this.importMessage = null;
+      this.isLoading = true; // ✅ Activer le loading
       this.compteService.importComptes(this.selectedFile).subscribe({
         next: (response) => {
+          this.isLoading = false; // ✅ Désactiver le loading
           this.importMessage = {
             type: 'success',
             text: `Import réussi: ${response.count || 0} comptes importés`
@@ -217,6 +237,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
           if (fileInput) fileInput.value = '';
         },
         error: (error) => {
+          this.isLoading = false; // ✅ Désactiver le loading
           this.importMessage = {
             type: 'error',
             text: error.message
@@ -230,6 +251,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
       };
     }
   }
+
   getStatusClass(status: string): string {
     const statusMap: Record<string, string> = {
       'ACTIF': 'status-active',
@@ -238,5 +260,4 @@ export class ComptesComponent implements OnInit, OnDestroy {
     };
     return statusMap[status] || 'status-default';
   }
-  
 }

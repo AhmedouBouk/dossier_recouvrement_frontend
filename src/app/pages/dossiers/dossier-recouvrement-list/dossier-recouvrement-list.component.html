@@ -358,4 +358,15 @@
       </div>
     </div>
   </div>
+  <!-- Confirmation Dialog Component -->
+  <app-confirmation-dialog
+    [isVisible]="showConfirmationDialog"
+    [title]="confirmationDialogTitle"
+    [message]="confirmationDialogMessage"
+    [confirmButtonText]="'Supprimer'"
+    [cancelButtonText]="'Annuler'"
+    [iconName]="'delete_forever'"
+    (confirm)="confirmDeleteDossier()"
+    (cancel)="cancelDeleteDossier()"
+  ></app-confirmation-dialog>
 </main>

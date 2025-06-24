@@ -41,8 +41,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   setupSearch() {
     this.searchSubscription = this.searchSubject.pipe(
-      debounceTime(300), // Wait for 300ms after the last keystroke
-      distinctUntilChanged() // Only emit if the search term has changed
+      debounceTime(300),
+      distinctUntilChanged()
     ).subscribe(searchTerm => {
       this.searchClients(searchTerm);
     });
@@ -167,7 +167,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error loading all clients:', error);
           this.showMessage('error', this.handleError(error));
-          this.clients = []; // Clear results on error
+          this.clients = [];
         },
         complete: () => {
            console.log('Loading all clients complete.');
@@ -195,8 +195,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error during search:', error);
           this.showMessage('error', this.handleError(error));
-          this.clients = []; // Clear results on error
-          this.showNoResultsMessage = true; // Show no results message on error
+          this.clients = [];
+          this.showNoResultsMessage = true;
         },
         complete: () => {
           console.log('Search complete.');
@@ -297,7 +297,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       this.selectedFile = input.files[0];
-      console.log('Fichier sélectionné:', this.selectedFile.name); // Ajoutez cette ligne pour déboguer
+      console.log('Fichier sélectionné:', this.selectedFile.name);
     }
   }
 }

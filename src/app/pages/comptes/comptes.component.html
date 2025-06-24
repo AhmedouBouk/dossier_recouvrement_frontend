@@ -1,6 +1,5 @@
 <div class="container">
 
-
   <!-- Actions Bar (similar to dossier list) -->
   <div class="actions-bar">
     <!-- Search Container -->
@@ -33,11 +32,7 @@
     </div>
   </div>
 
-  <!-- Import Message -->
-  <div *ngIf="importMessage" class="alert" [ngClass]="'alert-' + importMessage.type">
-    <i class="material-icons">{{ getAlertIcon(importMessage.type) }}</i>
-    {{ importMessage.text }}
-  </div>
+  
 
   <!-- No Results Message -->
   <div *ngIf="showNoResultsMessage" class="alert alert-warning" role="alert">
@@ -48,8 +43,15 @@
     </button>
   </div>
 
-  <!-- Accounts Table - only show when there are results -->
-  <div class="card-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="material-icons rotating">sync</i>
+    <span>Chargement des comptes...</span>
+  </div>
+
+  <!-- Accounts Table and No Results Message -->
+  <div class="card-container" *ngIf="!isLoading">
+    <!-- Accounts Table - only show when there are results -->
     <div class="table-container" *ngIf="comptes && comptes.length > 0">
       <table>
         <thead>
@@ -74,7 +76,7 @@
                     {{ compte.client?.nom }} {{ compte.client?.prenom }}
                   </a>
               </td>
-                            <td>
+              <td>
                 <span class="category-badge">{{compte.categorie}}</span>
               </td>
               <td>
@@ -97,7 +99,6 @@
                     data-tooltip="Modifier"
                     (click)="startEdit(compte)">
                     <i class="material-icons">edit</i>
-                    
                   </button>
                   <button 
                     *ngIf="roleService.hasDeleteComptePermission()"
@@ -105,7 +106,6 @@
                     data-tooltip="Supprimer"
                     (click)="deleteCompte(compte.nomCompte)">
                     <i class="material-icons">delete</i>
-                    
                   </button>
                 </div>
               </td>
@@ -148,6 +148,12 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Message Aucun Compte -->
+    <div *ngIf="comptes && comptes.length === 0" class="no-comptes-message">
+      <i class="material-icons">account_balance_wallet</i>
+      <h3>Aucun compte trouvé</h3>
     </div>
   </div>
 </div>
