@@ -39,9 +39,32 @@
               class="form-input"
               placeholder="Entrez le titre de la garantie"
             />
-            <div *ngIf="newGarantieForm.get('titre')?.invalid && newGarantieForm.get('titre')?.touched" class="error-text">
+            <div *ngIf="newGarantieForm.get('titre')?.invalid && (newGarantieForm.get('titre')?.touched || formSubmitted)" class="error-text">
               Le titre est requis
             </div>
+          </div>
+
+          <div class="form-group">
+            <label for="typeGarantie">Type de garantie</label>
+            <select 
+              id="typeGarantie" 
+              formControlName="typeGarantie" 
+              class="form-input"
+            >
+              <option value="">Sélectionnez un type</option>
+              <option *ngFor="let type of typesGarantie" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="valeurGarantie">Valeur de garantie</label>
+            <input 
+              type="number" 
+              id="valeurGarantie" 
+              formControlName="valeurGarantie" 
+              class="form-input"
+              placeholder="Entrez la valeur de la garantie"
+            />
           </div>
 
           <div class="form-group">
@@ -68,8 +91,70 @@
             <button type="button" class="btn btn-secondary" (click)="closeAddForm()">
               Annuler
             </button>
-            <button type="submit" class="btn btn-primary" [disabled]="newGarantieForm.invalid || !selectedFile">
-              Ajouter
+            <button type="submit" class="btn btn-primary" [disabled]="newGarantieForm.invalid || !selectedFile || isLoading">
+              <span *ngIf="isLoading">Ajout en cours...</span>
+              <span *ngIf="!isLoading">Ajouter</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal/Form pour modifier une garantie -->
+    <div *ngIf="showEditForm" class="modal-overlay" (click)="closeEditForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Modifier une garantie</h3>
+          <button class="close-btn" (click)="closeEditForm()">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <form [formGroup]="editGarantieForm" (ngSubmit)="submitEditGarantie()" class="garantie-form">
+          <div class="form-group">
+            <label for="editTitre">Titre de la garantie *</label>
+            <input 
+              type="text" 
+              id="editTitre" 
+              formControlName="titre" 
+              class="form-input"
+              placeholder="Entrez le titre de la garantie"
+            />
+            <div *ngIf="editGarantieForm.get('titre')?.invalid && (editGarantieForm.get('titre')?.touched || formSubmitted)" class="error-text">
+              Le titre est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="editTypeGarantie">Type de garantie</label>
+            <select 
+              id="editTypeGarantie" 
+              formControlName="typeGarantie" 
+              class="form-input"
+            >
+              <option value="">Sélectionnez un type</option>
+              <option *ngFor="let type of typesGarantie" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editValeurGarantie">Valeur de garantie</label>
+            <input 
+              type="number" 
+              id="editValeurGarantie" 
+              formControlName="valeurGarantie" 
+              class="form-input"
+              placeholder="Entrez la valeur de la garantie"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeEditForm()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="editGarantieForm.invalid || isLoading">
+              <span *ngIf="isLoading">Mise à jour...</span>
+              <span *ngIf="!isLoading">Enregistrer</span>
             </button>
           </div>
         </form>
@@ -94,7 +179,7 @@
                 {{ dossier.id }}
               </a>
             </td>
-            <td>{{ dossier.compte.nomCompte }}</td>
+            <td>{{ dossier.compte?.nomCompte || 'N/A' }}</td>
 
             <!-- Liste des garanties -->
             <td class="garanties-container">
@@ -102,30 +187,24 @@
                 <div *ngFor="let garantie of dossier.garanties; trackBy: trackByGarantieId">
                   <div class="garantie-item">
                     <div class="garantie-row">
-                      <!-- Titre de garantie -->
+                      <!-- Titre de garantie (non éditable en ligne) -->
                       <div class="garantie-cell garantie-titre">
-                        <div *ngIf="!editingGarantie || editingGarantie.id !== garantie.id">
-                          <button class="editable-text" (click)="startEdit(garantie)" [disabled]="dossier.status === 'Clôturé'">
-                            {{ garantie.titre || 'Sans titre' }}
-                          </button>
-                        </div>
-                        <div *ngIf="editingGarantie && editingGarantie.id === garantie.id">
-                          <input 
-                            class="edit-input" 
-                            [(ngModel)]="editingGarantie.titre" 
-                            placeholder="Titre de la garantie"
-                            #editInput
-                          />
-                          <div class="edit-buttons">
-                            <button class="btn btn-sm btn-success" (click)="updateGarantie()">Enregistrer</button>
-                            <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">Annuler</button>
-                          </div>
-                        </div>
+                        <span class="garantie-title-text">{{ garantie.titre || 'Sans titre' }}</span>
+                      </div>
+
+                      <!-- Type de garantie -->
+                      <div class="garantie-cell garantie-type">
+                        <span class="garantie-type-badge">{{ garantie.typeGarantie || 'Non spécifié' }}</span>
+                      </div>
+
+                      <!-- Valeur de garantie -->
+                      <div class="garantie-cell garantie-valeur">
+                        <span class="garantie-value">{{ garantie.valeurGarantie ? (garantie.valeurGarantie | number:'1.2-2') + ' €' : 'Non spécifiée' }}</span>
                       </div>
 
                       <!-- Date de création -->
                       <div class="garantie-cell garantie-date">
-                        {{ garantie.uploadDate | date:'dd/MM/yyyy' }}
+                        <span class="garantie-date-text">{{ garantie.uploadDate | date:'dd/MM/yyyy' }}</span>
                       </div>
 
                       <!-- Actions -->
@@ -148,6 +227,16 @@
                           *ngIf="garantie.filePath && roleService.hasPermission('DOWNLOAD_GRANTIE')"
                         >
                           <i class="material-icons">download</i>
+                        </button>
+                        
+                        <!-- Modifier garantie -->
+                        <button
+                          class="icon-btn edit-btn"
+                          data-tooltip="Modifier"
+                          (click)="openEditForm(garantie)"
+                          *ngIf="dossier.status !== 'Clôturé'"
+                        >
+                          <i class="material-icons">edit</i>
                         </button>
 
                         <!-- Supprimer fichier -->
@@ -190,7 +279,7 @@
     </div>
 
     <!-- Aucun dossier trouvé -->
-    <div *ngIf="!isLoading && dossiers.length === 0" class="no-dossiers-message">
+    <div *ngIf="!isLoading && (!dossiers || dossiers.length === 0)" class="no-dossiers-message">
       <i class="material-icons">folder_off</i>
       <p>Aucun dossier trouvé</p>
     </div>

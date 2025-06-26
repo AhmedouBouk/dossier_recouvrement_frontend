@@ -171,8 +171,12 @@ hasUploadCautionFilePermission(): boolean {
 
 
 
-
-
+hasReadDossierRecouvrementPermission(): boolean {
+  return this.authService.hasPermission('DETECT_DOSSIERRECOUVREMENT');
+}
+hasCreateDossierRecouvrementPermission(): boolean {
+  return this.authService.hasPermission('CREATE_DOSSIERRECOUVREMENT');
+}
 
 
 hasDeleteDossierRecouvrementPermission(): boolean {
