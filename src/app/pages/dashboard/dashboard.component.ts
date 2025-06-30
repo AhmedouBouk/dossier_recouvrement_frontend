@@ -24,8 +24,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private refreshSubscription: Subscription | null = null;
 
   constructor(
-    private dashboardService: DashboardService,
-    private router: Router
+    private readonly dashboardService: DashboardService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -90,13 +90,54 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   
   navigateToDossier(notification: Notification): void {
-    if (notification.dossier && notification.dossier.id) {
-      this.router.navigate(['/dossiers', notification.dossier.id]);
+    if (!notification?.dossier?.id) {
+      return;
+    }
+    
+    const dossierId = notification.dossier.id;
+    
+    // Redirect based on notification type
+    switch (notification.type) {
+      case 'GARANTIE':
+        // Navigate to garanties component with dossier id
+        this.router.navigate(['/garanties'], { queryParams: { dossierId: dossierId } });
+        break;
+        
+      case 'DOCUMENT_DO':
+      case 'LC':
+        // Navigate to LC file management with dossier id
+        this.router.navigate(['/lc-file-management'], { queryParams: { dossierId: dossierId } });
+        break;
+        
+      case 'CHEQUE':
+        // Navigate to cheque files with dossier id
+        this.router.navigate(['/cheque-files'], { queryParams: { dossierId: dossierId } });
+        break;
+        
+      case 'CAUTION':
+        // Navigate to cautions file management with dossier id
+        this.router.navigate(['/cautions-file-management'], { queryParams: { dossierId: dossierId } });
+        break;
+        
+      case 'CREDIT':
+        // Navigate to credits file management with dossier id
+        this.router.navigate(['/credits-file-management'], { queryParams: { dossierId: dossierId } });
+        break;
+        
+      case 'REFUS_DOSSIER':
+        // Navigate to rejets list with dossier id
+        this.router.navigate(['/rejets'], { queryParams: { dossierId: dossierId } });
+        break;
+        
+      default:
+        // Default behavior - navigate to dossier details
+        this.router.navigate(['/dossiers/view', dossierId]);
+        break;
     }
   }
   
   markAsRead(notification: Notification): void {
-    if (notification.id) {
+    if (notification?.id) {
       this.dashboardService.markNotificationAsRead(notification.id).subscribe({
         next: () => {
           notification.lu = true;
