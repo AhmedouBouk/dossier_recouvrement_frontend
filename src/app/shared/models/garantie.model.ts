@@ -1,7 +1,9 @@
 export interface Garantie {
     id?: number;
     titre: string;
-    filePath?: string;
-    uploadDate?: Date;
-    dossierId?: number;
+    typeGarantie?: string;
+    valeurGarantie?: number;
+    filePath: string;
+    uploadDate: Date;
+    dossierId: number;
 }
