@@ -17,16 +17,9 @@ export class GarantieService {
   getAllDossiers(): Observable<DossierRecouvrement[]> {
     return this.http.get<DossierRecouvrement[]>(`${this.apiUrl}`);
   }
-  updateGarantie(id: number, garantie: DossierRecouvrement): Observable<DossierRecouvrement> {
-    return this.http.put<DossierRecouvrement>(`${this.apiUrl}/${id}`, garantie);
-  }
 
   // Uploader un fichier de garantie
-  uploadGarantie(dossierId: number, file: File, titre: string): Observable<DossierRecouvrement> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('titre', titre);
-
+  uploadGarantie(dossierId: number, formData: FormData): Observable<DossierRecouvrement> {
     return this.http.post<DossierRecouvrement>(
       `${this.apiUrl}/${dossierId}/garantie`,
       formData
@@ -43,15 +36,20 @@ export class GarantieService {
     return this.http.get<Garantie>(`${this.apiUrl}/garantie/${garantieId}`);
   }
 
-  // Mettre à jour le titre d'une garantie
-  updateGarantieTitre(garantieId: number, nouveauTitre: string): Observable<Garantie> {
-    const formData = new FormData();
-    formData.append('titre', nouveauTitre);
-    
+  // Mettre à jour une garantie
+  updateGarantie(garantieId: number, formData: FormData): Observable<Garantie> {
     return this.http.put<Garantie>(
       `${this.apiUrl}/garantie/${garantieId}`,
       formData
     );
+  }
+  
+  // Mettre à jour le titre d'une garantie (méthode maintenue pour compatibilité)
+  updateGarantieTitre(garantieId: number, nouveauTitre: string): Observable<Garantie> {
+    const formData = new FormData();
+    formData.append('titre', nouveauTitre);
+    
+    return this.updateGarantie(garantieId, formData);
   }
 
   // Télécharger le PDF d'une garantie

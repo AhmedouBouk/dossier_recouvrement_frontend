@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DossierRecouvrement } from 'src/app/shared/models/dossier-recouvrement.model';
 import { Garantie } from 'src/app/shared/models/garantie.model';
 import { GarantieService } from 'src/app/shared/services/garantie.service';
@@ -7,6 +7,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoleService } from 'src/app/shared/services/role.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-garanties',
@@ -18,26 +19,47 @@ export class GarantiesComponent implements OnInit {
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
-  editingGarantie: Garantie | null = null;
   readonly newGarantieForm: FormGroup;
+  readonly editGarantieForm: FormGroup;
   
-  // New properties for the add form
+  // Types de garantie disponibles
+  typesGarantie: string[] = [
+    'Hypothèque',
+    'Nantissement',
+    'Caution personnelle',
+    'Caution bancaire',
+    'Gage',
+    'Assurance',
+    'Autre'
+  ];
+  
+  // Properties for forms
   showAddForm = false;
+  showEditForm = false;
   selectedFile: File | null = null;
   selectedFileName: string | null = null;
   currentDossierId: number | null = null;
+  currentGarantieId: number | null = null;
   formSubmitted = false;
 
   constructor(
-    private garantieService: GarantieService,
-    private dossierService: DossierRecouvrementService,
+    private readonly garantieService: GarantieService,
+    private readonly dossierService: DossierRecouvrementService,
     public authService: AuthService,
     public roleService: RoleService,
     private readonly fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.newGarantieForm = this.fb.group({
-      titre: ['', Validators.required]
+      titre: ['', Validators.required],
+      typeGarantie: [''],
+      valeurGarantie: [null]
+    });
+    
+    this.editGarantieForm = this.fb.group({
+      titre: ['', Validators.required],
+      typeGarantie: [''],
+      valeurGarantie: [null]
     });
   }
 
@@ -48,110 +70,148 @@ export class GarantiesComponent implements OnInit {
   loadDossiers(): void {
     this.isLoading = true;
     this.dossierService.getDossiers().subscribe({
-      next: (data) => {
-        this.dossiers = [...data]; // Create new array reference
+      next: (data: DossierRecouvrement[]) => {
+        // Create new array reference to trigger change detection
+        this.dossiers = [...data];
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des dossiers', err);
         this.errorMessage = 'Erreur lors du chargement des dossiers';
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
     });
   }
 
   getFileNameFromUrl(url: string | null): string {
     if (!url) return 'Aucun fichier';
-    return url.split('/').pop() || 'Aucun fichier';
+    return url.split('/').pop() ?? 'Aucun fichier';
   }
 
   getFileName(filePath: string | null): string {
     if (!filePath) return 'Aucun fichier';
-    // Handle both forward and backslashes
-    const parts = filePath.split(/[\/\\]/);
-    return parts[parts.length - 1] || 'Aucun fichier';
+    const parts = filePath.split(/[/\\]/);
+    return parts[parts.length - 1] ?? 'Aucun fichier';
   }
   
   getDossierById(dossierId: number): DossierRecouvrement | undefined {
     return this.dossiers.find(dossier => dossier.id === dossierId);
   }
 
-  startEdit(garantie: Garantie): void {
-    // Create a deep copy to avoid reference issues
-    this.editingGarantie = { 
-      ...garantie,
-      titre: garantie.titre || ''
-    };
+  // Open edit form modal
+  openEditForm(garantie: Garantie): void {
+    this.currentGarantieId = garantie.id ?? null;
+    this.currentDossierId = garantie.dossierId ?? null;
+    this.showEditForm = true;
+    
+    // Fill form with existing data
+    this.editGarantieForm.patchValue({
+      titre: garantie.titre ?? '',
+      typeGarantie: garantie.typeGarantie ?? '',
+      valeurGarantie: garantie.valeurGarantie ?? null
+    });
+    
     this.errorMessage = null;
-    this.cdr.markForCheck();
+    this.successMessage = null;
+    this.formSubmitted = false;
+    this.cdr.detectChanges();
+  }
+  
+  // Close edit form modal
+  closeEditForm(): void {
+    this.showEditForm = false;
+    this.currentGarantieId = null;
+    this.currentDossierId = null;
+    this.editGarantieForm.reset();
+    this.formSubmitted = false;
+    this.cdr.detectChanges();
   }
 
-  cancelEdit(): void {
-    this.editingGarantie = null;
-    this.cdr.markForCheck();
-  }
+  // Submit edit form - Using the same pattern as credits component
+  submitEditGarantie(): void {
+    this.formSubmitted = true;
+    
+    if (this.editGarantieForm.invalid || !this.currentGarantieId) {
+      return;
+    }
 
-  updateGarantie(): void {
-    if (!this.editingGarantie) return;
-
-    const titre = this.editingGarantie.titre?.trim();
+    const formValue = this.editGarantieForm.value;
+    const titre = formValue.titre?.trim();
     if (!titre) {
       this.errorMessage = 'Le titre de la garantie est requis.';
       return;
     }
 
-    // Check if ID exists
-    if (!this.editingGarantie.id) {
-      this.errorMessage = 'ID de garantie invalide.';
-      return;
-    }
-
     this.isLoading = true;
-    this.garantieService.updateGarantieTitre(this.editingGarantie.id, titre).subscribe({
-      next: (updatedGarantie) => {
-        console.log('Garantie updated:', updatedGarantie); // Debug log
-        
-        // Create completely new array structure to ensure change detection
-        this.dossiers = this.dossiers.map(dossier => {
-          if (dossier.id === updatedGarantie.dossierId && dossier.garanties) {
-            const newGaranties = dossier.garanties.map(garantie => 
-              garantie.id === updatedGarantie.id 
-                ? { ...garantie, ...updatedGarantie } // Merge to preserve all properties
-                : { ...garantie } // Create new reference even for unchanged items
-            );
-            
-            return {
-              ...dossier,
-              garanties: newGaranties
-            };
+    this.errorMessage = null;
+    this.successMessage = null;
+    
+    const formData = new FormData();
+    formData.append('titre', titre);
+    
+    const typeGarantie = formValue.typeGarantie;
+    const valeurGarantie = formValue.valeurGarantie;
+    
+    if (typeGarantie) {
+      formData.append('typeGarantie', typeGarantie);
+    }
+    
+    if (valeurGarantie !== null && valeurGarantie !== '') {
+      formData.append('valeurGarantie', valeurGarantie);
+    }
+    
+    this.garantieService.updateGarantie(this.currentGarantieId, formData)
+      .pipe(finalize(() => {
+        this.isLoading = false;
+      }))
+      .subscribe({
+        next: (updatedGarantie) => {
+          this.successMessage = 'Garantie mise à jour avec succès.';
+          
+          // Update the garantie in the dossier using the same pattern as credits
+          for (let i = 0; i < this.dossiers.length; i++) {
+            const dossier = this.dossiers[i];
+            if (dossier.garanties) {
+              const garantieIndex = dossier.garanties.findIndex(g => g.id === updatedGarantie.id);
+              if (garantieIndex !== -1) {
+                // Create a new dossier object with updated garanties array
+                const updatedDossier = { ...dossier };
+                updatedDossier.garanties = [
+                  ...dossier.garanties.slice(0, garantieIndex),
+                  updatedGarantie,
+                  ...dossier.garanties.slice(garantieIndex + 1)
+                ];
+                
+                // Update the dossiers array
+                this.dossiers = [
+                  ...this.dossiers.slice(0, i),
+                  updatedDossier,
+                  ...this.dossiers.slice(i + 1)
+                ];
+                break;
+              }
+            }
           }
-          return { ...dossier }; // Create new reference for all dossiers
-        });
-        
-        this.successMessage = 'Titre de la garantie mis à jour avec succès.';
-        this.editingGarantie = null;
-        this.errorMessage = null;
-        this.isLoading = false;
-        
-        // Force change detection
-        this.cdr.detectChanges();
-        
-        // Clear success message after 3 seconds
-        
-        window.location.reload();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Erreur lors de la mise à jour du titre', err);
-        this.errorMessage = 'Erreur lors de la mise à jour du titre de la garantie.';
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-    });
+          
+          // Close the form
+          this.closeEditForm();
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            this.successMessage = null;
+            this.cdr.detectChanges();
+          }, 1000);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Erreur lors de la mise à jour', err);
+          this.errorMessage = 'Erreur lors de la mise à jour de la garantie';
+        },
+      });
   }
 
-  // New methods for the add form
+  // Open add form modal
   openAddForm(dossierId: number): void {
     this.currentDossierId = dossierId;
     this.showAddForm = true;
@@ -161,9 +221,10 @@ export class GarantiesComponent implements OnInit {
     this.formSubmitted = false;
     this.errorMessage = null;
     this.successMessage = null;
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
+  // Close add form modal
   closeAddForm(): void {
     this.showAddForm = false;
     this.currentDossierId = null;
@@ -171,9 +232,10 @@ export class GarantiesComponent implements OnInit {
     this.selectedFileName = null;
     this.formSubmitted = false;
     this.newGarantieForm.reset();
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
+  // Handle file selection
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -185,10 +247,11 @@ export class GarantiesComponent implements OnInit {
         const nameWithoutExtension = file.name.split('.').slice(0, -1).join('.');
         this.newGarantieForm.patchValue({ titre: nameWithoutExtension });
       }
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     }
   }
 
+  // Submit new garantie form - Using the same pattern as credits component
   submitNewGarantie(): void {
     this.formSubmitted = true;
     
@@ -199,7 +262,8 @@ export class GarantiesComponent implements OnInit {
       return;
     }
 
-    const titre = this.newGarantieForm.get('titre')?.value?.trim();
+    const formValue = this.newGarantieForm.value;
+    const titre = formValue.titre?.trim();
     if (!titre) {
       this.errorMessage = 'Veuillez saisir un titre pour la garantie.';
       return;
@@ -208,38 +272,58 @@ export class GarantiesComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
     this.successMessage = null;
-
-    this.garantieService
-      .uploadGarantie(this.currentDossierId, this.selectedFile, titre)
+    
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+    formData.append('titre', titre);
+    
+    const typeGarantie = formValue.typeGarantie;
+    const valeurGarantie = formValue.valeurGarantie;
+    
+    if (typeGarantie) {
+      formData.append('typeGarantie', typeGarantie);
+    }
+    
+    if (valeurGarantie !== null && valeurGarantie !== '') {
+      formData.append('valeurGarantie', valeurGarantie);
+    }
+    
+    this.garantieService.uploadGarantie(this.currentDossierId, formData)
+      .pipe(finalize(() => {
+        this.isLoading = false;
+      }))
       .subscribe({
         next: (updatedDossier) => {
-          // Create completely new array structure
-          this.dossiers = this.dossiers.map(d => 
-            d.id === updatedDossier.id ? { ...updatedDossier } : { ...d }
-          );
-          
           this.successMessage = 'Garantie ajoutée avec succès.';
-          this.closeAddForm();
-          this.isLoading = false;
           
-          // Force change detection
-          this.cdr.detectChanges();
+          // Update the dossier in our list using the same pattern as credits
+          const dossierIndex = this.dossiers.findIndex(d => d.id === updatedDossier.id);
+          if (dossierIndex !== -1) {
+            // Create a new array to trigger change detection
+            this.dossiers = [
+              ...this.dossiers.slice(0, dossierIndex),
+              updatedDossier,
+              ...this.dossiers.slice(dossierIndex + 1)
+            ];
+          }
+          
+          // Close the form
+          this.closeAddForm();
           
           // Clear success message after 3 seconds
           setTimeout(() => {
             this.successMessage = null;
-            this.cdr.markForCheck();
+            this.cdr.detectChanges();
           }, 3000);
         },
         error: (err: HttpErrorResponse) => {
           console.error("Erreur lors de l'upload", err);
           this.errorMessage = "Erreur lors de l'ajout de la garantie.";
-          this.isLoading = false;
-          this.cdr.markForCheck();
         },
       });
   }
 
+  // View or download garantie file
   viewGarantieFile(garantie: Garantie, download: boolean = false): void {
     if (!garantie.filePath) {
       alert('Aucun fichier trouvé pour cette garantie.');
@@ -265,20 +349,22 @@ export class GarantiesComponent implements OnInit {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
           } else {
             window.open(blobUrl, '_blank');
           }
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         },
         error: (error) => {
           this.isLoading = false;
           console.error('Erreur:', error);
           this.errorMessage = 'Impossible de charger le fichier.';
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         }
       });
   }
 
+  // Delete garantie - Using the same pattern as credits component
   deleteGarantie(garantie: Garantie): void {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette garantie ?')) return;
 
@@ -293,43 +379,60 @@ export class GarantiesComponent implements OnInit {
 
     this.garantieService.deleteGarantie(garantie.id).subscribe({
       next: () => {
-        // Create completely new array structure
-        this.dossiers = this.dossiers.map(dossier => {
-          if (dossier.id === garantie.dossierId && dossier.garanties) {
-            return {
-              ...dossier,
-              garanties: dossier.garanties.filter(g => g.id !== garantie.id).map(g => ({ ...g }))
-            };
-          }
-          return { ...dossier };
-        });
-        
         this.successMessage = 'Garantie supprimée avec succès.';
-        this.isLoading = false;
         
-        // Force change detection
-        this.cdr.detectChanges();
+        // Remove the garantie from the dossier using the same pattern as credits
+        for (let i = 0; i < this.dossiers.length; i++) {
+          const dossier = this.dossiers[i];
+          if (dossier.garanties) {
+            const garantieIndex = dossier.garanties.findIndex(g => g.id === garantie.id);
+            if (garantieIndex !== -1) {
+              // Create a new dossier object with updated garanties array
+              const updatedDossier = { ...dossier };
+              updatedDossier.garanties = dossier.garanties.filter(g => g.id !== garantie.id);
+              
+              // Update the dossiers array
+              this.dossiers = [
+                ...this.dossiers.slice(0, i),
+                updatedDossier,
+                ...this.dossiers.slice(i + 1)
+              ];
+              break;
+            }
+          }
+        }
+        
+        this.isLoading = false;
         
         // Clear success message after 3 seconds
         setTimeout(() => {
           this.successMessage = null;
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         }, 3000);
       },
       error: (err: HttpErrorResponse) => {
         console.error('Erreur lors de la suppression de la garantie', err);
         this.errorMessage = 'Erreur lors de la suppression de la garantie.';
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
     });
   }
+
+  // Keyboard event handlers
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.closeAddForm();
+    }
+  }
   
-  addNewGarantie(dossierId: number): void {
-    this.openAddForm(dossierId);
+  handleKeyDownEdit(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.closeEditForm();
+    }
   }
 
-  // Add this method to help Angular track changes
+  // Track by functions for ngFor performance
   trackByGarantieId(index: number, garantie: Garantie): any {
     return garantie.id;
   }
@@ -338,12 +441,12 @@ export class GarantiesComponent implements OnInit {
     return dossier.id;
   }
 
-  // Keep the old methods for backward compatibility
-  onFileUpload(event: any, dossierId: number): void {
+  // Legacy methods for backward compatibility
+  addNewGarantie(dossierId: number): void {
     this.openAddForm(dossierId);
   }
 
-  uploadGarantie(dossierId: number): void {
-    // This method is now handled by submitNewGarantie
+  onFileUpload(event: any, dossierId: number): void {
+    this.openAddForm(dossierId);
   }
 }

@@ -24,7 +24,7 @@
       <i class="material-icons">account_balance</i>
       Comptes
     </a>
-    <a routerLink="/dossiers" routerLinkActive="active" class="menu-item">
+    <a routerLink="/dossiers" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadDossierRecouvrementPermission()">
       <i class="material-icons">folder</i>
       Dossiers Recouvrement
     </a>
@@ -32,6 +32,7 @@
       <i class="material-icons">verified</i>
       garanties
     </a>
+    
 
     <a routerLink="/cheque-files" routerLinkActive="active" class="menu-item" *ngIf="roleService.hasReadChequePermission()">
       <i class="material-icons">description</i>

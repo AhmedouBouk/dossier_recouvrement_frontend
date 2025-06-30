@@ -76,7 +76,12 @@
           *ngFor="let notification of notifications" 
           class="notification-item" 
           [ngClass]="{'unread': !notification.lu}"
-          (click)="navigateToDossier(notification)">
+          (click)="navigateToDossier(notification)"
+          (keydown.enter)="navigateToDossier(notification)"
+          (keydown.space)="$event.preventDefault(); navigateToDossier(notification)"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'Voir notification: ' + notification.titre">
           
           <div class="notification-icon" [ngClass]="notification.type.toLowerCase()">
             <i *ngIf="notification.type === 'GARANTIE'" class="material-icons">security</i>
@@ -93,9 +98,8 @@
             </div>
             <p>{{ notification.contenu }}</p>
             <div class="notification-actions">
-              <button class="btn-view"    [routerLink]="['/dossiers/view', notification.dossier.id]" class="link-id">
-
-                <i class="material-icons">visibility</i> Voir le dossier
+              <button class="btn-view" (click)="$event.stopPropagation(); navigateToDossier(notification)" class="link-id">
+                <i class="material-icons">visibility</i> Voir
               </button>
               <button *ngIf="!notification.lu" class="btn-mark-read" (click)="$event.stopPropagation(); markAsRead(notification)">
                 <i class="material-icons">done</i> Marquer comme lu
